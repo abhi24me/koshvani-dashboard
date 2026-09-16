@@ -1,0 +1,57 @@
+{
+  "id": "agri-011-2402001020109",
+  "name": "नेशनल प्रोजेक्ट ऑन स्वायल हेल्थ फर्टिलिटी (के.60/रा.40-के.+ रा.) (Grant 011)",
+  "grant_text": "011",
+  "scheme_code": "2402001020109",
+  "district": "G.B.NAGAR",
+  "fin_year": "2026-2027",
+  "generated_at": "2026-09-16T16:11:59+00:00",
+  "status": "ok",
+  "message": null,
+  "prev_month": "August",
+  "current_month": "September",
+  "column_headers": [
+    "Treasury",
+    "Standard Object",
+    "Plan / Non-Plan",
+    "Voted / Charged",
+    "Progressive Allotment",
+    "Actual Progressive Expenditure upto month (August)",
+    "Provisional Current Month Expenditure(September)",
+    "Total Expenditure Upto Month (September)",
+    "% A/E"
+  ],
+  "column_widths": [
+    10.0,
+    15.0,
+    5.0,
+    5.0,
+    10.0,
+    15.0,
+    15.0,
+    20.0,
+    5.0
+  ],
+  "rows": [
+    {
+      "cells": [
+        "G.B.NAGAR",
+        "42-अन्य व्यय",
+        "N",
+        "V",
+        "53700.00",
+        "53400.00",
+        "0.00",
+        "53400.00",
+        "99.44"
+      ]
+    }
+  ],
+  "totals": {
+    "progressive_allotment": 53700.0,
+    "expenditure_upto_prev_month": 53400.0,
+    "current_month_expenditure": 0.0,
+    "total_expenditure_upto_month": 53400.0,
+    "pct_expenditure_of_allotment": 99.44
+  }
+}

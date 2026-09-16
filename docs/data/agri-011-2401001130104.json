@@ -1,0 +1,70 @@
+{
+  "id": "agri-011-2401001130104",
+  "name": "प्रमोशन ऑफ एग्रीमल्चर मैकेनाइजेशन फार इनसीटू मैनेजमेंट ऑफ क्राप रेजडयू (CRM) (के.60/रा.40-के.+ रा.) (Grant 011)",
+  "grant_text": "011",
+  "scheme_code": "2401001130104",
+  "district": "G.B.NAGAR",
+  "fin_year": "2026-2027",
+  "generated_at": "2026-09-16T16:10:42+00:00",
+  "status": "ok",
+  "message": null,
+  "prev_month": "August",
+  "current_month": "September",
+  "column_headers": [
+    "Treasury",
+    "Standard Object",
+    "Plan / Non-Plan",
+    "Voted / Charged",
+    "Progressive Allotment",
+    "Actual Progressive Expenditure upto month (August)",
+    "Provisional Current Month Expenditure(September)",
+    "Total Expenditure Upto Month (September)",
+    "% A/E"
+  ],
+  "column_widths": [
+    10.0,
+    15.0,
+    5.0,
+    5.0,
+    10.0,
+    15.0,
+    15.0,
+    20.0,
+    5.0
+  ],
+  "rows": [
+    {
+      "cells": [
+        "G.B.NAGAR",
+        "27-सब्सिडी",
+        "N",
+        "V",
+        "5800000.00",
+        "0.00",
+        "0.00",
+        "0.00",
+        ".00"
+      ]
+    },
+    {
+      "cells": [
+        "",
+        "42-अन्य व्यय",
+        "N",
+        "V",
+        "1565900.00",
+        "200000.00",
+        "0.00",
+        "200000.00",
+        "12.77"
+      ]
+    }
+  ],
+  "totals": {
+    "progressive_allotment": 7365900.0,
+    "expenditure_upto_prev_month": 200000.0,
+    "current_month_expenditure": 0.0,
+    "total_expenditure_upto_month": 200000.0,
+    "pct_expenditure_of_allotment": 2.72
+  }
+}

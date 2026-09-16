@@ -1,0 +1,37 @@
+{
+  "id": "agri-011-2401001030400",
+  "name": "प्रमाणित बीजों पर अनुदान (Grant 011)",
+  "grant_text": "011",
+  "scheme_code": "2401001030400",
+  "district": "G.B.NAGAR",
+  "fin_year": "2026-2027",
+  "generated_at": "2026-09-16T16:07:11+00:00",
+  "status": "no_district_data",
+  "message": "No G.B.NAGAR rows found for this scheme in the current period.",
+  "prev_month": "August",
+  "current_month": "September",
+  "column_headers": [
+    "Treasury",
+    "Standard Object",
+    "Plan / Non-Plan",
+    "Voted / Charged",
+    "Progressive Allotment",
+    "Actual Progressive Expenditure upto month (August)",
+    "Provisional Current Month Expenditure(September)",
+    "Total Expenditure Upto Month (September)",
+    "% A/E"
+  ],
+  "column_widths": [
+    10.0,
+    15.0,
+    5.0,
+    5.0,
+    10.0,
+    15.0,
+    15.0,
+    20.0,
+    5.0
+  ],
+  "rows": [],
+  "totals": {}
+}

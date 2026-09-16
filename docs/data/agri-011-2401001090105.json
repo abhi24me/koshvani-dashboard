@@ -1,0 +1,83 @@
+{
+  "id": "agri-011-2401001090105",
+  "name": "नेशनल मिशन ऑन एग्रीकल्चर एक्सटेंशन एण्ड टेक्नोलाजी (एन.एम.ए.ई.टी.) के अर्न्तगत नेशनल ई-गर्वनेन्स प्रोग्राम (के.60/रा.40-के.+ रा.) (Grant 011)",
+  "grant_text": "011",
+  "scheme_code": "2401001090105",
+  "district": "G.B.NAGAR",
+  "fin_year": "2026-2027",
+  "generated_at": "2026-09-16T16:09:22+00:00",
+  "status": "ok",
+  "message": null,
+  "prev_month": "August",
+  "current_month": "September",
+  "column_headers": [
+    "Treasury",
+    "Standard Object",
+    "Plan / Non-Plan",
+    "Voted / Charged",
+    "Progressive Allotment",
+    "Actual Progressive Expenditure upto month (August)",
+    "Provisional Current Month Expenditure(September)",
+    "Total Expenditure Upto Month (September)",
+    "% A/E"
+  ],
+  "column_widths": [
+    10.0,
+    15.0,
+    5.0,
+    5.0,
+    10.0,
+    15.0,
+    15.0,
+    20.0,
+    5.0
+  ],
+  "rows": [
+    {
+      "cells": [
+        "G.B.NAGAR",
+        "42-अन्य व्यय",
+        "N",
+        "V",
+        "449600.00",
+        "385901.00",
+        "25655.00",
+        "411556.00",
+        "91.54"
+      ]
+    },
+    {
+      "cells": [
+        "",
+        "44-प्रशिक्षण हेतु यात्रा एवं अन्य प्रासंगिक व्यय",
+        "N",
+        "V",
+        "270000.00",
+        "0.00",
+        "0.00",
+        "0.00",
+        ".00"
+      ]
+    },
+    {
+      "cells": [
+        "",
+        "47-कम्प्यूटर अनुरक्षण/तत्सम्बन्धी स्टेशनरी का क्रय",
+        "N",
+        "V",
+        "154800.00",
+        "57600.00",
+        "0.00",
+        "57600.00",
+        "37.21"
+      ]
+    }
+  ],
+  "totals": {
+    "progressive_allotment": 874400.0,
+    "expenditure_upto_prev_month": 443501.0,
+    "current_month_expenditure": 25655.0,
+    "total_expenditure_upto_month": 469156.0,
+    "pct_expenditure_of_allotment": 53.65
+  }
+}
