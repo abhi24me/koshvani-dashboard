@@ -5,7 +5,7 @@
   "scheme_code": "2401000010500",
   "district": "G.B.NAGAR",
   "fin_year": null,
-  "generated_at": "2026-09-16T13:22:03+00:00",
+  "generated_at": "2026-09-16T13:29:18+00:00",
   "status": "error",
   "message": "Page.goto: Timeout 90000ms exceeded.\nCall log:\n  - navigating to \"https://koshvani.up.nic.in/KoshvaniStatic.aspx\", waiting until \"domcontentloaded\"\n",
   "column_headers": [],
