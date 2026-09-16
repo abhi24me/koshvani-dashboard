@@ -21,6 +21,12 @@ jobs:
     # technique can get past it - only a genuine residential/office
     # connection works, like this self-hosted runner has. See README.
     runs-on: self-hosted
+    # This runner only has legacy Windows PowerShell 5.1 installed, not
+    # PowerShell Core (pwsh) - which is GitHub Actions' default shell on
+    # Windows and fails outright ("pwsh: command not found") if unset.
+    defaults:
+      run:
+        shell: powershell
     steps:
       # Plain git clone/pull instead of actions/checkout@v4 - the latter's
       # own Windows temp-file cleanup step hits a persistent EBUSY
@@ -28,7 +34,6 @@ jobs:
       # exclusion and killing stale processes; this sidesteps that code
       # path entirely rather than continuing to chase the root cause.
       - name: Checkout (manual)
-        shell: pwsh
         run: |
           $remote = "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
           if (-not (Test-Path "repo\.git")) {
