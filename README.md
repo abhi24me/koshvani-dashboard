@@ -8,10 +8,10 @@ device.
 
 It's built to run at **zero ongoing cost**:
 
-- A scraper (Python + Playwright) drives a real headless browser through the
-  site's actual click path (the site requires session cookies, so a plain
-  HTTP fetch of the report pages returns nothing) and writes the results as
-  JSON.
+- A scraper (Python + `requests` + BeautifulSoup) replays the site's actual
+  click path (it requires a session cookie, but is otherwise plain
+  server-rendered HTML - no browser or JavaScript execution needed) and
+  writes the results as JSON.
 - A static dashboard (plain HTML/CSS/JS, no backend) reads that JSON and is
   hosted for free on [GitHub Pages](https://pages.github.com/) — reachable
   from any device, anytime, independent of the scraper.
@@ -21,10 +21,12 @@ It's built to run at **zero ongoing cost**:
 koshvani.up.nic.in's firewall drops the connection outright (TCP timeout,
 before any HTTP request) from every cloud/datacenter network tested: GitHub's
 own hosted runners, Google Cloud, 12 other independent countries (including
-an India-based one), and multiple residential-proxy services with real Chrome
-browser fingerprints. Only genuine residential/office connections get
-through - so **the reliable way to refresh data today is running the
-scraper on a normal home/office connection and pushing the result**:
+an India-based one), and multiple residential-proxy services - confirmed at
+the raw network layer (plain `requests`, no browser, still blocked instantly
+from a cloud runner) so no client-side trick fixes it. Only genuine
+residential/office connections get through - so **the reliable way to
+refresh data today is running the scraper on a normal home/office connection
+and pushing the result**:
 
 ```
 python scraper/scrape.py
@@ -83,7 +85,6 @@ helper scripts locally (they just print lists, they don't write anything):
 
 ```
 pip install -r scraper/requirements.txt
-python -m playwright install chromium
 
 python scraper/list_grants.py            # lists every grant code + name
 python scraper/list_schemes.py 011        # lists every scheme code + name under grant 011
@@ -118,9 +119,14 @@ can open `docs/index.html` via a local static server (e.g.
 - The theme button in the header cycles system → light → dark and remembers
   your choice per browser.
 - The site's report-page URLs contain encrypted, per-render query tokens —
-  the scraper never hardcodes these; it always replays the real click path
-  (main page -> Grant-wise expenditure -> grant -> scheme) in a fresh browser
-  session, which is why each scheme takes a few seconds to scrape.
+  the scraper never hardcodes these; it always follows the real click path
+  (main page -> Grant-wise expenditure -> grant -> scheme) in a fresh
+  session each time.
+- No headless browser is used - the scraper is a lightweight `requests` +
+  BeautifulSoup script, since the site is fully server-rendered HTML (no
+  JavaScript needed for content). This was verified by porting the whole
+  flow from an earlier Playwright-based version and confirming identical
+  output across every scheme.
 - If a scheme shows "No expenditure" or "No district rows", that reflects
   the portal itself having no recorded spend for that scheme/district in the
   current period — not a bug.

@@ -41,10 +41,6 @@ jobs:
         working-directory: repo
         run: pip install -r scraper/requirements.txt
 
-      - name: Install Chromium
-        working-directory: repo
-        run: python -m playwright install chromium
-
       - name: Run scraper
         working-directory: repo
         run: python scraper/scrape.py

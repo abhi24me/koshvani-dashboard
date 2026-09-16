@@ -1,13 +1,20 @@
 """
-Helper: given a grant code, prints every scheme code + name under it, so you can
-find the `scheme_code` value to use in schemes.json.
+Helper: given a grant code, prints every scheme code + name under it, so you
+can find the `scheme_code` value to use in schemes.json.
 
 Usage: python scraper/list_schemes.py 011
 """
 import sys
-from playwright.sync_api import sync_playwright
+from urllib.parse import urljoin
+
+import requests
+from bs4 import BeautifulSoup
 
 MAIN_URL = "https://koshvani.up.nic.in/KoshvaniStatic.aspx"
+HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+                  "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+}
 
 
 def main():
@@ -16,36 +23,39 @@ def main():
         sys.exit(1)
     grant_code = sys.argv[1]
 
-    with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
-        page = browser.new_page()
-        page.goto(MAIN_URL, wait_until="networkidle")
-        for link in page.query_selector_all("body a"):
-            if link.inner_text().strip() == "Grant-wise expenditure":
-                link.click()
-                break
-        page.wait_for_load_state("networkidle")
+    session = requests.Session()
+    session.headers.update(HEADERS)
 
-        found = False
-        for link in page.query_selector_all("table a"):
-            if link.inner_text().strip() == grant_code:
-                link.click()
-                found = True
-                break
-        if not found:
-            print(f"Grant code '{grant_code}' not found on ExpGrant.aspx", file=sys.stderr)
-            sys.exit(1)
-        page.wait_for_load_state("networkidle")
+    r = session.get(MAIN_URL, timeout=45)
+    soup = BeautifulSoup(r.text, "html.parser")
+    href = next(
+        (a.get("href") for a in soup.select("body a") if a.get_text(strip=True) == "Grant-wise expenditure"),
+        None,
+    )
+    if not href:
+        print("Could not find 'Grant-wise expenditure' link", file=sys.stderr)
+        sys.exit(1)
 
-        if "ExpHead" not in page.url:
-            print(f"Unexpected page after selecting grant: {page.url}", file=sys.stderr)
-            sys.exit(1)
+    r = session.get(urljoin(r.url, href), timeout=45)
+    soup = BeautifulSoup(r.text, "html.parser")
+    href2 = next(
+        (a.get("href") for a in soup.select("table a") if a.get_text(strip=True) == grant_code),
+        None,
+    )
+    if not href2:
+        print(f"Grant code '{grant_code}' not found on ExpGrant.aspx", file=sys.stderr)
+        sys.exit(1)
 
-        for link in page.query_selector_all("table a"):
-            text = link.inner_text().strip()
-            if "=" in text:
-                print(text)
-        browser.close()
+    r = session.get(urljoin(r.url, href2), timeout=45)
+    if "ExpHead" not in r.url:
+        print(f"Unexpected page after selecting grant: {r.url}", file=sys.stderr)
+        sys.exit(1)
+    soup = BeautifulSoup(r.text, "html.parser")
+
+    for link in soup.select("table a"):
+        text = link.get_text(strip=True)
+        if "=" in text:
+            print(text)
 
 
 if __name__ == "__main__":

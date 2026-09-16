@@ -3,34 +3,52 @@ Scrapes district-level (default: G.B.NAGAR) expenditure data from the
 Koshvani (UP government finance) portal for a configured list of schemes,
 and writes the results as JSON for the static dashboard in docs/.
 
-The site is ASP.NET WebForms and requires a real browser session (cookies +
-postbacks) - a plain HTTP GET returns a blank page. So for every scheme we
-replay the actual click path in a headless browser:
+The site is ASP.NET WebForms and requires a session cookie (a plain GET
+without one bounces back to the main page) - but it's fully server-rendered
+HTML, no client-side JS needed for content. So instead of a real browser,
+this replays the click path with plain HTTP requests (requests.Session()
+handles the cookie jar automatically, same as a browser would) and parses
+the HTML with BeautifulSoup:
 
     KoshvaniStatic.aspx
-      -> click "Grant-wise expenditure"      -> ExpGrant.aspx
-      -> click the grant code (e.g. "011")   -> ExpHead.aspx (scheme-code list)
-      -> click the scheme code               -> ExpTreas.aspx (treasury/district
-                                                 breakdown) or NoRecordFound.htm
+      -> "Grant-wise expenditure" link  -> ExpGrant.aspx
+      -> the grant code (e.g. "011")    -> ExpHead.aspx (scheme-code list)
+      -> the scheme code                -> ExpTreas.aspx (treasury/district
+                                            breakdown) or NoRecordFound.htm
 
 The encrypted query-string tokens on these links are generated per-render by
-the server, so they are never hardcoded here - we always click through fresh.
+the server, so they are never hardcoded here - we always follow them fresh
+from whatever the previous page actually rendered.
+
+Note: koshvani.up.nic.in's firewall blocks connections from cloud/datacenter
+IP ranges outright (confirmed extensively - see README), so this only works
+from a genuine residential/office network connection, not from GitHub's
+hosted runners or any other cloud provider.
 """
 import json
+import os
 import re
 import sys
 import time
 from datetime import datetime, timezone
 from pathlib import Path
+from urllib.parse import urljoin
 
-from playwright.sync_api import sync_playwright, TimeoutError as PWTimeoutError
+import requests
+from bs4 import BeautifulSoup
 
 ROOT = Path(__file__).resolve().parent.parent
 CONFIG_PATH = Path(__file__).resolve().parent / "schemes.json"
 DATA_DIR = ROOT / "docs" / "data"
 
-MAIN_URL = "https://koshvani.up.nic.in/KoshvaniStatic.aspx"
-NAV_TIMEOUT_MS = 90_000
+BASE_URL = "https://koshvani.up.nic.in"
+MAIN_URL = f"{BASE_URL}/KoshvaniStatic.aspx"
+REQUEST_TIMEOUT = 45
+
+HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+                  "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+}
 
 # Index of the numeric columns within a row's raw `cells` array, used only to
 # compute the derived totals block - the cells themselves are stored verbatim,
@@ -42,7 +60,6 @@ NUMERIC_CELL_INDEXES = {
     "current_month_expenditure": 6,
     "total_expenditure_upto_month": 7,
 }
-PCT_CELL_INDEX = 8
 MIN_CELLS = 9
 
 
@@ -54,24 +71,26 @@ def to_number(text):
         return 0.0
 
 
-def extract_table_headers(page):
+def extract_table_headers(soup):
     """Pulls the report's own column header text verbatim from the DOM."""
-    return page.eval_on_selector_all(
-        "#Table1 tr:first-child th", "els => els.map(e => e.innerText.trim())"
-    )
+    row = soup.select_one("#Table1 tr:first-child")
+    if not row:
+        return []
+    return [th.get_text(strip=True) for th in row.find_all("th")]
 
 
-def extract_column_widths(page):
+def extract_column_widths(soup):
     """Pulls the report's own column width percentages (it sets width:X% per
     <th> itself), so the dashboard table keeps the site's proportions."""
-    styles = page.eval_on_selector_all(
-        "#Table1 tr:first-child th", "els => els.map(e => e.style.width || '')"
-    )
+    row = soup.select_one("#Table1 tr:first-child")
+    if not row:
+        return None
     widths = []
-    for s in styles:
-        m = re.match(r"(\d+(?:\.\d+)?)%", s.strip())
+    for th in row.find_all("th"):
+        style = th.get("style", "") or ""
+        m = re.match(r"width:\s*(\d+(?:\.\d+)?)%", style.strip())
         widths.append(float(m.group(1)) if m else None)
-    if any(w is None for w in widths) or not widths:
+    if not widths or any(w is None for w in widths):
         return None
     return widths
 
@@ -88,17 +107,14 @@ def extract_month_labels(header_cells):
     return labels
 
 
-def extract_district_rows(page, district):
+def extract_district_rows(soup, district):
     """Returns the district's rows exactly as the site renders the block:
     the district name appears only on the first row, blank on the rest -
     same as on koshvani.up.nic.in itself."""
-    rows = page.eval_on_selector_all(
-        "#myTable tr",
-        "els => els.map(r => Array.from(r.querySelectorAll('td')).map(td => td.innerText.trim()))",
-    )
     result = []
     current_district = None
-    for cells in rows:
+    for tr in soup.select("#myTable tr"):
+        cells = [td.get_text(strip=True) for td in tr.find_all("td")]
         if len(cells) < MIN_CELLS:
             continue
         first_cell = cells[0].strip()
@@ -122,44 +138,36 @@ def compute_totals(rows):
     return totals
 
 
-def get_selected_fin_year(page):
-    try:
-        return page.eval_on_selector(
-            "#ddlFinYear", "el => el.options[el.selectedIndex] ? el.options[el.selectedIndex].text : null"
-        )
-    except Exception:
+def get_selected_fin_year(soup):
+    select = soup.select_one("#ddlFinYear")
+    if not select:
         return None
+    option = select.select_one("option[selected]") or select.select_one("option")
+    return option.get_text(strip=True) if option else None
 
 
-def click_exact_text_link(page, selector_scope, text):
-    links = page.query_selector_all(f"{selector_scope} a")
-    for link in links:
-        if link.inner_text().strip() == text:
-            link.click()
-            return True
-    return False
+def find_link(soup, css_selector, predicate):
+    """css_selector is a full CSS selector for the <a> tags to search, e.g.
+    "table a" - a descendant selector matching links inside ANY table on the
+    page, not just the first one."""
+    for a in soup.select(css_selector):
+        if predicate(a.get_text(strip=True)):
+            return a.get("href")
+    return None
 
 
-def click_prefix_text_link(page, selector_scope, prefix):
-    links = page.query_selector_all(f"{selector_scope} a")
-    for link in links:
-        if link.inner_text().strip().startswith(prefix):
-            link.click()
-            return True
-    return False
-
-
-def scrape_scheme(browser, scheme, attempts=3):
-    """Retries with a fresh browser context each time - the portal
-    occasionally bounces a session back to the main page (session hiccup /
+def scrape_scheme(scheme, attempts=3):
+    """Retries with a fresh session (fresh cookie jar) each time - the portal
+    occasionally bounces a request back to the main page (session hiccup /
     light throttling), and a brand new session usually clears it."""
     last_result = None
     for attempt in range(1, attempts + 1):
-        context = browser.new_context()
+        session = requests.Session()
+        session.headers.update(HEADERS)
         try:
-            last_result = _scrape_scheme_once(context, scheme)
+            last_result = _scrape_scheme_once(session, scheme)
         finally:
-            context.close()
+            session.close()
         if last_result["status"] != "error":
             return last_result
         print(f"    attempt {attempt}/{attempts} failed: {last_result['message']}", file=sys.stderr)
@@ -168,41 +176,41 @@ def scrape_scheme(browser, scheme, attempts=3):
     return last_result
 
 
-def _scrape_scheme_once(context, scheme):
-    page = context.new_page()
-    page.set_default_navigation_timeout(NAV_TIMEOUT_MS)
-    page.set_default_timeout(NAV_TIMEOUT_MS)
-
+def _scrape_scheme_once(session, scheme):
     try:
-        # These are server-rendered ASP.NET WebForms pages - the full table is
-        # already in the initial HTML response, nothing loads in async after
-        # that. "networkidle" waits for zero in-flight requests, which can
-        # hang well past its timeout on any lingering tracker/analytics
-        # request; "domcontentloaded" plus a wait for a known element is both
-        # faster and more reliable.
-        page.goto(MAIN_URL, wait_until="domcontentloaded")
-        page.wait_for_selector("a:text-is('Grant-wise expenditure')")
-        fin_year = get_selected_fin_year(page)
+        r = session.get(MAIN_URL, timeout=REQUEST_TIMEOUT)
+        r.raise_for_status()
+        soup = BeautifulSoup(r.text, "html.parser")
+        fin_year = get_selected_fin_year(soup)
 
-        if not click_exact_text_link(page, "body", "Grant-wise expenditure"):
+        href = find_link(soup, "body a", lambda t: t == "Grant-wise expenditure")
+        if not href:
             raise RuntimeError("Could not find 'Grant-wise expenditure' link on main page")
-        page.wait_for_load_state("domcontentloaded")
-        page.wait_for_selector("#ddlAmountIn")
 
-        if not click_exact_text_link(page, "table", scheme["grant_text"]):
+        r = session.get(urljoin(r.url, href), timeout=REQUEST_TIMEOUT)
+        r.raise_for_status()
+        if "ddlAmountIn" not in r.text:
+            raise RuntimeError(f"Unexpected page after following 'Grant-wise expenditure': {r.url}")
+        soup = BeautifulSoup(r.text, "html.parser")
+
+        href = find_link(soup, "table a", lambda t: t == scheme["grant_text"])
+        if not href:
             raise RuntimeError(f"Could not find grant link '{scheme['grant_text']}' on ExpGrant.aspx")
-        page.wait_for_url("**/ExpHead.aspx*")
-        page.wait_for_load_state("domcontentloaded")
 
-        if "ExpHead" not in page.url:
-            raise RuntimeError(f"Expected ExpHead.aspx after selecting grant, got {page.url}")
+        r = session.get(urljoin(r.url, href), timeout=REQUEST_TIMEOUT)
+        r.raise_for_status()
+        if "ExpHead" not in r.url:
+            raise RuntimeError(f"Expected ExpHead.aspx after selecting grant, got {r.url}")
+        soup = BeautifulSoup(r.text, "html.parser")
 
-        if not click_prefix_text_link(page, "table", scheme["scheme_code"]):
+        href = find_link(soup, "table a", lambda t: t.startswith(scheme["scheme_code"]))
+        if not href:
             raise RuntimeError(f"Could not find scheme code '{scheme['scheme_code']}' on ExpHead.aspx")
-        page.wait_for_url(re.compile(r"(ExpTreas\.aspx|NoRecordFound\.htm)"))
-        page.wait_for_load_state("domcontentloaded")
 
-        if "NoRecordFound" in page.url:
+        r = session.get(urljoin(r.url, href), timeout=REQUEST_TIMEOUT)
+        r.raise_for_status()
+
+        if "NoRecordFound" in r.url:
             return {
                 **base_meta(scheme, fin_year),
                 "status": "empty",
@@ -213,13 +221,14 @@ def _scrape_scheme_once(context, scheme):
                 "totals": {},
             }
 
-        if "ExpTreas" not in page.url:
-            raise RuntimeError(f"Expected ExpTreas.aspx after selecting scheme, got {page.url}")
+        if "ExpTreas" not in r.url:
+            raise RuntimeError(f"Expected ExpTreas.aspx after selecting scheme, got {r.url}")
 
-        headers = extract_table_headers(page)
-        column_widths = extract_column_widths(page)
+        soup = BeautifulSoup(r.text, "html.parser")
+        headers = extract_table_headers(soup)
+        column_widths = extract_column_widths(soup)
         month_labels = extract_month_labels(headers)
-        rows = extract_district_rows(page, scheme["district"])
+        rows = extract_district_rows(soup, scheme["district"])
         totals = compute_totals(rows) if rows else {}
 
         return {
@@ -234,7 +243,7 @@ def _scrape_scheme_once(context, scheme):
             "totals": totals,
         }
 
-    except (PWTimeoutError, RuntimeError) as exc:
+    except (requests.exceptions.RequestException, RuntimeError) as exc:
         return {
             **base_meta(scheme, None),
             "status": "error",
@@ -244,8 +253,6 @@ def _scrape_scheme_once(context, scheme):
             "rows": [],
             "totals": {},
         }
-    finally:
-        page.close()
 
 
 def base_meta(scheme, fin_year):
@@ -265,31 +272,28 @@ def main():
     DATA_DIR.mkdir(parents=True, exist_ok=True)
 
     index = []
-    with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
-        for scheme in schemes:
-            print(f"Scraping {scheme['id']} ({scheme['name']})...", file=sys.stderr)
-            result = scrape_scheme(browser, scheme)
+    for scheme in schemes:
+        print(f"Scraping {scheme['id']} ({scheme['name']})...", file=sys.stderr)
+        result = scrape_scheme(scheme)
 
-            out_path = DATA_DIR / f"{scheme['id']}.json"
-            out_path.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
+        out_path = DATA_DIR / f"{scheme['id']}.json"
+        out_path.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
 
-            totals = result.get("totals", {})
-            index.append({
-                "id": result["id"],
-                "name": result["name"],
-                "grant_text": result["grant_text"],
-                "scheme_code": result["scheme_code"],
-                "district": result["district"],
-                "status": result["status"],
-                "generated_at": result["generated_at"],
-                "fin_year": result.get("fin_year"),
-                "progressive_allotment": totals.get("progressive_allotment"),
-                "total_expenditure": totals.get("total_expenditure_upto_month"),
-                "pct_expenditure_of_allotment": totals.get("pct_expenditure_of_allotment"),
-            })
-            print(f"  -> status={result['status']}", file=sys.stderr)
-        browser.close()
+        totals = result.get("totals", {})
+        index.append({
+            "id": result["id"],
+            "name": result["name"],
+            "grant_text": result["grant_text"],
+            "scheme_code": result["scheme_code"],
+            "district": result["district"],
+            "status": result["status"],
+            "generated_at": result["generated_at"],
+            "fin_year": result.get("fin_year"),
+            "progressive_allotment": totals.get("progressive_allotment"),
+            "total_expenditure": totals.get("total_expenditure_upto_month"),
+            "pct_expenditure_of_allotment": totals.get("pct_expenditure_of_allotment"),
+        })
+        print(f"  -> status={result['status']}", file=sys.stderr)
 
     (DATA_DIR / "index.json").write_text(
         json.dumps({"schemes": index, "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds")},
