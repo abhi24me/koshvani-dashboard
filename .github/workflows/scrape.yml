@@ -26,6 +26,14 @@ jobs:
       - name: Install Chromium
         run: python -m playwright install --with-deps chromium
 
+      - name: Diagnose connectivity to koshvani.up.nic.in
+        run: |
+          echo "--- DNS ---"
+          nslookup koshvani.up.nic.in || true
+          echo "--- curl (verbose, 25s timeout) ---"
+          curl -v --max-time 25 -o /dev/null https://koshvani.up.nic.in/KoshvaniStatic.aspx || echo "curl exit code: $?"
+        continue-on-error: true
+
       - name: Run scraper
         run: python scraper/scrape.py
 
