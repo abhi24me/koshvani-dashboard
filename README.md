@@ -12,28 +12,40 @@ It's built to run at **zero ongoing cost**:
   site's actual click path (the site requires session cookies, so a plain
   HTTP fetch of the report pages returns nothing) and writes the results as
   JSON.
-- A [GitHub Actions](https://github.com/features/actions) workflow runs that
-  scraper on a schedule, and can also be triggered manually any time you want
-  fresher data.
 - A static dashboard (plain HTML/CSS/JS, no backend) reads that JSON and is
-  hosted for free on [GitHub Pages](https://pages.github.com/).
+  hosted for free on [GitHub Pages](https://pages.github.com/) — reachable
+  from any device, anytime, independent of the scraper.
 
-### Why the workflow runs on a self-hosted runner
+### Keeping the dashboard updated
 
 koshvani.up.nic.in's firewall drops the connection outright (TCP timeout,
 before any HTTP request) from every cloud/datacenter network tested: GitHub's
 own hosted runners, Google Cloud, 12 other independent countries (including
 an India-based one), and multiple residential-proxy services with real Chrome
-browser fingerprints. It only accepts genuine residential/office connections
-- so the workflow runs on a **self-hosted runner** (a small background
-service on your own PC) instead of GitHub's cloud runners. The dashboard
-itself (GitHub Pages) is unaffected and reachable from any device, anytime -
-only the scrape step needs this PC on and online when a run is due.
+browser fingerprints. Only genuine residential/office connections get
+through - so **the reliable way to refresh data today is running the
+scraper on a normal home/office connection and pushing the result**:
+
+```
+python scraper/scrape.py
+git add docs/data
+git commit -m "Update data"
+git push
+```
+
+That's it - the live Pages site updates within a minute or two of the push.
+
+A GitHub Actions workflow (`.github/workflows/scrape.yml`) that does this
+automatically on a self-hosted runner is included and partly set up, but
+currently has unresolved Windows-specific issues on this machine (runner
+service account permissions, antivirus file locks) and isn't relied on yet -
+treat it as a future improvement, not the current path. The manual command
+above is what actually keeps this dashboard current.
 
 ## One-time setup
 
-1. **Create a GitHub repository** (public, so Actions minutes and Pages are
-   free) and push this project to it:
+1. **Create a GitHub repository** (public, so Pages is free) and push this
+   project to it:
    ```
    git init
    git add .
@@ -42,68 +54,14 @@ only the scrape step needs this PC on and online when a run is due.
    git remote add origin https://github.com/<your-username>/<repo-name>.git
    git push -u origin main
    ```
-2. **Set up the self-hosted runner** on the PC that will run scrapes: repo ->
-   Settings -> Actions -> Runners -> "New self-hosted runner" -> pick your OS
-   -> follow the download/config/run commands shown (they include a
-   short-lived registration token). Run `run.cmd`/`./run.sh` once to confirm
-   it connects (shows "Listening for Jobs"), then install it as a background
-   service so it starts automatically:
-   - Windows: `./svc.sh install` isn't available - instead run
-     `.\config.cmd --runasservice` during setup, or use `nssm`/Task Scheduler
-     to launch `run.cmd` at login.
-   - Linux/macOS: `sudo ./svc.sh install && sudo ./svc.sh start`.
-3. **Enable GitHub Pages**: repo Settings -> Pages -> Source: "Deploy from a
+2. **Enable GitHub Pages**: repo Settings -> Pages -> Source: "Deploy from a
    branch" -> Branch: `main`, folder `/docs` -> Save. Your dashboard will be
    live at `https://<your-username>.github.io/<repo-name>/`.
-4. **Run the workflow once manually** to generate the first data files:
-   repo -> Actions tab -> "Update Koshvani Data" -> Run workflow. Wait for it
-   to finish (a couple of minutes), then refresh your Pages URL.
+3. Run `python scraper/scrape.py` locally once (see "Running the scraper
+   locally" below) and push - the Pages site now has real data.
 
-That's it — from then on it refreshes itself automatically twice a day
-(~10:00 and ~18:00 IST) whenever the runner PC is on, and you can always
-trigger an extra refresh from the Actions tab (works from the GitHub mobile
-app too) if you want it sooner - the manual trigger still runs on the same
-self-hosted runner, so that PC needs to be reachable for it too.
-
-## Enabling the in-page "Refresh" button (optional)
-
-The dashboard has a "Refresh" button with a loading spinner that re-scrapes
-live and updates the page automatically once done. It needs a place to hold
-a GitHub token that can start the Actions workflow — a browser page can't
-hold that secret itself, so this uses a small [Cloudflare
-Workers](https://workers.cloudflare.com/) proxy (free tier: 100,000
-requests/day, no credit card required). This just triggers the same
-workflow_dispatch as the Actions tab button, so it still needs the runner PC
-on to actually complete.
-
-1. Create a free Cloudflare account, then install Wrangler:
-   ```
-   npm install -g wrangler
-   wrangler login
-   ```
-2. In `cloudflare-worker/wrangler.toml`, fill in `GH_OWNER`, `GH_REPO`, and
-   `ALLOWED_ORIGIN` (your `https://<user>.github.io` Pages origin).
-3. Create a GitHub **fine-grained personal access token**
-   (github.com -> Settings -> Developer settings -> Fine-grained tokens):
-   scope it to this one repository only, with **Actions: Read and write**
-   permission, nothing else.
-4. Deploy the worker and set the token as a secret:
-   ```
-   cd cloudflare-worker
-   wrangler deploy
-   wrangler secret put GH_TOKEN
-   ```
-5. Wrangler prints your worker's URL, e.g.
-   `https://koshvani-refresh.<you>.workers.dev`. Open `docs/index.html` and
-   set:
-   ```js
-   const REFRESH_TRIGGER_URL = "https://koshvani-refresh.<you>.workers.dev/trigger";
-   ```
-   Commit and push.
-
-Without this step, the dashboard still works fully — it just refreshes on
-the twice-daily schedule, and clicking "Refresh" will point you to GitHub
-Actions instead of triggering a live run itself.
+From then on, refresh whenever you want by running the same command and
+pushing again.
 
 ## Adding more schemes
 
@@ -133,8 +91,8 @@ python scraper/list_schemes.py 011        # lists every scheme code + name under
 
 Pick the grant code (e.g. `011`) and the numeric prefix of the scheme you
 want (e.g. `2401000010500` from `2401000010500=जिला संगठन`), add a new object
-to `schemes.json` with a unique `id`, commit, and push. The next scheduled
-run (or a manual "Run workflow") will pick it up. You can also just paste the
+to `schemes.json` with a unique `id`, then run `python scraper/scrape.py` and
+push - see "Keeping the dashboard updated" above. You can also just paste the
 scheme name/link to Claude in a future session and ask it to add it for you.
 
 ## Running the scraper locally

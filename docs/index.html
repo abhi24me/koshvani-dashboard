@@ -458,8 +458,8 @@
 <footer class="note">
   <div class="inner">
     Every number on this dashboard is copied verbatim from the UP Koshvani portal (same labels, same figures, same
-    formatting) &mdash; the only thing this page does is filter each report down to G.B.NAGAR. Data refreshes
-    automatically twice a day, and "Refresh" above triggers a live re-scrape on demand.
+    formatting) &mdash; the only thing this page does is filter each report down to G.B.NAGAR. Data is updated by
+    running the scraper and pushing (see the project README) &mdash; the date on each card shows how fresh it is.
   </div>
 </footer>
 
@@ -699,7 +699,7 @@ async function pollForUpdate(beforeTs) {
 async function triggerRefresh() {
   if (refreshing) return;
   if (!REFRESH_TRIGGER_URL) {
-    showBanner('Live refresh isn’t configured yet (see README) — data still updates automatically twice a day, or run "Update Koshvani Data" from GitHub Actions.', 'warn');
+    showBanner('Live refresh isn’t set up here — to update, run the scraper locally and push (see the project README).', 'warn');
     return;
   }
   setRefreshing(true);
@@ -717,7 +717,7 @@ async function triggerRefresh() {
     await pollForUpdate(beforeTs);
   } catch (e) {
     setRefreshing(false);
-    showBanner('Could not start a live refresh. You can run "Update Koshvani Data" from GitHub Actions instead.', 'warn');
+    showBanner('Could not start a live refresh. Run the scraper locally and push instead (see the project README).', 'warn');
   }
 }
 refreshBtn.addEventListener('click', triggerRefresh);

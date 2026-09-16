@@ -1,10 +1,13 @@
 name: Update Koshvani Data
 
+# Manual trigger only for now - see README "Keeping the dashboard updated"
+# for why. A self-hosted runner (needed because koshvani.up.nic.in blocks
+# every cloud/datacenter IP tested) is registered on one machine but still
+# has unresolved Windows-specific issues (service account permissions,
+# antivirus file locks); the schedule is left off so it doesn't fail
+# silently twice a day in the meantime. The reliable path today is running
+# scraper/scrape.py locally and pushing - see the README.
 on:
-  schedule:
-    # ~10:00 IST and ~18:00 IST (UTC = IST - 5:30)
-    - cron: "30 4 * * *"
-    - cron: "30 12 * * *"
   workflow_dispatch: {}
 
 permissions:
@@ -12,27 +15,11 @@ permissions:
 
 jobs:
   scrape:
-    # GitHub-hosted runners (ubuntu-latest) run on Azure datacenter IPs, which
-    # koshvani.up.nic.in's firewall drops outright - confirmed via extensive
-    # testing (raw TCP connect times out before any TLS handshake, from
-    # GitHub Actions, Google Cloud, 12 other independent networks worldwide
-    # including an India-based one, and multiple residential-proxy services).
-    # It's a network-level block, so no client library or fingerprint
-    # technique can get past it - only a genuine residential/office
-    # connection works, like this self-hosted runner has. See README.
     runs-on: self-hosted
-    # This runner only has legacy Windows PowerShell 5.1 installed, not
-    # PowerShell Core (pwsh) - which is GitHub Actions' default shell on
-    # Windows and fails outright ("pwsh: command not found") if unset.
     defaults:
       run:
         shell: powershell
     steps:
-      # Plain git clone/pull instead of actions/checkout@v4 - the latter's
-      # own Windows temp-file cleanup step hits a persistent EBUSY
-      # (file locked) error on this machine that survived a Defender
-      # exclusion and killing stale processes; this sidesteps that code
-      # path entirely rather than continuing to chase the root cause.
       - name: Checkout (manual)
         run: |
           $remote = "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
