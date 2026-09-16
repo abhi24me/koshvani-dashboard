@@ -135,6 +135,22 @@
     height: 34px;
     cursor: pointer;
   }
+  button.nav-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12.5px;
+    font-weight: 650;
+    color: var(--text-primary);
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 0 14px;
+    height: 34px;
+    cursor: pointer;
+  }
+  button.nav-btn:hover { border-color: var(--series-1); color: var(--series-1); }
+
   button.refresh-btn:hover { filter: brightness(1.08); }
   button.refresh-btn:disabled { cursor: default; opacity: 0.75; }
   .spinner {
@@ -238,9 +254,38 @@
     font-weight: 650;
     font-variant-numeric: tabular-nums;
   }
+  .scheme-card .card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
   .scheme-card .updated {
     font-size: 11px;
     color: var(--text-muted);
+  }
+
+  .download-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    font-weight: 650;
+    color: var(--series-1);
+    background: color-mix(in srgb, var(--series-1) 10%, transparent);
+    border: 1px solid transparent;
+    border-radius: 7px;
+    padding: 5px 10px;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .download-btn:hover { background: color-mix(in srgb, var(--series-1) 18%, transparent); }
+  .detail-header-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
   }
 
   .status-badge {
@@ -258,6 +303,84 @@
   .status-badge.no_district_data { color: #1a1a19; background: var(--warning); }
   .status-badge.empty { color: var(--text-secondary); background: transparent; border: 1px solid var(--border); }
   .status-badge.error { color: #ffffff; background: var(--critical); }
+
+  /* ---- insights view ---- */
+  .insights-intro {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin: 0 0 18px;
+    max-width: 640px;
+    line-height: 1.5;
+  }
+  .status-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 14px 0 26px;
+  }
+  .status-summary .chip {
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 4px 12px;
+  }
+  .bar-list {
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 4px 18px;
+  }
+  .bar-row {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--gridline);
+  }
+  .bar-row:last-child { border-bottom: none; }
+  .bar-row .bar-name {
+    font-size: 12.5px;
+    font-weight: 600;
+    line-height: 1.35;
+  }
+  .bar-row .bar-viz {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .bar-track {
+    flex: 1 1 140px;
+    height: 10px;
+    border-radius: 999px;
+    background: var(--gridline);
+    overflow: hidden;
+  }
+  .bar-fill {
+    height: 100%;
+    border-radius: 999px;
+    background: var(--series-1);
+    min-width: 3px;
+  }
+  .bar-meta {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+  }
+  .bar-meta .bar-amount { color: var(--text-secondary); font-weight: 600; }
+  .bar-meta .bar-pct { font-weight: 700; min-width: 40px; text-align: right; }
+  .legend-note {
+    font-size: 11.5px;
+    color: var(--text-muted);
+    line-height: 1.6;
+    margin: 14px 2px 0;
+  }
 
   /* ---- detail view ---- */
   .back-link {
@@ -443,6 +566,7 @@
       <span class="district-tag" id="districtTag">G.B.NAGAR</span>
     </div>
     <div class="controls">
+      <button class="nav-btn" id="insightsBtn" type="button">Insights</button>
       <button class="refresh-btn" id="refreshBtn" type="button">
         <span id="refreshIcon">&#8635;</span>
         <span id="refreshLabel">Refresh</span>
@@ -476,6 +600,8 @@ const refreshIcon = document.getElementById('refreshIcon');
 const refreshLabel = document.getElementById('refreshLabel');
 const refreshBanner = document.getElementById('refreshBanner');
 const themeBtn = document.getElementById('themeBtn');
+const insightsBtn = document.getElementById('insightsBtn');
+insightsBtn.addEventListener('click', () => { location.hash = '#/insights'; });
 
 /* ---------- theme toggle ---------- */
 function applyTheme(mode) {
@@ -531,6 +657,57 @@ function escapeHtml(s) {
   return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
+/* ---------- CSV download ---------- */
+function csvField(v) {
+  const s = String(v ?? '');
+  return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+}
+function buildSchemeCSV(data) {
+  const lines = [
+    ['Scheme', data.name],
+    ['Grant', data.grant_text],
+    ['Scheme Code', data.scheme_code],
+    ['District', data.district],
+    ['Financial Year', data.fin_year || ''],
+    ['Updated', data.generated_at || ''],
+    [],
+    data.column_headers || [],
+  ];
+  (data.rows || []).forEach(r => lines.push(r.cells));
+  return lines.map(row => row.map(csvField).join(',')).join('\r\n');
+}
+function safeFilename(s) {
+  return String(s ?? 'scheme').replace(/[^a-z0-9_-]+/gi, '_').slice(0, 60);
+}
+function downloadText(filename, content, mime) {
+  const blob = new Blob([content], { type: mime });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+async function downloadScheme(id, preloadedData) {
+  let data = preloadedData;
+  if (!data) {
+    try {
+      data = await fetchJSON('data/' + id + '.json');
+    } catch (e) {
+      alert('Could not load this scheme\'s data to download.');
+      return;
+    }
+  }
+  if (!data.rows || data.rows.length === 0) {
+    alert('No row data available to download for this scheme yet.');
+    return;
+  }
+  // Leading BOM so Excel reads the Hindi text as UTF-8 instead of mojibake.
+  downloadText(`koshvani-${safeFilename(data.scheme_code)}-gb-nagar.csv`, '﻿' + buildSchemeCSV(data), 'text/csv;charset=utf-8;');
+}
+
 async function fetchJSON(path) {
   const res = await fetch(path + '?_=' + Date.now(), { cache: 'no-store' });
   if (!res.ok) throw new Error('Failed to load ' + path);
@@ -553,7 +730,7 @@ async function renderList() {
     return;
   }
   const cards = schemes.map(s => `
-    <button class="scheme-card" data-id="${escapeHtml(s.id)}">
+    <div class="scheme-card" data-id="${escapeHtml(s.id)}" tabindex="0" role="button" aria-label="Open ${escapeHtml(s.name)}">
       <div class="card-top">
         <div class="name">${escapeHtml(s.name)}</div>
         <span class="status-badge ${s.status}">${statusLabel(s.status)}</span>
@@ -568,12 +745,25 @@ async function renderList() {
         <div><div class="mini-label">Expenditure</div><div class="mini-val">${fmtCurrency(s.total_expenditure)}</div></div>
         <div><div class="mini-label">% Spent</div><div class="mini-val ${pctClass(s.pct_expenditure_of_allotment)}">${s.pct_expenditure_of_allotment ?? '—'}${s.pct_expenditure_of_allotment != null ? '%' : ''}</div></div>
       </div>
-      <div class="updated">Updated ${fmtDate(s.generated_at)}${s.fin_year ? ' &middot; FY ' + escapeHtml(s.fin_year) : ''}</div>
-    </button>
+      <div class="card-footer">
+        <div class="updated">Updated ${fmtDate(s.generated_at)}${s.fin_year ? ' &middot; FY ' + escapeHtml(s.fin_year) : ''}</div>
+        ${s.status === 'ok' ? `<button class="download-btn" data-id="${escapeHtml(s.id)}" type="button" title="Download this scheme's G.B.NAGAR data as CSV">&#8681; Download</button>` : ''}
+      </div>
+    </div>
   `).join('');
   app.innerHTML = `<div class="scheme-grid">${cards}</div>`;
-  app.querySelectorAll('.scheme-card').forEach(btn => {
-    btn.addEventListener('click', () => { location.hash = '#/scheme/' + btn.dataset.id; });
+  app.querySelectorAll('.scheme-card').forEach(card => {
+    const go = () => { location.hash = '#/scheme/' + card.dataset.id; };
+    card.addEventListener('click', go);
+    card.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); }
+    });
+  });
+  app.querySelectorAll('.download-btn').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      downloadScheme(btn.dataset.id);
+    });
   });
 }
 
@@ -591,7 +781,10 @@ async function renderDetail(id) {
   const header = `
     <button class="back-link" onclick="location.hash='#/'">&larr; Back to schemes</button>
     <div class="detail-header">
-      <h2>${escapeHtml(data.name)}</h2>
+      <div class="detail-header-top">
+        <h2>${escapeHtml(data.name)}</h2>
+        ${data.status === 'ok' ? `<button class="download-btn" id="detailDownloadBtn" type="button">&#8681; Download</button>` : ''}
+      </div>
       <div class="sub">Grant ${escapeHtml(data.grant_text)} &middot; Scheme ${escapeHtml(data.scheme_code)} &middot; ${escapeHtml(data.district)}
         ${data.fin_year ? ' &middot; FY ' + escapeHtml(data.fin_year) : ''} &middot; Updated ${fmtDate(data.generated_at)}</div>
     </div>
@@ -647,6 +840,85 @@ async function renderDetail(id) {
 
   app.innerHTML = header + stats + table;
   districtTag.textContent = data.district;
+  document.getElementById('detailDownloadBtn')?.addEventListener('click', () => downloadScheme(data.id, data));
+}
+
+/* ---------- insights view ---------- */
+async function renderInsights() {
+  app.innerHTML = '<div class="loading">Loading insights...</div>';
+  let idx;
+  try {
+    idx = await fetchJSON('data/index.json');
+  } catch (e) {
+    app.innerHTML = '<button class="back-link" onclick="location.hash=\'#/\'">&larr; Back</button><div class="error-state">Could not load dashboard data.</div>';
+    return;
+  }
+  districtTag.textContent = 'G.B.NAGAR';
+
+  const schemes = idx.schemes || [];
+  const withData = schemes.filter(s => s.status === 'ok' && s.total_expenditure != null);
+
+  const totalAllotment = withData.reduce((sum, s) => sum + (s.progressive_allotment || 0), 0);
+  const totalExpenditure = withData.reduce((sum, s) => sum + (s.total_expenditure || 0), 0);
+  const overallPct = totalAllotment ? Math.round((totalExpenditure / totalAllotment) * 10000) / 100 : 0;
+
+  const statusCounts = {};
+  schemes.forEach(s => { statusCounts[s.status] = (statusCounts[s.status] || 0) + 1; });
+  const statusChips = Object.entries(statusCounts)
+    .map(([status, count]) => `<span class="chip">${count} &times; ${escapeHtml(statusLabel(status))}</span>`)
+    .join('');
+
+  const header = `
+    <button class="back-link" onclick="location.hash='#/'">&larr; Back to schemes</button>
+    <div class="detail-header">
+      <h2>Spending at a Glance</h2>
+      <p class="insights-intro">A combined view across all ${schemes.length} tracked scheme${schemes.length === 1 ? '' : 's'} for G.B.NAGAR &mdash; how much has been allotted, how much has actually been spent, and which schemes account for the most.</p>
+    </div>
+  `;
+
+  const stats = `
+    <div class="stat-row">
+      <div class="stat-tile"><div class="label">Total Allotment</div><div class="num">${fmtCurrency(totalAllotment)}</div></div>
+      <div class="stat-tile"><div class="label">Total Expenditure</div><div class="num">${fmtCurrency(totalExpenditure)}</div></div>
+      <div class="stat-tile"><div class="label">Overall % Spent</div><div class="num ${pctClass(overallPct)}">${overallPct}%</div></div>
+    </div>
+    <div class="status-summary">${statusChips}</div>
+  `;
+
+  if (withData.length === 0) {
+    app.innerHTML = header + stats + '<div class="empty-state">No scheme has G.B.NAGAR expenditure data yet.</div>';
+    return;
+  }
+
+  const sorted = [...withData].sort((a, b) => (b.total_expenditure || 0) - (a.total_expenditure || 0));
+  const maxExpenditure = sorted[0].total_expenditure || 1;
+
+  const bars = sorted.map(s => {
+    const widthPct = Math.max(1, Math.round((s.total_expenditure / maxExpenditure) * 1000) / 10);
+    const cls = pctClass(s.pct_expenditure_of_allotment);
+    return `
+      <div class="bar-row">
+        <div class="bar-name">${escapeHtml(s.name)}</div>
+        <div class="bar-viz">
+          <div class="bar-track"><div class="bar-fill" style="width:${widthPct}%"></div></div>
+          <div class="bar-meta">
+            <span class="bar-amount">${fmtCurrency(s.total_expenditure)}</span>
+            <span class="bar-pct ${cls}">${s.pct_expenditure_of_allotment ?? '—'}%</span>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  const chart = `
+    <p class="section-label">Expenditure by scheme, highest first</p>
+    <div class="bar-list">${bars}</div>
+    <p class="legend-note">Bar length shows expenditure relative to the highest-spending scheme. The percentage is how much of that scheme's own allotment has been used &mdash;
+      <span class="pct-good" style="font-weight:700">green</span> is 60%+ used,
+      <span class="pct-warn" style="font-weight:700">red</span> is under 25% used.</p>
+  `;
+
+  app.innerHTML = header + stats + chart;
 }
 
 /* ---------- routing ---------- */
@@ -655,6 +927,8 @@ function route() {
   const m = hash.match(/^#\/scheme\/(.+)$/);
   if (m) {
     renderDetail(decodeURIComponent(m[1]));
+  } else if (hash === '#/insights') {
+    renderInsights();
   } else {
     districtTag.textContent = 'G.B.NAGAR';
     renderList();
