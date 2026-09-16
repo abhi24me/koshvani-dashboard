@@ -281,31 +281,7 @@
     flex-shrink: 0;
   }
   .download-btn:hover { background: color-mix(in srgb, var(--series-1) 18%, transparent); }
-  .download-menu {
-    position: fixed;
-    z-index: 50;
-    background: var(--surface-1);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.18);
-    overflow: hidden;
-    min-width: 150px;
-  }
-  .download-menu button {
-    display: block;
-    width: 100%;
-    text-align: left;
-    padding: 10px 14px;
-    font-size: 12.5px;
-    font-weight: 600;
-    color: var(--text-primary);
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-family: inherit;
-  }
-  .download-menu button:hover { background: var(--page-plane); color: var(--series-1); }
-  .download-menu button + button { border-top: 1px solid var(--gridline); }
+  .download-btn:disabled { opacity: 0.7; cursor: default; }
   .detail-header-top {
     display: flex;
     align-items: flex-start;
@@ -682,9 +658,9 @@ function escapeHtml(s) {
   return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
-/* ---------- download (CSV / Excel) ---------- */
-// One metadata paragraph shared by both formats, instead of a label/value
-// row per field - a single readable block rather than a mini 2-column table.
+/* ---------- download (Excel) ---------- */
+// One metadata paragraph rather than a label/value row per field - a single
+// readable block instead of a mini 2-column table.
 function buildMetaBlock(data) {
   return [
     `Scheme: ${data.name}`,
@@ -707,22 +683,7 @@ function downloadBlob(filename, content, mime) {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-function csvField(v) {
-  const s = String(v ?? '');
-  return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
-}
-function buildSchemeCSV(data) {
-  const lines = [
-    [buildMetaBlock(data)],
-    [],
-    data.column_headers || [],
-  ];
-  (data.rows || []).forEach(r => lines.push(r.cells));
-  return lines.map(row => row.map(csvField).join(',')).join('\r\n');
-}
-
-// ExcelJS is only needed for the .xlsx option, so it's fetched on first use
-// rather than loaded on every page visit.
+// ExcelJS is fetched on first use rather than loaded on every page visit.
 let exceljsPromise = null;
 function loadExcelJS() {
   if (window.ExcelJS) return Promise.resolve();
@@ -793,7 +754,7 @@ async function buildSchemeXLSX(data) {
   return wb.xlsx.writeBuffer();
 }
 
-async function downloadScheme(id, preloadedData, format) {
+async function downloadScheme(id, preloadedData, triggerBtn) {
   let data = preloadedData;
   if (!data) {
     try {
@@ -807,54 +768,19 @@ async function downloadScheme(id, preloadedData, format) {
     alert('No row data available to download for this scheme yet.');
     return;
   }
-  const base = `koshvani-${safeFilename(data.scheme_code)}-gb-nagar`;
-  if (format === 'xlsx') {
-    try {
-      const buffer = await buildSchemeXLSX(data);
-      downloadBlob(`${base}.xlsx`, new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }));
-    } catch (e) {
-      alert('Could not build the Excel file (are you offline?). Try CSV instead.');
-    }
-  } else {
-    // Leading BOM so Excel reads the Hindi text as UTF-8 instead of mojibake.
-    downloadBlob(`${base}.csv`, '﻿' + buildSchemeCSV(data), 'text/csv;charset=utf-8;');
+  const original = triggerBtn ? triggerBtn.innerHTML : null;
+  if (triggerBtn) { triggerBtn.disabled = true; triggerBtn.innerHTML = 'Preparing…'; }
+  try {
+    const buffer = await buildSchemeXLSX(data);
+    downloadBlob(
+      `koshvani-${safeFilename(data.scheme_code)}-gb-nagar.xlsx`,
+      new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
+    );
+  } catch (e) {
+    alert('Could not build the Excel file (are you offline?).');
+  } finally {
+    if (triggerBtn) { triggerBtn.disabled = false; triggerBtn.innerHTML = original; }
   }
-}
-
-/* ---------- download format menu ---------- */
-let openDownloadMenu = null;
-function closeDownloadMenu() {
-  if (!openDownloadMenu) return;
-  openDownloadMenu.remove();
-  openDownloadMenu = null;
-  document.removeEventListener('click', onDocClickCloseDownloadMenu, true);
-}
-function onDocClickCloseDownloadMenu(e) {
-  if (openDownloadMenu && !openDownloadMenu.contains(e.target)) closeDownloadMenu();
-}
-function showDownloadMenu(anchorBtn, id, preloadedData) {
-  closeDownloadMenu();
-  const menu = document.createElement('div');
-  menu.className = 'download-menu';
-  menu.innerHTML = `
-    <button type="button" data-fmt="xlsx">Excel (.xlsx)</button>
-    <button type="button" data-fmt="csv">CSV</button>
-  `;
-  document.body.appendChild(menu);
-  const rect = anchorBtn.getBoundingClientRect();
-  const menuWidth = menu.offsetWidth;
-  menu.style.top = Math.round(rect.bottom + 6) + 'px';
-  menu.style.left = Math.round(Math.min(rect.right - menuWidth, window.innerWidth - menuWidth - 8)) + 'px';
-  openDownloadMenu = menu;
-  menu.querySelectorAll('button').forEach(b => {
-    b.addEventListener('click', e => {
-      e.stopPropagation();
-      const fmt = b.dataset.fmt;
-      closeDownloadMenu();
-      downloadScheme(id, preloadedData, fmt);
-    });
-  });
-  setTimeout(() => document.addEventListener('click', onDocClickCloseDownloadMenu, true), 0);
 }
 
 async function fetchJSON(path) {
@@ -896,7 +822,7 @@ async function renderList() {
       </div>
       <div class="card-footer">
         <div class="updated">Updated ${fmtDate(s.generated_at)}${s.fin_year ? ' &middot; FY ' + escapeHtml(s.fin_year) : ''}</div>
-        ${s.status === 'ok' ? `<button class="download-btn" data-id="${escapeHtml(s.id)}" type="button" title="Download this scheme's G.B.NAGAR data">&#8681; Download &#9662;</button>` : ''}
+        ${s.status === 'ok' ? `<button class="download-btn" data-id="${escapeHtml(s.id)}" type="button" title="Download this scheme's G.B.NAGAR data as Excel">&#8681; Download</button>` : ''}
       </div>
     </div>
   `).join('');
@@ -911,7 +837,7 @@ async function renderList() {
   app.querySelectorAll('.download-btn').forEach(btn => {
     btn.addEventListener('click', e => {
       e.stopPropagation();
-      showDownloadMenu(btn, btn.dataset.id, null);
+      downloadScheme(btn.dataset.id, null, btn);
     });
   });
 }
@@ -932,7 +858,7 @@ async function renderDetail(id) {
     <div class="detail-header">
       <div class="detail-header-top">
         <h2>${escapeHtml(data.name)}</h2>
-        ${data.status === 'ok' ? `<button class="download-btn" id="detailDownloadBtn" type="button">&#8681; Download &#9662;</button>` : ''}
+        ${data.status === 'ok' ? `<button class="download-btn" id="detailDownloadBtn" type="button">&#8681; Download</button>` : ''}
       </div>
       <div class="sub">Grant ${escapeHtml(data.grant_text)} &middot; Scheme ${escapeHtml(data.scheme_code)} &middot; ${escapeHtml(data.district)}
         ${data.fin_year ? ' &middot; FY ' + escapeHtml(data.fin_year) : ''} &middot; Updated ${fmtDate(data.generated_at)}</div>
@@ -989,7 +915,7 @@ async function renderDetail(id) {
 
   app.innerHTML = header + stats + table;
   districtTag.textContent = data.district;
-  document.getElementById('detailDownloadBtn')?.addEventListener('click', e => showDownloadMenu(e.currentTarget, data.id, data));
+  document.getElementById('detailDownloadBtn')?.addEventListener('click', e => downloadScheme(data.id, data, e.currentTarget));
 }
 
 /* ---------- insights view ---------- */
