@@ -13,10 +13,22 @@ It's built to run at **zero ongoing cost**:
   HTTP fetch of the report pages returns nothing) and writes the results as
   JSON.
 - A [GitHub Actions](https://github.com/features/actions) workflow runs that
-  scraper twice a day on a free schedule, and can also be triggered manually
-  any time you want fresher data.
+  scraper on a schedule, and can also be triggered manually any time you want
+  fresher data.
 - A static dashboard (plain HTML/CSS/JS, no backend) reads that JSON and is
   hosted for free on [GitHub Pages](https://pages.github.com/).
+
+### Why the workflow runs on a self-hosted runner
+
+koshvani.up.nic.in's firewall drops the connection outright (TCP timeout,
+before any HTTP request) from every cloud/datacenter network tested: GitHub's
+own hosted runners, Google Cloud, 12 other independent countries (including
+an India-based one), and multiple residential-proxy services with real Chrome
+browser fingerprints. It only accepts genuine residential/office connections
+- so the workflow runs on a **self-hosted runner** (a small background
+service on your own PC) instead of GitHub's cloud runners. The dashboard
+itself (GitHub Pages) is unaffected and reachable from any device, anytime -
+only the scrape step needs this PC on and online when a run is due.
 
 ## One-time setup
 
@@ -30,16 +42,28 @@ It's built to run at **zero ongoing cost**:
    git remote add origin https://github.com/<your-username>/<repo-name>.git
    git push -u origin main
    ```
-2. **Enable GitHub Pages**: repo Settings -> Pages -> Source: "Deploy from a
+2. **Set up the self-hosted runner** on the PC that will run scrapes: repo ->
+   Settings -> Actions -> Runners -> "New self-hosted runner" -> pick your OS
+   -> follow the download/config/run commands shown (they include a
+   short-lived registration token). Run `run.cmd`/`./run.sh` once to confirm
+   it connects (shows "Listening for Jobs"), then install it as a background
+   service so it starts automatically:
+   - Windows: `./svc.sh install` isn't available - instead run
+     `.\config.cmd --runasservice` during setup, or use `nssm`/Task Scheduler
+     to launch `run.cmd` at login.
+   - Linux/macOS: `sudo ./svc.sh install && sudo ./svc.sh start`.
+3. **Enable GitHub Pages**: repo Settings -> Pages -> Source: "Deploy from a
    branch" -> Branch: `main`, folder `/docs` -> Save. Your dashboard will be
    live at `https://<your-username>.github.io/<repo-name>/`.
-3. **Run the workflow once manually** to generate the first data files:
+4. **Run the workflow once manually** to generate the first data files:
    repo -> Actions tab -> "Update Koshvani Data" -> Run workflow. Wait for it
    to finish (a couple of minutes), then refresh your Pages URL.
 
 That's it — from then on it refreshes itself automatically twice a day
-(~10:00 and ~18:00 IST), and you can always trigger an extra refresh from
-the Actions tab (works from the GitHub mobile app too) if you want it sooner.
+(~10:00 and ~18:00 IST) whenever the runner PC is on, and you can always
+trigger an extra refresh from the Actions tab (works from the GitHub mobile
+app too) if you want it sooner - the manual trigger still runs on the same
+self-hosted runner, so that PC needs to be reachable for it too.
 
 ## Enabling the in-page "Refresh" button (optional)
 
@@ -48,7 +72,9 @@ live and updates the page automatically once done. It needs a place to hold
 a GitHub token that can start the Actions workflow — a browser page can't
 hold that secret itself, so this uses a small [Cloudflare
 Workers](https://workers.cloudflare.com/) proxy (free tier: 100,000
-requests/day, no credit card required).
+requests/day, no credit card required). This just triggers the same
+workflow_dispatch as the Actions tab button, so it still needs the runner PC
+on to actually complete.
 
 1. Create a free Cloudflare account, then install Wrangler:
    ```

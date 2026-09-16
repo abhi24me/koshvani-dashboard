@@ -1,6 +1,10 @@
 name: Update Koshvani Data
 
 on:
+  schedule:
+    # ~10:00 IST and ~18:00 IST (UTC = IST - 5:30)
+    - cron: "30 4 * * *"
+    - cron: "30 12 * * *"
   workflow_dispatch: {}
 
 permissions:
@@ -8,7 +12,15 @@ permissions:
 
 jobs:
   scrape:
-    runs-on: ubuntu-latest
+    # GitHub-hosted runners (ubuntu-latest) run on Azure datacenter IPs, which
+    # koshvani.up.nic.in's firewall drops outright - confirmed via extensive
+    # testing (raw TCP connect times out before any TLS handshake, from
+    # GitHub Actions, Google Cloud, 12 other independent networks worldwide
+    # including an India-based one, and multiple residential-proxy services).
+    # It's a network-level block, so no client library or fingerprint
+    # technique can get past it - only a genuine residential/office
+    # connection works, like this self-hosted runner has. See README.
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
 
@@ -16,24 +28,19 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Diagnostic - test curl-cffi (Chrome JA3 impersonation) direct, no proxy
-        run: |
-          pip install curl-cffi
-          python3 << 'PYEOF'
-          from curl_cffi import requests
-          import time
-          for impersonate in ["chrome", "chrome124", "safari", "safari17_0"]:
-              t0 = time.time()
-              try:
-                  s = requests.Session(impersonate=impersonate)
-                  r = s.get("https://koshvani.up.nic.in/KoshvaniStatic.aspx", timeout=30)
-                  print(f"{impersonate}: status={r.status_code} time={time.time()-t0:.1f}s size={len(r.content)}")
-              except Exception as e:
-                  print(f"{impersonate}: FAILED after {time.time()-t0:.1f}s: {type(e).__name__}: {e}")
-          PYEOF
-        continue-on-error: true
+      - name: Install dependencies
+        run: pip install -r scraper/requirements.txt
+
+      - name: Install Chromium
+        run: python -m playwright install chromium
 
       - name: Run scraper
-        env:
-          SCRAPERAPI_KEY: ${{ secrets.SCRAPERAPI_KEY }}
-        run: echo "placeholder - will restore after diagnostic"
+        run: python scraper/scrape.py
+
+      - name: Commit updated data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/data
+          git diff --cached --quiet || git commit -m "Update Koshvani data $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          git push
