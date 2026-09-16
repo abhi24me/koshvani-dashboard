@@ -4,49 +4,54 @@
 # Koshvani Daily Automation
 # ==========================================
 
-cd ~/koshvani-dashboard || exit 1
+REPO="$HOME/koshvani-dashboard"
+LOG_DIR="$REPO/logs"
+
+cd "$REPO" || exit 1
 
 # ==========================================
-# Logging
+# Daily Log
 # ==========================================
-
-LOG_DIR="$HOME/koshvani-dashboard/logs"
 
 mkdir -p "$LOG_DIR"
 
-# One log file per day
 LOG_FILE="$LOG_DIR/daily-$(date +%Y-%m-%d).log"
 
 # Delete logs older than 10 days
-find "$LOG_DIR" -name "daily-*.log" -type f -mtime +10 -delete
+find "$LOG_DIR" -type f -name "daily-*.log" -mtime +10 -delete
 
-# Send all output to today's log
-exec >> "$LOG_FILE" 2>&1
-
-
-# ==========================================
-# Start
-# ==========================================
+# Show output on screen AND save to log
+exec > >(tee -a "$LOG_FILE") 2>&1
 
 echo ""
 echo "========================================"
-echo "KOSHVA​​NI JOB STARTED"
+echo "KOSHVANI JOB STARTED"
 echo "Time: $(date)"
 echo "========================================"
 
 
 # ==========================================
-# Git Pull
+# Check Git Status
 # ==========================================
 
 echo ""
-echo "[1/4] Pulling latest code from GitHub..."
+echo "[1/5] Checking Git status..."
+
+git status --short
+
+# ==========================================
+# Pull Latest Code
+# ==========================================
+
+echo ""
+echo "[2/5] Pulling latest code from GitHub..."
 
 git pull --rebase origin main
 
 if [ $? -ne 0 ]; then
     echo ""
     echo "ERROR: Git pull failed."
+    echo "Please check Git status."
     echo "Time: $(date)"
     echo "========================================"
     exit 1
@@ -56,11 +61,11 @@ echo "Git pull successful."
 
 
 # ==========================================
-# Run Scraper
+# Run Koshvani Scraper
 # ==========================================
 
 echo ""
-echo "[2/4] Starting Koshvani scraper..."
+echo "[3/5] Starting Koshvani scraper..."
 echo "Time: $(date)"
 echo ""
 
@@ -83,16 +88,16 @@ echo "Koshvani scraper completed successfully."
 # ==========================================
 
 echo ""
-echo "[3/4] Checking for data changes..."
+echo "[4/5] Checking for data changes..."
 
 if git diff --quiet -- docs/data; then
 
     echo "No data changes detected."
-    echo "GitHub update not required."
+    echo "No GitHub update required."
 
     echo ""
     echo "========================================"
-    echo "KOSH​​VANI JOB COMPLETED"
+    echo "KOSHVANI JOB COMPLETED"
     echo "Status: SUCCESS - NO DATA CHANGES"
     echo "Time: $(date)"
     echo "========================================"
@@ -104,11 +109,11 @@ echo "Data changes detected."
 
 
 # ==========================================
-# Commit Changes
+# Commit & Push
 # ==========================================
 
 echo ""
-echo "[4/4] Committing and pushing updated data..."
+echo "[5/5] Committing updated Koshvani data..."
 
 git add docs/data
 
@@ -122,15 +127,10 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-echo "Git commit successful."
-
-
-# ==========================================
-# Push to GitHub
-# ==========================================
+echo "Commit successful."
 
 echo ""
-echo "Pushing changes to GitHub..."
+echo "Pushing to GitHub..."
 
 git push origin main
 
@@ -147,13 +147,12 @@ echo "GitHub push successful."
 
 
 # ==========================================
-# Completed
+# Finished
 # ==========================================
 
 echo ""
 echo "========================================"
-echo "KOSH​​VANI JOB COMPLETED"
+echo "KOSHVANI JOB COMPLETED"
 echo "Status: SUCCESS"
 echo "Time: $(date)"
 echo "========================================"
-
