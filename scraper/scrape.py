@@ -30,7 +30,7 @@ CONFIG_PATH = Path(__file__).resolve().parent / "schemes.json"
 DATA_DIR = ROOT / "docs" / "data"
 
 MAIN_URL = "https://koshvani.up.nic.in/KoshvaniStatic.aspx"
-NAV_TIMEOUT_MS = 45_000
+NAV_TIMEOUT_MS = 90_000
 
 # Index of the numeric columns within a row's raw `cells` array, used only to
 # compute the derived totals block - the cells themselves are stored verbatim,
