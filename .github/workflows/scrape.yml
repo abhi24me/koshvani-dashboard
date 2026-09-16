@@ -12,7 +12,13 @@ permissions:
 
 jobs:
   scrape:
-    runs-on: ubuntu-latest
+    # GitHub-hosted runners (ubuntu-latest) run on Azure datacenter IPs, which
+    # koshvani.up.nic.in's firewall blocks outright (connection times out
+    # before any HTTP response - confirmed via a diagnostic curl step). A
+    # self-hosted runner on a normal residential/office connection reaches it
+    # fine, so this job runs on a self-hosted runner instead. See README for
+    # setup - it's a small background service, not a full server.
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
 
@@ -24,15 +30,7 @@ jobs:
         run: pip install -r scraper/requirements.txt
 
       - name: Install Chromium
-        run: python -m playwright install --with-deps chromium
-
-      - name: Diagnose connectivity to koshvani.up.nic.in
-        run: |
-          echo "--- DNS ---"
-          nslookup koshvani.up.nic.in || true
-          echo "--- curl (verbose, 25s timeout) ---"
-          curl -v --max-time 25 -o /dev/null https://koshvani.up.nic.in/KoshvaniStatic.aspx || echo "curl exit code: $?"
-        continue-on-error: true
+        run: python -m playwright install chromium
 
       - name: Run scraper
         run: python scraper/scrape.py
