@@ -174,23 +174,33 @@ def _scrape_scheme_once(context, scheme):
     page.set_default_timeout(NAV_TIMEOUT_MS)
 
     try:
-        page.goto(MAIN_URL, wait_until="networkidle")
+        # These are server-rendered ASP.NET WebForms pages - the full table is
+        # already in the initial HTML response, nothing loads in async after
+        # that. "networkidle" waits for zero in-flight requests, which can
+        # hang well past its timeout on any lingering tracker/analytics
+        # request; "domcontentloaded" plus a wait for a known element is both
+        # faster and more reliable.
+        page.goto(MAIN_URL, wait_until="domcontentloaded")
+        page.wait_for_selector("a:text-is('Grant-wise expenditure')")
         fin_year = get_selected_fin_year(page)
 
         if not click_exact_text_link(page, "body", "Grant-wise expenditure"):
             raise RuntimeError("Could not find 'Grant-wise expenditure' link on main page")
-        page.wait_for_load_state("networkidle")
+        page.wait_for_load_state("domcontentloaded")
+        page.wait_for_selector("#ddlAmountIn")
 
         if not click_exact_text_link(page, "table", scheme["grant_text"]):
             raise RuntimeError(f"Could not find grant link '{scheme['grant_text']}' on ExpGrant.aspx")
-        page.wait_for_load_state("networkidle")
+        page.wait_for_url("**/ExpHead.aspx*")
+        page.wait_for_load_state("domcontentloaded")
 
         if "ExpHead" not in page.url:
             raise RuntimeError(f"Expected ExpHead.aspx after selecting grant, got {page.url}")
 
         if not click_prefix_text_link(page, "table", scheme["scheme_code"]):
             raise RuntimeError(f"Could not find scheme code '{scheme['scheme_code']}' on ExpHead.aspx")
-        page.wait_for_load_state("networkidle")
+        page.wait_for_url(re.compile(r"(ExpTreas\.aspx|NoRecordFound\.htm)"))
+        page.wait_for_load_state("domcontentloaded")
 
         if "NoRecordFound" in page.url:
             return {
