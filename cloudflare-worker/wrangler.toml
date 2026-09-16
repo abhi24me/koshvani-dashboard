@@ -1,0 +1,13 @@
+name = "koshvani-refresh"
+main = "worker.js"
+compatibility_date = "2024-09-01"
+
+[vars]
+GH_OWNER = "your-github-username"
+GH_REPO = "your-repo-name"
+GH_WORKFLOW = "scrape.yml"
+GH_BRANCH = "main"
+ALLOWED_ORIGIN = "https://your-github-username.github.io"
+
+# GH_TOKEN is a secret, not set here - see README for
+#   npx wrangler secret put GH_TOKEN

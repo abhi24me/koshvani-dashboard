@@ -1,0 +1,728 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Koshvani G.B.Nagar Dashboard</title>
+<style>
+  :root {
+    color-scheme: light;
+    --surface-1:      #fcfcfb;
+    --page-plane:     #f9f9f7;
+    --text-primary:   #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted:     #898781;
+    --gridline:       #e1e0d9;
+    --baseline:       #c3c2b7;
+    --border:         rgba(11,11,11,0.10);
+    --series-1:       #2a78d6;
+    --good:           #0ca30c;
+    --warning:        #fab219;
+    --critical:       #d03b3b;
+    --success-text:   #006300;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --surface-1:      #1a1a19;
+      --page-plane:     #0d0d0d;
+      --text-primary:   #ffffff;
+      --text-secondary: #c3c2b7;
+      --text-muted:     #a9a89f;
+      --gridline:       #2c2c2a;
+      --baseline:       #383835;
+      --border:         rgba(255,255,255,0.14);
+      --series-1:       #3987e5;
+      --good:           #14c414;
+      --warning:        #fab219;
+      --critical:       #ff6b6b;
+      --success-text:   #14c414;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --surface-1:      #1a1a19;
+    --page-plane:     #0d0d0d;
+    --text-primary:   #ffffff;
+    --text-secondary: #c3c2b7;
+    --text-muted:     #a9a89f;
+    --gridline:       #2c2c2a;
+    --baseline:       #383835;
+    --border:         rgba(255,255,255,0.14);
+    --series-1:       #3987e5;
+    --good:           #14c414;
+    --warning:        #fab219;
+    --critical:       #ff6b6b;
+    --success-text:   #14c414;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding-block: env(safe-area-inset-top, 0px) env(safe-area-inset-bottom, 0px);
+    background: var(--page-plane);
+    color: var(--text-primary);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  [hidden] { display: none !important; }
+
+  header.top {
+    flex: 0 0 auto;
+    position: sticky;
+    top: env(safe-area-inset-top, 0px);
+    z-index: 10;
+    background: var(--surface-1);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 20px;
+  }
+  header.top .wrap {
+    max-width: 1320px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  header.top .titles { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+  header.top h1 {
+    font-size: 17px;
+    margin: 0;
+    font-weight: 650;
+  }
+  header.top .district-tag {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--series-1);
+    background: color-mix(in srgb, var(--series-1) 16%, transparent);
+    border-radius: 999px;
+    padding: 3px 10px;
+    letter-spacing: 0.02em;
+  }
+  .controls { display: flex; align-items: center; gap: 8px; }
+
+  button.icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    border: 1px solid var(--border);
+    background: var(--surface-1);
+    color: var(--text-primary);
+    cursor: pointer;
+    font-size: 15px;
+    padding: 0;
+  }
+  button.icon-btn:hover { border-color: var(--series-1); }
+
+  button.refresh-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 12.5px;
+    font-weight: 650;
+    color: #ffffff;
+    background: var(--series-1);
+    border: none;
+    border-radius: 9px;
+    padding: 0 14px;
+    height: 34px;
+    cursor: pointer;
+  }
+  button.refresh-btn:hover { filter: brightness(1.08); }
+  button.refresh-btn:disabled { cursor: default; opacity: 0.75; }
+  .spinner {
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.4);
+    border-top-color: #ffffff;
+    animation: spin 0.7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .refresh-banner {
+    max-width: 1320px;
+    margin: 12px auto 0;
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-size: 12.5px;
+    font-weight: 550;
+  }
+  .refresh-banner.info { background: color-mix(in srgb, var(--series-1) 14%, transparent); color: var(--series-1); }
+  .refresh-banner.warn { background: color-mix(in srgb, var(--warning) 22%, transparent); color: #8a5a00; }
+  :root[data-theme="dark"] .refresh-banner.warn { color: #ffd679; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .refresh-banner.warn { color: #ffd679; }
+  }
+
+  main {
+    flex: 1 0 auto;
+    width: 100%;
+    max-width: 1320px;
+    margin: 0 auto;
+    padding: 20px 20px 24px;
+  }
+
+  /* ---- list view ---- */
+  .scheme-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 14px;
+  }
+  .scheme-card {
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 18px;
+    text-align: left;
+    cursor: pointer;
+    font-family: inherit;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+    transition: border-color 0.15s ease;
+  }
+  .scheme-card:hover, .scheme-card:focus-visible { border-color: var(--series-1); outline: none; }
+  .scheme-card .card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .scheme-card .name {
+    font-size: 14px;
+    font-weight: 620;
+    line-height: 1.35;
+  }
+  .scheme-card .code-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .scheme-card .code-chip {
+    font-size: 10.5px;
+    font-weight: 650;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-secondary);
+    background: var(--page-plane);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 2px 7px;
+    letter-spacing: 0.01em;
+  }
+  .scheme-card .card-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    padding-top: 10px;
+    border-top: 1px solid var(--gridline);
+  }
+  .scheme-card .card-stats .mini-label {
+    font-size: 9.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--text-muted);
+    margin-bottom: 3px;
+  }
+  .scheme-card .card-stats .mini-val {
+    font-size: 13px;
+    font-weight: 650;
+    font-variant-numeric: tabular-nums;
+  }
+  .scheme-card .updated {
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+    white-space: nowrap;
+    gap: 5px;
+    font-size: 11px;
+    font-weight: 700;
+    border-radius: 999px;
+    padding: 3px 10px;
+  }
+  .status-badge.ok { color: #ffffff; background: var(--good); }
+  .status-badge.no_district_data { color: #1a1a19; background: var(--warning); }
+  .status-badge.empty { color: var(--text-secondary); background: transparent; border: 1px solid var(--border); }
+  .status-badge.error { color: #ffffff; background: var(--critical); }
+
+  /* ---- detail view ---- */
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--series-1);
+    text-decoration: none;
+    margin-bottom: 14px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+    font-family: inherit;
+  }
+  .detail-header h2 {
+    font-size: 19px;
+    margin: 0 0 4px;
+  }
+  .detail-header .sub {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-bottom: 18px;
+  }
+
+  .stat-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+  .stat-tile {
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+  }
+  .stat-tile .label {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 6px;
+  }
+  .stat-tile .num {
+    font-size: 20px;
+    font-weight: 650;
+    font-variant-numeric: tabular-nums;
+  }
+  .stat-caption {
+    font-size: 11.5px;
+    color: var(--text-muted);
+    margin: 0 0 20px;
+  }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    margin: 0 0 8px;
+  }
+
+  .table-wrap {
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  table.data {
+    table-layout: fixed;
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 12.5px;
+  }
+  table.data th, table.data td {
+    padding: 8px 10px;
+    text-align: right;
+    border-bottom: 1px solid var(--gridline);
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+  table.data th:nth-child(1), table.data td:nth-child(1),
+  table.data th:nth-child(2), table.data td:nth-child(2) {
+    text-align: left;
+  }
+  table.data th:nth-child(3), table.data td:nth-child(3),
+  table.data th:nth-child(4), table.data td:nth-child(4) {
+    text-align: center;
+  }
+  table.data thead th {
+    color: var(--text-muted);
+    font-weight: 650;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.01em;
+    background: var(--surface-1);
+    line-height: 1.25;
+  }
+  table.data tbody tr:last-child td { border-bottom: none; }
+  table.data td { font-variant-numeric: tabular-nums; }
+  .pct-good { color: var(--success-text); font-weight: 700; }
+  .pct-warn { color: var(--critical); font-weight: 700; }
+
+  /* Below this width, 9 columns can't stay readable side by side without
+     shrinking to illegible text or scrolling - so each row becomes a
+     label/value card instead. Still the exact same headers and cell text,
+     just laid out vertically. */
+  @media (max-width: 700px) {
+    table.data, table.data tbody, table.data tr, table.data td { display: block; width: auto !important; }
+    table.data colgroup { display: none; }
+    table.data thead { position: absolute; left: -9999px; }
+    table.data tr {
+      border: 1px solid var(--gridline);
+      border-radius: 10px;
+      padding: 4px 12px;
+      margin-bottom: 10px;
+    }
+    table.data tbody tr:last-child { margin-bottom: 0; }
+    table.data td {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 14px;
+      text-align: right;
+      padding: 7px 0;
+      border-bottom: 1px solid var(--gridline);
+    }
+    table.data tr td:last-child { border-bottom: none; }
+    table.data td::before {
+      content: attr(data-label);
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+      color: var(--text-muted);
+      text-align: left;
+      flex: 0 0 42%;
+    }
+  }
+
+  .empty-state, .error-state {
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    font-size: 14px;
+    color: var(--text-secondary);
+  }
+  .error-state { color: var(--critical); }
+
+  footer.note {
+    flex: 0 0 auto;
+    margin: 0;
+    padding: 14px 20px calc(14px + env(safe-area-inset-bottom, 0px));
+    background: var(--surface-1);
+    border-top: 1px solid var(--border);
+    font-size: 11.5px;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+  footer.note .inner {
+    max-width: 1320px;
+    margin: 0 auto;
+  }
+
+  .loading {
+    padding: 40px 0;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 13px;
+  }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <div class="titles">
+      <h1>Koshvani Dashboard</h1>
+      <span class="district-tag" id="districtTag">G.B.NAGAR</span>
+    </div>
+    <div class="controls">
+      <button class="refresh-btn" id="refreshBtn" type="button">
+        <span id="refreshIcon">&#8635;</span>
+        <span id="refreshLabel">Refresh</span>
+      </button>
+      <button class="icon-btn" id="themeBtn" type="button" title="Toggle light/dark theme" aria-label="Toggle theme">&#9680;</button>
+    </div>
+  </div>
+  <div id="refreshBanner"></div>
+</header>
+<main id="app">
+  <div class="loading">Loading...</div>
+</main>
+<footer class="note">
+  <div class="inner">
+    Every number on this dashboard is copied verbatim from the UP Koshvani portal (same labels, same figures, same
+    formatting) &mdash; the only thing this page does is filter each report down to G.B.NAGAR. Data refreshes
+    automatically twice a day, and "Refresh" above triggers a live re-scrape on demand.
+  </div>
+</footer>
+
+<script>
+// Fill this in once you deploy the optional Cloudflare Worker (see README) to make
+// the in-page "Refresh" button trigger a live GitHub Actions run. Leave blank to
+// keep the button pointed at manual/scheduled-only refresh.
+const REFRESH_TRIGGER_URL = "";
+
+const app = document.getElementById('app');
+const districtTag = document.getElementById('districtTag');
+const refreshBtn = document.getElementById('refreshBtn');
+const refreshIcon = document.getElementById('refreshIcon');
+const refreshLabel = document.getElementById('refreshLabel');
+const refreshBanner = document.getElementById('refreshBanner');
+const themeBtn = document.getElementById('themeBtn');
+
+/* ---------- theme toggle ---------- */
+function applyTheme(mode) {
+  if (mode === 'system') {
+    document.documentElement.removeAttribute('data-theme');
+    themeBtn.textContent = '◐';
+  } else if (mode === 'dark') {
+    document.documentElement.setAttribute('data-theme', 'dark');
+    themeBtn.textContent = '☾';
+  } else {
+    document.documentElement.setAttribute('data-theme', 'light');
+    themeBtn.textContent = '☀';
+  }
+}
+function currentTheme() {
+  try { return localStorage.getItem('kosh-theme') || 'system'; } catch (e) { return 'system'; }
+}
+function setTheme(mode) {
+  try { localStorage.setItem('kosh-theme', mode); } catch (e) {}
+  applyTheme(mode);
+}
+themeBtn.addEventListener('click', () => {
+  const order = ['system', 'light', 'dark'];
+  const next = order[(order.indexOf(currentTheme()) + 1) % order.length];
+  setTheme(next);
+});
+applyTheme(currentTheme());
+
+/* ---------- formatting (only used for OUR OWN computed stat tiles,
+   never for table cells copied from the site) ---------- */
+function fmtNumber(n) {
+  if (n === null || n === undefined) return '—';
+  return new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 }).format(n);
+}
+function fmtCurrency(n) {
+  if (n === null || n === undefined) return '—';
+  return '₹' + fmtNumber(n);
+}
+function fmtDate(iso) {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  return d.toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' });
+}
+function statusLabel(s) {
+  return { ok: 'Live data', no_district_data: 'No district rows', empty: 'No expenditure', error: 'Fetch error' }[s] || s;
+}
+function pctClass(pct) {
+  const v = parseFloat(pct);
+  if (isNaN(v)) return '';
+  return v >= 60 ? 'pct-good' : (v < 25 ? 'pct-warn' : '');
+}
+function escapeHtml(s) {
+  return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+async function fetchJSON(path) {
+  const res = await fetch(path + '?_=' + Date.now(), { cache: 'no-store' });
+  if (!res.ok) throw new Error('Failed to load ' + path);
+  return res.json();
+}
+
+/* ---------- list view ---------- */
+async function renderList() {
+  app.innerHTML = '<div class="loading">Loading schemes...</div>';
+  let idx;
+  try {
+    idx = await fetchJSON('data/index.json');
+  } catch (e) {
+    app.innerHTML = '<div class="error-state">Could not load dashboard data (data/index.json). If this is a fresh deploy, run the scraper workflow once first.</div>';
+    return;
+  }
+  const schemes = idx.schemes || [];
+  if (schemes.length === 0) {
+    app.innerHTML = '<div class="empty-state">No schemes configured yet. Add one to scraper/schemes.json.</div>';
+    return;
+  }
+  const cards = schemes.map(s => `
+    <button class="scheme-card" data-id="${escapeHtml(s.id)}">
+      <div class="card-top">
+        <div class="name">${escapeHtml(s.name)}</div>
+        <span class="status-badge ${s.status}">${statusLabel(s.status)}</span>
+      </div>
+      <div class="code-row">
+        <span class="code-chip">Grant ${escapeHtml(s.grant_text)}</span>
+        <span class="code-chip">Scheme ${escapeHtml(s.scheme_code)}</span>
+        <span class="code-chip">${escapeHtml(s.district)}</span>
+      </div>
+      <div class="card-stats">
+        <div><div class="mini-label">Allotment</div><div class="mini-val">${fmtCurrency(s.progressive_allotment)}</div></div>
+        <div><div class="mini-label">Expenditure</div><div class="mini-val">${fmtCurrency(s.total_expenditure)}</div></div>
+        <div><div class="mini-label">% Spent</div><div class="mini-val ${pctClass(s.pct_expenditure_of_allotment)}">${s.pct_expenditure_of_allotment ?? '—'}${s.pct_expenditure_of_allotment != null ? '%' : ''}</div></div>
+      </div>
+      <div class="updated">Updated ${fmtDate(s.generated_at)}${s.fin_year ? ' &middot; FY ' + escapeHtml(s.fin_year) : ''}</div>
+    </button>
+  `).join('');
+  app.innerHTML = `<div class="scheme-grid">${cards}</div>`;
+  app.querySelectorAll('.scheme-card').forEach(btn => {
+    btn.addEventListener('click', () => { location.hash = '#/scheme/' + btn.dataset.id; });
+  });
+}
+
+/* ---------- detail view ---------- */
+async function renderDetail(id) {
+  app.innerHTML = '<div class="loading">Loading scheme...</div>';
+  let data;
+  try {
+    data = await fetchJSON('data/' + id + '.json');
+  } catch (e) {
+    app.innerHTML = '<button class="back-link" onclick="location.hash=\'#/\'">&larr; Back</button><div class="error-state">Could not load this scheme\'s data.</div>';
+    return;
+  }
+
+  const header = `
+    <button class="back-link" onclick="location.hash='#/'">&larr; Back to schemes</button>
+    <div class="detail-header">
+      <h2>${escapeHtml(data.name)}</h2>
+      <div class="sub">Grant ${escapeHtml(data.grant_text)} &middot; Scheme ${escapeHtml(data.scheme_code)} &middot; ${escapeHtml(data.district)}
+        ${data.fin_year ? ' &middot; FY ' + escapeHtml(data.fin_year) : ''} &middot; Updated ${fmtDate(data.generated_at)}</div>
+    </div>
+  `;
+
+  if (data.status === 'empty' || data.status === 'no_district_data') {
+    app.innerHTML = header + `<div class="empty-state">${escapeHtml(data.message || 'No data available.')}</div>`;
+    districtTag.textContent = data.district;
+    return;
+  }
+  if (data.status === 'error') {
+    app.innerHTML = header + `<div class="error-state">${escapeHtml(data.message || 'An error occurred while scraping this scheme.')}</div>`;
+    districtTag.textContent = data.district;
+    return;
+  }
+
+  const t = data.totals || {};
+  const stats = `
+    <div class="stat-row">
+      <div class="stat-tile"><div class="label">Progressive Allotment</div><div class="num">${fmtCurrency(t.progressive_allotment)}</div></div>
+      <div class="stat-tile"><div class="label">Total Expenditure</div><div class="num">${fmtCurrency(t.total_expenditure_upto_month)}</div></div>
+      <div class="stat-tile"><div class="label">% Spent</div><div class="num ${pctClass(t.pct_expenditure_of_allotment)}">${t.pct_expenditure_of_allotment ?? '—'}%</div></div>
+    </div>
+    <p class="stat-caption">These three figures are computed by this dashboard (sum of the rows below) &mdash; everything in the table itself is unmodified, straight from the portal.</p>
+  `;
+
+  const headers = data.column_headers || [];
+  const widths = Array.isArray(data.column_widths) && data.column_widths.length === headers.length
+    ? data.column_widths
+    : headers.map(() => 100 / headers.length);
+  const colgroupHtml = '<colgroup>' + widths.map(w => `<col style="width:${w}%">`).join('') + '</colgroup>';
+  const theadHtml = '<tr>' + headers.map(h => `<th>${escapeHtml(h)}</th>`).join('') + '</tr>';
+
+  const pctColIdx = headers.length - 1;
+  const rowsHtml = data.rows.map(r => {
+    const cells = r.cells;
+    return '<tr>' + cells.map((c, i) => {
+      const cls = i === pctColIdx ? pctClass(c) : '';
+      return `<td class="${cls}" data-label="${escapeHtml(headers[i] || '')}">${escapeHtml(c)}</td>`;
+    }).join('') + '</tr>';
+  }).join('');
+
+  const table = `
+    <p class="section-label">Exactly as shown on koshvani.up.nic.in, filtered to ${escapeHtml(data.district)}</p>
+    <div class="table-wrap">
+      <table class="data">
+        ${colgroupHtml}
+        <thead>${theadHtml}</thead>
+        <tbody>${rowsHtml}</tbody>
+      </table>
+    </div>
+  `;
+
+  app.innerHTML = header + stats + table;
+  districtTag.textContent = data.district;
+}
+
+/* ---------- routing ---------- */
+function route() {
+  const hash = location.hash || '#/';
+  const m = hash.match(/^#\/scheme\/(.+)$/);
+  if (m) {
+    renderDetail(decodeURIComponent(m[1]));
+  } else {
+    districtTag.textContent = 'G.B.NAGAR';
+    renderList();
+  }
+}
+window.addEventListener('hashchange', route);
+
+/* ---------- refresh button ---------- */
+let refreshing = false;
+
+function setRefreshing(on) {
+  refreshing = on;
+  refreshBtn.disabled = on;
+  refreshIcon.innerHTML = on ? '<span class="spinner"></span>' : '&#8635;';
+  refreshLabel.textContent = on ? 'Refreshing…' : 'Refresh';
+}
+function showBanner(text, kind) {
+  refreshBanner.innerHTML = text ? `<div class="refresh-banner ${kind}">${escapeHtml(text)}</div>` : '';
+}
+
+async function pollForUpdate(beforeTs) {
+  const start = Date.now();
+  const maxMs = 5 * 60 * 1000;
+  const intervalMs = 10000;
+  while (Date.now() - start < maxMs) {
+    await new Promise(r => setTimeout(r, intervalMs));
+    try {
+      const idx = await fetchJSON('data/index.json');
+      if (idx.generated_at && idx.generated_at !== beforeTs) {
+        setRefreshing(false);
+        showBanner('Dashboard updated with the latest data.', 'info');
+        setTimeout(() => showBanner('', ''), 5000);
+        route();
+        return;
+      }
+    } catch (e) { /* transient network/deploy hiccup, keep polling */ }
+  }
+  setRefreshing(false);
+  showBanner('Still processing on GitHub — check back in a minute, or watch progress in the Actions tab.', 'warn');
+}
+
+async function triggerRefresh() {
+  if (refreshing) return;
+  if (!REFRESH_TRIGGER_URL) {
+    showBanner('Live refresh isn’t configured yet (see README) — data still updates automatically twice a day, or run "Update Koshvani Data" from GitHub Actions.', 'warn');
+    return;
+  }
+  setRefreshing(true);
+  showBanner('Requesting a live refresh…', 'info');
+  let beforeTs = null;
+  try {
+    const idx = await fetchJSON('data/index.json');
+    beforeTs = idx.generated_at;
+  } catch (e) { /* fine, poll will still detect a change once data exists */ }
+
+  try {
+    const res = await fetch(REFRESH_TRIGGER_URL, { method: 'POST' });
+    if (!res.ok) throw new Error('trigger failed: ' + res.status);
+    showBanner('Refresh started — this can take a couple of minutes.', 'info');
+    await pollForUpdate(beforeTs);
+  } catch (e) {
+    setRefreshing(false);
+    showBanner('Could not start a live refresh. You can run "Update Koshvani Data" from GitHub Actions instead.', 'warn');
+  }
+}
+refreshBtn.addEventListener('click', triggerRefresh);
+
+route();
+</script>
+</body>
+</html>
