@@ -22,25 +22,47 @@ jobs:
     # connection works, like this self-hosted runner has. See README.
     runs-on: self-hosted
     steps:
-      - uses: actions/checkout@v4
+      # Plain git clone/pull instead of actions/checkout@v4 - the latter's
+      # own Windows temp-file cleanup step hits a persistent EBUSY
+      # (file locked) error on this machine that survived a Defender
+      # exclusion and killing stale processes; this sidesteps that code
+      # path entirely rather than continuing to chase the root cause.
+      - name: Checkout (manual)
+        shell: pwsh
+        run: |
+          $remote = "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
+          if (-not (Test-Path "repo\.git")) {
+            git clone $remote repo
+          }
+          cd repo
+          git remote set-url origin $remote
+          git fetch origin main
+          git checkout main
+          git reset --hard origin/main
+          git clean -fdx
 
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
       - name: Install dependencies
+        working-directory: repo
         run: pip install -r scraper/requirements.txt
 
       - name: Install Chromium
+        working-directory: repo
         run: python -m playwright install chromium
 
       - name: Run scraper
+        working-directory: repo
         run: python scraper/scrape.py
 
       - name: Commit updated data
+        working-directory: repo
+        shell: bash
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add docs/data
           git diff --cached --quiet || git commit -m "Update Koshvani data $(date -u +%Y-%m-%dT%H:%M:%SZ)"
-          git push
+          git push origin main
