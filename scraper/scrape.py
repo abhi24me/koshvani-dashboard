@@ -28,6 +28,7 @@ hosted runners or any other cloud provider.
 import json
 import os
 import re
+import ssl
 import sys
 import time
 from datetime import datetime, timezone
@@ -36,6 +37,7 @@ from urllib.parse import urljoin
 
 import requests
 from bs4 import BeautifulSoup
+from requests.adapters import HTTPAdapter
 
 ROOT = Path(__file__).resolve().parent.parent
 CONFIG_PATH = Path(__file__).resolve().parent / "schemes.json"
@@ -49,6 +51,22 @@ HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
                   "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
 }
+
+
+class LegacyTLSAdapter(HTTPAdapter):
+    """Enables SSL_OP_LEGACY_SERVER_CONNECT, needed on newer OpenSSL builds
+    (confirmed via Termux: Python 3.14 / OpenSSL 3.6.3) to complete the TLS
+    handshake with this portal's server, which doesn't correctly support
+    secure renegotiation. Certificate verification is untouched - still on."""
+
+    def init_poolmanager(self, *args, **kwargs):
+        context = ssl.create_default_context()
+        context.options |= getattr(ssl, "OP_LEGACY_SERVER_CONNECT", 0)
+        kwargs["ssl_context"] = context
+        return super().init_poolmanager(*args, **kwargs)
+
+
+_LEGACY_TLS_ADAPTER = LegacyTLSAdapter()
 
 # Index of the numeric columns within a row's raw `cells` array, used only to
 # compute the derived totals block - the cells themselves are stored verbatim,
@@ -164,6 +182,7 @@ def scrape_scheme(scheme, attempts=3):
     for attempt in range(1, attempts + 1):
         session = requests.Session()
         session.headers.update(HEADERS)
+        session.mount("https://", _LEGACY_TLS_ADAPTER)
         try:
             last_result = _scrape_scheme_once(session, scheme)
         finally:
