@@ -6,13 +6,13 @@
       "grant_text": "011",
       "scheme_code": "2401000010500",
       "district": "G.B.NAGAR",
-      "status": "ok",
-      "generated_at": "2026-09-16T12:41:41+00:00",
-      "fin_year": "2026-2027",
-      "progressive_allotment": 9893000.0,
-      "total_expenditure": 4209943.0,
-      "pct_expenditure_of_allotment": 42.55
+      "status": "error",
+      "generated_at": "2026-09-16T13:03:26+00:00",
+      "fin_year": null,
+      "progressive_allotment": null,
+      "total_expenditure": null,
+      "pct_expenditure_of_allotment": null
     }
   ],
-  "generated_at": "2026-09-16T12:41:41+00:00"
+  "generated_at": "2026-09-16T13:03:26+00:00"
 }
