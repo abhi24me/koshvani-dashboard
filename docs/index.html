@@ -121,20 +121,6 @@
   }
   button.icon-btn:hover { border-color: var(--series-1); }
 
-  button.refresh-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    font-size: 12.5px;
-    font-weight: 650;
-    color: #ffffff;
-    background: var(--series-1);
-    border: none;
-    border-radius: 9px;
-    padding: 0 14px;
-    height: 34px;
-    cursor: pointer;
-  }
   button.nav-btn {
     display: inline-flex;
     align-items: center;
@@ -150,33 +136,6 @@
     cursor: pointer;
   }
   button.nav-btn:hover { border-color: var(--series-1); color: var(--series-1); }
-
-  button.refresh-btn:hover { filter: brightness(1.08); }
-  button.refresh-btn:disabled { cursor: default; opacity: 0.75; }
-  .spinner {
-    width: 13px;
-    height: 13px;
-    border-radius: 50%;
-    border: 2px solid rgba(255,255,255,0.4);
-    border-top-color: #ffffff;
-    animation: spin 0.7s linear infinite;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  .refresh-banner {
-    max-width: 1320px;
-    margin: 12px auto 0;
-    padding: 10px 16px;
-    border-radius: 10px;
-    font-size: 12.5px;
-    font-weight: 550;
-  }
-  .refresh-banner.info { background: color-mix(in srgb, var(--series-1) 14%, transparent); color: var(--series-1); }
-  .refresh-banner.warn { background: color-mix(in srgb, var(--warning) 22%, transparent); color: #8a5a00; }
-  :root[data-theme="dark"] .refresh-banner.warn { color: #ffd679; }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) .refresh-banner.warn { color: #ffd679; }
-  }
 
   main {
     flex: 1 0 auto;
@@ -568,14 +527,9 @@
     </div>
     <div class="controls">
       <button class="nav-btn" id="insightsBtn" type="button">Insights</button>
-      <button class="refresh-btn" id="refreshBtn" type="button">
-        <span id="refreshIcon">&#8635;</span>
-        <span id="refreshLabel">Refresh</span>
-      </button>
       <button class="icon-btn" id="themeBtn" type="button" title="Toggle light/dark theme" aria-label="Toggle theme">&#9680;</button>
     </div>
   </div>
-  <div id="refreshBanner"></div>
 </header>
 <main id="app">
   <div class="loading">Loading...</div>
@@ -589,17 +543,8 @@
 </footer>
 
 <script>
-// Fill this in once you deploy the optional Cloudflare Worker (see README) to make
-// the in-page "Refresh" button trigger a live GitHub Actions run. Leave blank to
-// keep the button pointed at manual/scheduled-only refresh.
-const REFRESH_TRIGGER_URL = "";
-
 const app = document.getElementById('app');
 const districtTag = document.getElementById('districtTag');
-const refreshBtn = document.getElementById('refreshBtn');
-const refreshIcon = document.getElementById('refreshIcon');
-const refreshLabel = document.getElementById('refreshLabel');
-const refreshBanner = document.getElementById('refreshBanner');
 const themeBtn = document.getElementById('themeBtn');
 const insightsBtn = document.getElementById('insightsBtn');
 insightsBtn.addEventListener('click', () => { location.hash = '#/insights'; });
@@ -1010,66 +955,6 @@ function route() {
   }
 }
 window.addEventListener('hashchange', route);
-
-/* ---------- refresh button ---------- */
-let refreshing = false;
-
-function setRefreshing(on) {
-  refreshing = on;
-  refreshBtn.disabled = on;
-  refreshIcon.innerHTML = on ? '<span class="spinner"></span>' : '&#8635;';
-  refreshLabel.textContent = on ? 'Refreshing…' : 'Refresh';
-}
-function showBanner(text, kind) {
-  refreshBanner.innerHTML = text ? `<div class="refresh-banner ${kind}">${escapeHtml(text)}</div>` : '';
-}
-
-async function pollForUpdate(beforeTs) {
-  const start = Date.now();
-  const maxMs = 5 * 60 * 1000;
-  const intervalMs = 10000;
-  while (Date.now() - start < maxMs) {
-    await new Promise(r => setTimeout(r, intervalMs));
-    try {
-      const idx = await fetchJSON('data/index.json');
-      if (idx.generated_at && idx.generated_at !== beforeTs) {
-        setRefreshing(false);
-        showBanner('Dashboard updated with the latest data.', 'info');
-        setTimeout(() => showBanner('', ''), 5000);
-        route();
-        return;
-      }
-    } catch (e) { /* transient network/deploy hiccup, keep polling */ }
-  }
-  setRefreshing(false);
-  showBanner('Still processing on GitHub — check back in a minute, or watch progress in the Actions tab.', 'warn');
-}
-
-async function triggerRefresh() {
-  if (refreshing) return;
-  if (!REFRESH_TRIGGER_URL) {
-    showBanner('Live refresh isn’t set up here — to update, run the scraper locally and push (see the project README).', 'warn');
-    return;
-  }
-  setRefreshing(true);
-  showBanner('Requesting a live refresh…', 'info');
-  let beforeTs = null;
-  try {
-    const idx = await fetchJSON('data/index.json');
-    beforeTs = idx.generated_at;
-  } catch (e) { /* fine, poll will still detect a change once data exists */ }
-
-  try {
-    const res = await fetch(REFRESH_TRIGGER_URL, { method: 'POST' });
-    if (!res.ok) throw new Error('trigger failed: ' + res.status);
-    showBanner('Refresh started — this can take a couple of minutes.', 'info');
-    await pollForUpdate(beforeTs);
-  } catch (e) {
-    setRefreshing(false);
-    showBanner('Could not start a live refresh. Run the scraper locally and push instead (see the project README).', 'warn');
-  }
-}
-refreshBtn.addEventListener('click', triggerRefresh);
 
 route();
 </script>

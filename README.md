@@ -68,8 +68,7 @@ An earlier attempt used a genuine GitHub Actions self-hosted runner instead
 (so the dashboard's "Run workflow" button would trigger it), but hit
 persistent Windows-specific issues (runner service account permissions,
 antivirus file locks) and was abandoned in favor of the simpler script
-above. See "Live refresh button" below for how the in-page button now
-triggers this without needing an Actions runner at all.
+above.
 
 ## One-time setup
 
@@ -91,64 +90,6 @@ triggers this without needing an Actions runner at all.
 
 From then on, refresh whenever you want by running the same command and
 pushing again.
-
-## Live refresh button (optional)
-
-The dashboard's "Refresh" button can trigger a real, on-demand scrape from
-your phone, without needing a GitHub Actions runner (which a phone can't
-reliably host as an always-on listener anyway). Instead:
-
-1. Click "Refresh" -> a small [Cloudflare Worker](https://workers.cloudflare.com/)
-   (free tier, no credit card) writes a timestamp to
-   `docs/data/refresh_request.json` in the repo, using a GitHub token it
-   holds server-side (never exposed to the browser).
-2. `watch_refresh.py`, running continuously on your phone in Termux,
-   polls the live site every couple of minutes and compares that timestamp
-   against `docs/data/index.json`'s own `generated_at`. If a request is
-   newer than the last scrape, it runs `run_daily.sh`.
-3. Once that pushes fresh data, the dashboard's own polling (already
-   built in) picks it up automatically.
-
-**Setup:**
-
-1. Create a free Cloudflare account, then install Wrangler:
-   ```
-   npm install -g wrangler
-   wrangler login
-   ```
-2. In `cloudflare-worker/wrangler.toml`, fill in `GH_OWNER`, `GH_REPO`, and
-   `ALLOWED_ORIGIN` (your `https://<user>.github.io` Pages origin).
-3. Create a GitHub **fine-grained personal access token**
-   (github.com -> Settings -> Developer settings -> Fine-grained tokens):
-   scope it to this one repository only, with **Contents: Read and write**
-   permission, nothing else.
-4. Deploy the worker and set the token as a secret:
-   ```
-   cd cloudflare-worker
-   wrangler deploy
-   wrangler secret put GH_TOKEN
-   ```
-5. Wrangler prints your worker's URL, e.g.
-   `https://koshvani-refresh.<you>.workers.dev`. Open `docs/index.html` and
-   set:
-   ```js
-   const REFRESH_TRIGGER_URL = "https://koshvani-refresh.<you>.workers.dev/trigger";
-   ```
-   Commit and push.
-6. On your phone, start the watcher (ideally auto-started at boot via
-   [Termux:Boot](https://wiki.termux.com/wiki/Termux:Boot), wrapped in
-   `termux-wake-lock` so Android doesn't suspend it):
-   ```
-   pip install requests
-   python watch_refresh.py
-   ```
-
-Without this setup, the dashboard still works fully - clicking "Refresh"
-just shows a message pointing you to `run_daily.sh`/`refresh.bat` instead
-of triggering a live run itself. And because this needs the watcher running
-continuously (not just once or twice a day), it's a meaningfully bigger ask
-of your phone's battery/connectivity than the scheduled `run_daily.sh`
-alone - worth it only if the on-demand button matters to you.
 
 ## Adding more schemes
 
