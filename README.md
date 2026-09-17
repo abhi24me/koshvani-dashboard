@@ -36,13 +36,40 @@ git push
 ```
 
 That's it - the live Pages site updates within a minute or two of the push.
+On Windows, double-click `refresh.bat` to do all four steps in one go (only
+pushes if the data actually changed).
 
-A GitHub Actions workflow (`.github/workflows/scrape.yml`) that does this
-automatically on a self-hosted runner is included and partly set up, but
-currently has unresolved Windows-specific issues on this machine (runner
-service account permissions, antivirus file locks) and isn't relied on yet -
-treat it as a future improvement, not the current path. The manual command
-above is what actually keeps this dashboard current.
+### Automatic updates from a phone (Termux)
+
+A phone on mobile data is a genuine residential-class connection too, and
+running a plain Python script is much lighter than trying to run a full
+browser or a GitHub Actions runner on Android. `run_daily.sh` (repo root)
+does the same pull-scrape-commit-push cycle as `refresh.bat`, meant to run
+on a schedule via [Termux](https://termux.dev/) + Termux:Boot:
+
+```
+pkg install python git -y
+git clone https://github.com/<your-username>/<repo-name>.git
+cd <repo-name>
+pip install -r scraper/requirements.txt
+bash run_daily.sh
+```
+
+One TLS quirk specific to this: koshvani.up.nic.in's server doesn't
+correctly support secure TLS renegotiation, which newer OpenSSL builds
+(like Termux's) reject by default - `scraper/scrape.py` already works around
+this with a small `LegacyTLSAdapter` that enables
+`SSL_OP_LEGACY_SERVER_CONNECT` (certificate verification stays fully on;
+this doesn't disable any security checks, it only permits a legacy
+renegotiation behavior the site's server needs). Desktop Python/OpenSSL
+builds don't need this flag, so it's a safe no-op there.
+
+An earlier attempt used a genuine GitHub Actions self-hosted runner instead
+(so the dashboard's "Run workflow" button would trigger it), but hit
+persistent Windows-specific issues (runner service account permissions,
+antivirus file locks) and was abandoned in favor of the simpler script
+above. See "Live refresh button" below for how the in-page button now
+triggers this without needing an Actions runner at all.
 
 ## One-time setup
 
@@ -64,6 +91,64 @@ above is what actually keeps this dashboard current.
 
 From then on, refresh whenever you want by running the same command and
 pushing again.
+
+## Live refresh button (optional)
+
+The dashboard's "Refresh" button can trigger a real, on-demand scrape from
+your phone, without needing a GitHub Actions runner (which a phone can't
+reliably host as an always-on listener anyway). Instead:
+
+1. Click "Refresh" -> a small [Cloudflare Worker](https://workers.cloudflare.com/)
+   (free tier, no credit card) writes a timestamp to
+   `docs/data/refresh_request.json` in the repo, using a GitHub token it
+   holds server-side (never exposed to the browser).
+2. `watch_refresh.py`, running continuously on your phone in Termux,
+   polls the live site every couple of minutes and compares that timestamp
+   against `docs/data/index.json`'s own `generated_at`. If a request is
+   newer than the last scrape, it runs `run_daily.sh`.
+3. Once that pushes fresh data, the dashboard's own polling (already
+   built in) picks it up automatically.
+
+**Setup:**
+
+1. Create a free Cloudflare account, then install Wrangler:
+   ```
+   npm install -g wrangler
+   wrangler login
+   ```
+2. In `cloudflare-worker/wrangler.toml`, fill in `GH_OWNER`, `GH_REPO`, and
+   `ALLOWED_ORIGIN` (your `https://<user>.github.io` Pages origin).
+3. Create a GitHub **fine-grained personal access token**
+   (github.com -> Settings -> Developer settings -> Fine-grained tokens):
+   scope it to this one repository only, with **Contents: Read and write**
+   permission, nothing else.
+4. Deploy the worker and set the token as a secret:
+   ```
+   cd cloudflare-worker
+   wrangler deploy
+   wrangler secret put GH_TOKEN
+   ```
+5. Wrangler prints your worker's URL, e.g.
+   `https://koshvani-refresh.<you>.workers.dev`. Open `docs/index.html` and
+   set:
+   ```js
+   const REFRESH_TRIGGER_URL = "https://koshvani-refresh.<you>.workers.dev/trigger";
+   ```
+   Commit and push.
+6. On your phone, start the watcher (ideally auto-started at boot via
+   [Termux:Boot](https://wiki.termux.com/wiki/Termux:Boot), wrapped in
+   `termux-wake-lock` so Android doesn't suspend it):
+   ```
+   pip install requests
+   python watch_refresh.py
+   ```
+
+Without this setup, the dashboard still works fully - clicking "Refresh"
+just shows a message pointing you to `run_daily.sh`/`refresh.bat` instead
+of triggering a live run itself. And because this needs the watcher running
+continuously (not just once or twice a day), it's a meaningfully bigger ask
+of your phone's battery/connectivity than the scheduled `run_daily.sh`
+alone - worth it only if the on-demand button matters to you.
 
 ## Adding more schemes
 

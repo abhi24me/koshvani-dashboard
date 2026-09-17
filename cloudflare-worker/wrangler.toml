@@ -5,7 +5,6 @@ compatibility_date = "2024-09-01"
 [vars]
 GH_OWNER = "your-github-username"
 GH_REPO = "your-repo-name"
-GH_WORKFLOW = "scrape.yml"
 GH_BRANCH = "main"
 ALLOWED_ORIGIN = "https://your-github-username.github.io"
 
