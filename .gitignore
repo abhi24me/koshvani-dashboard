@@ -3,7 +3,4 @@ __pycache__/
 .venv/
 logs/
 .env
-logs/
-.env
-logs/
 .koshvani_previous_data/

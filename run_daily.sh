@@ -8,6 +8,8 @@ LOG_DIR="$REPO/logs"
 
 cd "$REPO" || exit 1
 
+START_TS=$(date +%s)
+
 # ==========================================
 # Daily Log
 # ==========================================
@@ -34,7 +36,7 @@ echo "========================================"
 # ==========================================
 
 echo ""
-echo "[1/5] Checking Git status..."
+echo "[1/6] Checking Git status..."
 
 git status --short
 
@@ -53,7 +55,7 @@ fi
 # ==========================================
 
 echo ""
-echo "[2/5] Pulling latest code from GitHub..."
+echo "[2/6] Pulling latest code from GitHub..."
 
 git pull --rebase origin main
 
@@ -63,6 +65,7 @@ if [ $? -ne 0 ]; then
     echo "Please check Git status."
     echo "Time: $(date)"
     echo "========================================"
+    python telegram_alert.py error --start "$START_TS" --stage git-pull
     exit 1
 fi
 
@@ -74,7 +77,7 @@ echo "Git pull successful."
 # ==========================================
 
 echo ""
-echo "[3/5] Starting Koshvani scraper..."
+echo "[3/6] Starting Koshvani scraper..."
 echo "Time: $(date)"
 echo ""
 
@@ -85,6 +88,7 @@ if [ $? -ne 0 ]; then
     echo "ERROR: Koshvani scraper FAILED."
     echo "Time: $(date)"
     echo "========================================"
+    python telegram_alert.py error --start "$START_TS" --stage scraper
     exit 1
 fi
 
@@ -97,12 +101,18 @@ echo "Koshvani scraper completed successfully."
 # ==========================================
 
 echo ""
-echo "[4/5] Checking for data changes..."
+echo "[4/6] Checking for data changes..."
 
 if git diff --quiet -- docs/data; then
 
     echo "No data changes detected."
     echo "No GitHub update required."
+
+    # Nothing left that could still fail before the run is done - safe to
+    # validate results and notify now.
+    echo ""
+    echo "Validating scheme results and notifying Telegram..."
+    python telegram_alert.py report --start "$START_TS"
 
     echo ""
     echo "========================================"
@@ -122,7 +132,7 @@ echo "Data changes detected."
 # ==========================================
 
 echo ""
-echo "[5/5] Committing updated Koshvani data..."
+echo "[5/6] Committing updated Koshvani data..."
 
 git add docs/data
 
@@ -133,6 +143,7 @@ if [ $? -ne 0 ]; then
     echo "ERROR: Git commit failed."
     echo "Time: $(date)"
     echo "========================================"
+    python telegram_alert.py error --start "$START_TS" --stage git-commit
     exit 1
 fi
 
@@ -148,11 +159,25 @@ if [ $? -ne 0 ]; then
     echo "ERROR: Git push failed."
     echo "Time: $(date)"
     echo "========================================"
+    python telegram_alert.py error --start "$START_TS" --stage git-push
     exit 1
 fi
 
 echo ""
 echo "GitHub push successful."
+
+
+# ==========================================
+# Validate Results & Notify Telegram
+# ==========================================
+
+# Only reached once the run is fully complete (pull, scraper, commit and
+# push all succeeded) - so the Telegram status always reflects the real
+# final outcome, never a SUCCESS sent before a later step could still fail.
+echo ""
+echo "[6/6] Validating scheme results and notifying Telegram..."
+
+python telegram_alert.py report --start "$START_TS"
 
 
 # ==========================================
