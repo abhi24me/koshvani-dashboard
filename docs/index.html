@@ -265,13 +265,6 @@
   .status-badge.error { color: #ffffff; background: var(--critical); }
 
   /* ---- insights view ---- */
-  .insights-intro {
-    font-size: 13px;
-    color: var(--text-secondary);
-    margin: 0 0 18px;
-    max-width: 640px;
-    line-height: 1.5;
-  }
   .status-summary {
     display: flex;
     flex-wrap: wrap;
@@ -291,7 +284,7 @@
     position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
     overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
   }
-  .ins-asof { font-size: 12px; color: var(--text-muted); margin: -8px 0 14px; }
+  .ins-asof { font-size: 12px; color: var(--text-muted); margin: 0 0 14px; }
 
   /* filter + sort bar: one row above everything it scopes */
   .ins-controls {
@@ -320,25 +313,6 @@
   .ins-btn { cursor: pointer; font-weight: 600; }
   .ins-btn:hover { border-color: var(--series-1); }
   .ins-sortwrap { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 8px; }
-  .ins-group { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
-  .ins-chip {
-    font: inherit;
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--text-secondary);
-    background: transparent;
-    border: 1px solid var(--border);
-    border-radius: 999px;
-    padding: 6px 12px;
-    cursor: pointer;
-  }
-  .ins-chip:hover { border-color: var(--series-1); }
-  .ins-chip[aria-pressed="true"] {
-    color: var(--text-primary);
-    background: color-mix(in srgb, var(--series-1) 16%, transparent);
-    border-color: var(--series-1);
-  }
-  .ins-chip .n { font-weight: 500; color: var(--text-muted); margin-left: 5px; font-variant-numeric: tabular-nums; }
   .ins-link {
     font: inherit;
     font-size: 12px;
@@ -350,7 +324,7 @@
     cursor: pointer;
   }
   .ins-input:focus-visible, .ins-select:focus-visible, .ins-btn:focus-visible,
-  .ins-chip:focus-visible, .ins-link:focus-visible, a.ins-name:focus-visible,
+  .ins-link:focus-visible, a.ins-name:focus-visible,
   .ins-take a:focus-visible {
     outline: 2px solid var(--series-1);
     outline-offset: 2px;
@@ -358,7 +332,6 @@
   .ins-count { font-size: 12px; color: var(--text-muted); }
   @media (max-width: 700px) {
     .ins-input, .ins-select { font-size: 16px; }
-    .ins-chip { padding: 8px 13px; }
     .ins-sortwrap { flex: 1 1 100%; flex-wrap: nowrap; }
     .ins-select { flex: 1 1 0; min-width: 0; }
   }
@@ -971,12 +944,6 @@ async function renderDetail(id) {
 /* ---------- insights view ---------- */
 // Filter/sort choices live at module level so they survive opening a scheme
 // from here and coming back; "Reset" clears them.
-const INSIGHT_BANDS = [
-  { key: 'all',  label: 'All levels',    test: () => true },
-  { key: 'low',  label: 'Under 25%',     test: p => p < 25 },
-  { key: 'mid',  label: '25% to 59%',    test: p => p >= 25 && p < 60 },
-  { key: 'high', label: '60% and above', test: p => p >= 60 },
-];
 const INSIGHT_SORTS = {
   spent: { label: 'Expenditure',  phrase: 'expenditure so far',            get: r => r.spent, natural: 'desc' },
   allot: { label: 'Allotment',    phrase: 'allotment',                     get: r => r.allot, natural: 'desc' },
@@ -985,20 +952,16 @@ const INSIGHT_SORTS = {
   month: { label: 'This month',   phrase: 'spending this month',           get: r => r.month, natural: 'desc' },
   name:  { label: 'Name',         phrase: 'name',                          get: r => r.name,  natural: 'asc'  },
 };
-const INSIGHT_DEFAULTS = { q: '', band: 'all', monthOnly: false, sort: 'spent', dir: 'desc' };
+const INSIGHT_DEFAULTS = { q: '', sort: 'spent', dir: 'desc' };
 const INSIGHT_TOP_HEADS = 8;
 const INSIGHTS_CACHE_MS = 2 * 60 * 1000;
 let insightsState = { ...INSIGHT_DEFAULTS };
 let insightsCache = null;
 
-// `skip` leaves one filter out, so each chip can show the count it WOULD give.
-function insightsFilter(rows, st, skip) {
+function insightsFilter(rows, st) {
   const q = st.q.trim().toLowerCase();
-  const band = INSIGHT_BANDS.find(b => b.key === st.band) || INSIGHT_BANDS[0];
-  return rows.filter(r =>
-    (!q || r.name.toLowerCase().includes(q) || r.code.includes(q)) &&
-    (skip === 'band' || band.test(r.pct)) &&
-    (skip === 'month' || !st.monthOnly || r.month > 0));
+  if (!q) return rows;
+  return rows.filter(r => r.name.toLowerCase().includes(q) || r.code.includes(q));
 }
 function insightsSort(list, st) {
   const get = INSIGHT_SORTS[st.sort].get;
@@ -1159,13 +1122,9 @@ async function renderInsights() {
 
   const sortOptions = Object.entries(INSIGHT_SORTS)
     .map(([k, v]) => `<option value="${k}">${escapeHtml(v.label)}</option>`).join('');
-  const bandChips = INSIGHT_BANDS
-    .map(b => `<button type="button" class="ins-chip" data-band="${b.key}" aria-pressed="false">${escapeHtml(b.label)}<span class="n"></span></button>`).join('');
-  const monthChip = monthName
-    ? `<button type="button" class="ins-chip" id="insMonth" aria-pressed="false">Spent in ${escapeHtml(monthName)}<span class="n"></span></button>` : '';
 
   const controls = `
-    <div class="ins-controls" role="group" aria-label="Filter and sort schemes">
+    <div class="ins-controls" role="group" aria-label="Search and sort schemes">
       <div class="ins-line">
         <input id="insQ" class="ins-input" type="search" placeholder="Search by scheme name or code" aria-label="Search schemes by name or code" autocomplete="off">
         <span class="ins-sortwrap">
@@ -1174,21 +1133,16 @@ async function renderInsights() {
           <button id="insDir" class="ins-btn" type="button" title="Reverse the sort order"></button>
         </span>
       </div>
-      <div class="ins-line" id="insChips">
-        <span class="ins-group"><span class="ins-label">Spending level</span>${bandChips}</span>
-        ${monthChip ? `<span class="ins-group"><span class="ins-label">Activity</span>${monthChip}</span>` : ''}
+      <div class="ins-line">
+        <span class="ins-count" id="insCount" aria-live="polite"></span>
         <button type="button" class="ins-link" id="insReset" hidden>Reset</button>
       </div>
-      <div class="ins-count" id="insCount" aria-live="polite"></div>
     </div>`;
 
   app.innerHTML = `
     <div class="insights-root">
       <button class="back-link" onclick="location.hash='#/'">&larr; Back to schemes</button>
-      <div class="detail-header">
-        <h2>Spending at a Glance</h2>
-        <p class="insights-intro">A combined view across all ${schemes.length} tracked scheme${schemes.length === 1 ? '' : 's'} for G.B.NAGAR &mdash; how much has been allotted, how much has actually been spent, and where it went. Use the filters to look at any slice you like; everything below follows them.</p>
-      </div>
+      <h2 class="sr-only">Insights</h2>
       <p class="ins-asof">Updated ${fmtDate(idx.generated_at)}${fy ? ' &middot; FY ' + escapeHtml(fy) : ''}${monthName ? ' &middot; figures run up to ' + escapeHtml(monthName) + ' (the current month is provisional)' : ''}</p>
       <div class="status-summary">${statusChips}</div>
       ${rows.length === 0
@@ -1199,16 +1153,15 @@ async function renderInsights() {
 
   const byId = id => document.getElementById(id);
   const qEl = byId('insQ'), sortEl = byId('insSort'), dirEl = byId('insDir');
-  const monthEl = byId('insMonth'), resetEl = byId('insReset');
+  const resetEl = byId('insReset');
   const countEl = byId('insCount'), resultsEl = byId('insResults');
-  const bandEls = [...app.querySelectorAll('[data-band]')];
   qEl.value = insightsState.q;
   sortEl.value = insightsState.sort;
 
   function resultsHtml(shown) {
     const st = insightsState;
     if (shown.length === 0) {
-      return '<div class="empty-state" style="margin-top:18px">No schemes match these filters. Try clearing the search or choosing a different spending level.</div>';
+      return '<div class="empty-state" style="margin-top:18px">No schemes match your search. Try a different name or code, or reset.</div>';
     }
     const allot = sumBy(shown, 'allot'), spent = sumBy(shown, 'spent'), month = sumBy(shown, 'month');
     const pct = pctOf(spent, allot);
@@ -1248,16 +1201,6 @@ async function renderInsights() {
     const st = insightsState;
     const shown = insightsSort(insightsFilter(rows, st), st);
 
-    const bandBase = insightsFilter(rows, st, 'band');
-    bandEls.forEach(el => {
-      const b = INSIGHT_BANDS.find(x => x.key === el.dataset.band);
-      el.querySelector('.n').textContent = bandBase.filter(r => b.test(r.pct)).length;
-      el.setAttribute('aria-pressed', String(st.band === b.key));
-    });
-    if (monthEl) {
-      monthEl.querySelector('.n').textContent = insightsFilter(rows, st, 'month').filter(r => r.month > 0).length;
-      monthEl.setAttribute('aria-pressed', String(st.monthOnly));
-    }
     dirEl.textContent = st.sort === 'name'
       ? (st.dir === 'asc' ? 'A → Z' : 'Z → A')
       : (st.dir === 'desc' ? 'High → low' : 'Low → high');
@@ -1274,13 +1217,6 @@ async function renderInsights() {
   });
   dirEl.addEventListener('click', () => {
     insightsState.dir = insightsState.dir === 'asc' ? 'desc' : 'asc';
-    update();
-  });
-  byId('insChips').addEventListener('click', e => {
-    const chip = e.target.closest('.ins-chip');
-    if (!chip) return;
-    if (chip.id === 'insMonth') insightsState.monthOnly = !insightsState.monthOnly;
-    else insightsState.band = chip.dataset.band;
     update();
   });
   resetEl.addEventListener('click', () => {
