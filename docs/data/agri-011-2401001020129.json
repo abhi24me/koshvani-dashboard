@@ -4,12 +4,80 @@
   "grant_text": "011",
   "scheme_code": "2401001020129",
   "district": "G.B.NAGAR",
-  "fin_year": null,
-  "generated_at": "2026-09-18T00:36:49+00:00",
-  "status": "error",
-  "message": "Unexpected page after following 'Grant-wise expenditure': https://koshvani.up.nic.in/ClearSession.aspx?aspxerrorpath=/KoshReports/ExpGrant.aspx",
-  "column_headers": [],
-  "column_widths": null,
-  "rows": [],
-  "totals": {}
+  "fin_year": "2026-2027",
+  "generated_at": "2026-09-18T05:48:27+00:00",
+  "status": "ok",
+  "message": null,
+  "prev_month": "August",
+  "current_month": "September",
+  "column_headers": [
+    "Treasury",
+    "Standard Object",
+    "Plan / Non-Plan",
+    "Voted / Charged",
+    "Progressive Allotment",
+    "Actual Progressive Expenditure upto month (August)",
+    "Provisional Current Month Expenditure(September)",
+    "Total Expenditure Upto Month (September)",
+    "% A/E"
+  ],
+  "column_widths": [
+    10.0,
+    15.0,
+    5.0,
+    5.0,
+    10.0,
+    15.0,
+    15.0,
+    20.0,
+    5.0
+  ],
+  "rows": [
+    {
+      "cells": [
+        "G.B.NAGAR",
+        "27-सब्सिडी",
+        "N",
+        "V",
+        "94725.00",
+        "0.00",
+        "0.00",
+        "0.00",
+        ".00"
+      ]
+    },
+    {
+      "cells": [
+        "",
+        "42-अन्य व्यय",
+        "N",
+        "V",
+        "12750.00",
+        "12750.00",
+        "0.00",
+        "12750.00",
+        "100.00"
+      ]
+    },
+    {
+      "cells": [
+        "",
+        "44-प्रशिक्षण हेतु यात्रा एवं अन्य प्रासंगिक व्यय",
+        "N",
+        "V",
+        "141750.00",
+        "0.00",
+        "0.00",
+        "0.00",
+        ".00"
+      ]
+    }
+  ],
+  "totals": {
+    "progressive_allotment": 249225.0,
+    "expenditure_upto_prev_month": 12750.0,
+    "current_month_expenditure": 0.0,
+    "total_expenditure_upto_month": 12750.0,
+    "pct_expenditure_of_allotment": 5.12
+  }
 }
