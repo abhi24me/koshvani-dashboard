@@ -4,67 +4,12 @@
   "grant_text": "011",
   "scheme_code": "2401001020103",
   "district": "G.B.NAGAR",
-  "fin_year": "2026-2027",
-  "generated_at": "2026-09-17T14:22:10+00:00",
-  "status": "ok",
-  "message": null,
-  "prev_month": "August",
-  "current_month": "September",
-  "column_headers": [
-    "Treasury",
-    "Standard Object",
-    "Plan / Non-Plan",
-    "Voted / Charged",
-    "Progressive Allotment",
-    "Actual Progressive Expenditure upto month (August)",
-    "Provisional Current Month Expenditure(September)",
-    "Total Expenditure Upto Month (September)",
-    "% A/E"
-  ],
-  "column_widths": [
-    10.0,
-    15.0,
-    5.0,
-    5.0,
-    10.0,
-    15.0,
-    15.0,
-    20.0,
-    5.0
-  ],
-  "rows": [
-    {
-      "cells": [
-        "G.B.NAGAR",
-        "27-सब्सिडी",
-        "N",
-        "V",
-        "283900.00",
-        "72180.00",
-        "0.00",
-        "72180.00",
-        "25.42"
-      ]
-    },
-    {
-      "cells": [
-        "",
-        "42-अन्य व्यय",
-        "N",
-        "V",
-        "340000.00",
-        "30000.00",
-        "0.00",
-        "30000.00",
-        "8.82"
-      ]
-    }
-  ],
-  "totals": {
-    "progressive_allotment": 623900.0,
-    "expenditure_upto_prev_month": 102180.0,
-    "current_month_expenditure": 0.0,
-    "total_expenditure_upto_month": 102180.0,
-    "pct_expenditure_of_allotment": 16.38
-  }
+  "fin_year": null,
+  "generated_at": "2026-09-18T00:36:21+00:00",
+  "status": "error",
+  "message": "Unexpected page after following 'Grant-wise expenditure': https://koshvani.up.nic.in/ClearSession.aspx?aspxerrorpath=/KoshReports/ExpGrant.aspx",
+  "column_headers": [],
+  "column_widths": null,
+  "rows": [],
+  "totals": {}
 }
