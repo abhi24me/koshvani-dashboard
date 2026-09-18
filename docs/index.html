@@ -396,10 +396,20 @@
     text-decoration: none;
   }
   a.ins-name:hover { color: var(--series-1); text-decoration: underline; }
-  .ins-bar { position: relative; height: 10px; }
+  .ins-barline { display: flex; align-items: center; gap: 12px; color: var(--text-secondary); }
+  .ins-barline .ins-bar { flex: 1 1 auto; min-width: 0; }
+  .ins-barline .ins-pct {
+    flex: 0 0 auto;
+    min-width: 60px;
+    text-align: right;
+    font-size: 13px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  .ins-bar { position: relative; height: 8px; }
   .ins-bar > span { position: absolute; left: 0; top: 0; height: 100%; border-radius: 0 4px 4px 0; }
-  .ins-bar .allot { background: color-mix(in srgb, var(--series-1) 26%, var(--surface-1)); min-width: 3px; }
-  .ins-bar .spent { background: var(--series-1); min-width: 2px; }
+  .ins-bar .allot { background: color-mix(in srgb, var(--series-1) 26%, var(--surface-1)); min-width: 4px; }
+  .ins-bar .spent { background: var(--series-1); min-width: 4px; }
   .ins-meta {
     display: flex;
     flex-wrap: wrap;
@@ -408,8 +418,7 @@
     color: var(--text-secondary);
     font-variant-numeric: tabular-nums;
   }
-  .ins-meta b { color: var(--text-primary); font-weight: 650; }
-  .ins-meta .ins-pct { margin-left: auto; font-weight: 700; }
+  .ins-meta b, .ins-meta .v.em { color: var(--text-primary); font-weight: 650; }
   .stat-tile .sub { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
   .legend-note {
     font-size: 11.5px;
@@ -974,13 +983,14 @@ function insightsSort(list, st) {
 }
 function sumBy(list, key) { return list.reduce((n, r) => n + r[key], 0); }
 function pctOf(part, whole) { return whole ? Math.round((part / whole) * 10000) / 100 : 0; }
-function fmtLeft(n) { return n >= 0 ? fmtCurrency(n) + ' left' : fmtCurrency(-n) + ' over allotment'; }
 function insightLink(r, cls) {
   return `<a${cls ? ` class="${cls}"` : ''} href="#/scheme/${encodeURIComponent(r.id)}">${escapeHtml(r.name)}</a>`;
 }
 
-// Bars share one scale so lengths compare across rows: light = allotted,
-// dark = spent, and the light part still showing is what is left to spend.
+// Drawn from the left: light = allotted, dark = spent, so the light part still
+// showing is what is left to spend. `scaleMax` is what 100% of the width means:
+// for a scheme it is its own allotment (a full bar = fully used, however small
+// the scheme); for the expense heads it is one scale shared by every row.
 function insightBar(allot, spent, scaleMax) {
   const w = v => Math.min(100, Math.round((v / scaleMax) * 1000) / 10);
   return '<div class="ins-bar" aria-hidden="true">' +
@@ -988,19 +998,24 @@ function insightBar(allot, spent, scaleMax) {
     (spent > 0 ? `<span class="spent" style="width:${w(spent)}%"></span>` : '') +
     '</div>';
 }
-const INSIGHT_LEGEND = '<div class="ins-legend"><span><i class="ins-swatch spent"></i>Spent so far</span><span><i class="ins-swatch allot"></i>Allotted (the lighter part is still unspent)</span></div>';
+const insightLegend = note => '<div class="ins-legend"><span><i class="ins-swatch spent"></i>Spent so far</span><span><i class="ins-swatch allot"></i>' + note + '</span></div>';
 
-function schemeRowHtml(r, scaleMax, monthName) {
+// The figure the list is currently sorted by is set in bold, so a re-sort is visible.
+function schemeRowHtml(r, monthName, sortKey) {
   const tip = `Spent ${fmtCurrency(r.spent)} of ${fmtCurrency(r.allot)} (${r.pct}%)`;
+  const v = (text, key) => `<span class="v${sortKey === key ? ' em' : ''}">${text}</span>`;
+  const left = r.left >= 0 ? v(fmtCurrency(r.left), 'left') + ' left' : v(fmtCurrency(-r.left), 'left') + ' over allotment';
   return `
     <div class="ins-row" title="${escapeHtml(tip)}">
       ${insightLink(r, 'ins-name')}
-      ${insightBar(r.allot, r.spent, scaleMax)}
-      <div class="ins-meta">
-        <span><b>${fmtCurrency(r.spent)}</b> spent of ${fmtCurrency(r.allot)}</span>
-        <span>${fmtLeft(r.left)}</span>
-        ${r.month > 0 ? `<span>+${fmtCurrency(r.month)} in ${escapeHtml(monthName)}</span>` : ''}
+      <div class="ins-barline">
+        ${insightBar(r.allot, r.spent, r.allot || 1)}
         <span class="ins-pct ${pctClass(r.pct)}">${r.pct}%</span>
+      </div>
+      <div class="ins-meta">
+        <span>${v(fmtCurrency(r.spent), 'spent')} spent of ${v(fmtCurrency(r.allot), 'allot')}</span>
+        <span>${left}</span>
+        ${r.month > 0 ? `<span>+${v(fmtCurrency(r.month), 'month')} in ${escapeHtml(monthName)}</span>` : ''}
       </div>
     </div>`;
 }
@@ -1027,36 +1042,41 @@ function aggregateHeads(list) {
   return { heads, covered };
 }
 
+// "Where the money goes": each bar is a head's share of ALL the money spent
+// (the light track is the whole), so the bar always matches the percentage.
 function headsHtml(list) {
   const { heads, covered } = aggregateHeads(list);
   if (!heads.length) return '';
-  const totalAllot = sumBy(heads, 'allot');
+  heads.sort((a, b) => (b.spent - a.spent) || (b.allot - a.allot) || a.name.localeCompare(b.name, 'hi'));
+  const totalSpent = sumBy(heads, 'spent');
+  const whole = Math.max(totalSpent, 1);
   const display = heads.slice(0, INSIGHT_TOP_HEADS);
   if (heads.length > INSIGHT_TOP_HEADS) {
     const rest = heads.slice(INSIGHT_TOP_HEADS);
     display.push({ name: `All other heads (${rest.length})`, allot: sumBy(rest, 'allot'), spent: sumBy(rest, 'spent') });
   }
-  const scaleMax = Math.max(1, ...display.map(h => Math.max(h.allot, h.spent)));
   const rowsHtml = display.map(h => {
+    const share = pctOf(h.spent, totalSpent);
     const used = pctOf(h.spent, h.allot);
-    const tip = `${h.name}: spent ${fmtCurrency(h.spent)} of ${fmtCurrency(h.allot)} (${used}%)`;
+    const tip = `${h.name}: ${share}% of all spending. Spent ${fmtCurrency(h.spent)} of ${fmtCurrency(h.allot)} allotted (${used}% used)`;
     return `
       <div class="ins-row" title="${escapeHtml(tip)}">
         <div class="ins-name">${escapeHtml(h.name)}</div>
-        ${insightBar(h.allot, h.spent, scaleMax)}
+        <div class="ins-barline">
+          ${insightBar(whole, h.spent, whole)}
+          <span class="ins-pct">${share}%</span>
+        </div>
         <div class="ins-meta">
-          <span><b>${fmtCurrency(h.spent)}</b> spent of ${fmtCurrency(h.allot)}</span>
-          <span>${pctOf(h.allot, totalAllot)}% of all allotment</span>
-          <span class="ins-pct ${pctClass(used)}">${used}%</span>
+          <span><b>${fmtCurrency(h.spent)}</b> spent</span>
+          <span>of ${fmtCurrency(h.allot)} allotted (${used}% used)</span>
         </div>
       </div>`;
   }).join('');
   return `
     <p class="section-label">Where the money goes, by expense head</p>
-    ${INSIGHT_LEGEND}
     <div class="ins-list">${rowsHtml}</div>
     <p class="legend-note">Expense heads are the government's own spending categories, added up across the ${covered} scheme${covered === 1 ? '' : 's'} shown.
-      The percentage is how much of that head's allotment has been spent.</p>`;
+      Each bar is that head's share of all the money spent so far; the figures beneath show how much of the head's own allotment has been used.</p>`;
 }
 
 function takeawaysHtml(list) {
@@ -1176,7 +1196,6 @@ async function renderInsights() {
       </div>
       ${missing ? `<p class="legend-note">Details for ${missing} of these schemes could not be loaded, so the monthly and expense-head figures leave them out.</p>` : ''}`;
 
-    const scaleMax = Math.max(1, ...shown.map(r => Math.max(r.allot, r.spent)));
     const dirWord = st.sort === 'name'
       ? (st.dir === 'asc' ? 'A to Z' : 'Z to A')
       : (st.dir === 'desc' ? 'highest first' : 'lowest first');
@@ -1187,8 +1206,8 @@ async function renderInsights() {
         ${take ? `<section class="ins-take">${take}</section>` : ''}
         <section class="ins-schemes">
           <p class="section-label">Schemes (${shown.length}), sorted by ${escapeHtml(INSIGHT_SORTS[st.sort].phrase)}, ${dirWord}</p>
-          ${INSIGHT_LEGEND}
-          <div class="ins-list">${shown.map(r => schemeRowHtml(r, scaleMax, monthName)).join('')}</div>
+          ${insightLegend('Still unspent &mdash; a full bar means fully used')}
+          <div class="ins-list">${shown.map(r => schemeRowHtml(r, monthName, st.sort)).join('')}</div>
           <p class="legend-note">Each scheme's percentage is how much of its own allotment has been used &mdash;
             <span class="pct-good" style="font-weight:700">green</span> is 60%+ used,
             <span class="pct-warn" style="font-weight:700">red</span> is under 25% used. Select a scheme to see its full table.</p>
