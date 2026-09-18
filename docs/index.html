@@ -942,16 +942,30 @@ async function renderInsights() {
 }
 
 /* ---------- routing ---------- */
-function route() {
+// Every view swap replaces #app (via a short "Loading..." placeholder), which
+// collapses the page and resets scroll to the top - so the list's scroll
+// position is remembered here and put back once the list has re-rendered.
+if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+let listScrollY = 0;
+
+async function route() {
   const hash = location.hash || '#/';
+
+  // Only record while the fully rendered list is on screen - not while a
+  // loading placeholder has already clamped the scroll position to 0.
+  if (app.querySelector('.scheme-grid')) listScrollY = window.scrollY;
+
   const m = hash.match(/^#\/scheme\/(.+)$/);
   if (m) {
-    renderDetail(decodeURIComponent(m[1]));
+    await renderDetail(decodeURIComponent(m[1]));
+    window.scrollTo(0, 0);
   } else if (hash === '#/insights') {
-    renderInsights();
+    await renderInsights();
+    window.scrollTo(0, 0);
   } else {
     districtTag.textContent = 'G.B.NAGAR';
-    renderList();
+    await renderList();
+    window.scrollTo(0, listScrollY);
   }
 }
 window.addEventListener('hashchange', route);
