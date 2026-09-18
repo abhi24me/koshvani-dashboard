@@ -276,7 +276,7 @@
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
-    margin: 14px 0 26px;
+    margin: 0 0 18px;
   }
   .status-summary .chip {
     font-size: 11.5px;
@@ -287,54 +287,157 @@
     border-radius: 999px;
     padding: 4px 12px;
   }
-  .bar-list {
+  .sr-only {
+    position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+    overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+  }
+  .ins-asof { font-size: 12px; color: var(--text-muted); margin: -8px 0 14px; }
+
+  /* filter + sort bar: one row above everything it scopes */
+  .ins-controls {
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+  .ins-line { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; }
+  .ins-label { font-size: 12px; color: var(--text-muted); }
+  .ins-input, .ins-select, .ins-btn {
+    font: inherit;
+    font-size: 13px;
+    color: var(--text-primary);
+    background: var(--page-plane);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 8px 12px;
+    min-height: 38px;
+  }
+  .ins-input { flex: 1 1 220px; min-width: 0; }
+  .ins-btn { cursor: pointer; font-weight: 600; }
+  .ins-btn:hover { border-color: var(--series-1); }
+  .ins-sortwrap { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  .ins-group { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  .ins-chip {
+    font: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 6px 12px;
+    cursor: pointer;
+  }
+  .ins-chip:hover { border-color: var(--series-1); }
+  .ins-chip[aria-pressed="true"] {
+    color: var(--text-primary);
+    background: color-mix(in srgb, var(--series-1) 16%, transparent);
+    border-color: var(--series-1);
+  }
+  .ins-chip .n { font-weight: 500; color: var(--text-muted); margin-left: 5px; font-variant-numeric: tabular-nums; }
+  .ins-link {
+    font: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--series-1);
+    background: none;
+    border: none;
+    padding: 6px 4px;
+    cursor: pointer;
+  }
+  .ins-input:focus-visible, .ins-select:focus-visible, .ins-btn:focus-visible,
+  .ins-chip:focus-visible, .ins-link:focus-visible, a.ins-name:focus-visible,
+  .ins-take a:focus-visible {
+    outline: 2px solid var(--series-1);
+    outline-offset: 2px;
+  }
+  .ins-count { font-size: 12px; color: var(--text-muted); }
+  @media (max-width: 700px) {
+    .ins-input, .ins-select { font-size: 16px; }
+    .ins-chip { padding: 8px 13px; }
+    .ins-sortwrap { flex: 1 1 100%; flex-wrap: nowrap; }
+    .ins-select { flex: 1 1 0; min-width: 0; }
+  }
+
+  /* results: one slice, three sections */
+  .ins-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 22px; margin-top: 18px; }
+  @media (min-width: 1000px) {
+    .ins-grid {
+      grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+      grid-template-areas: "list take" "list heads";
+      grid-template-rows: auto 1fr;
+      align-items: start;
+    }
+    .ins-take { grid-area: take; }
+    .ins-schemes { grid-area: list; }
+    .ins-heads { grid-area: heads; }
+  }
+  .ins-takeaways {
+    margin: 0;
+    padding: 14px 18px 14px 34px;
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--text-secondary);
+  }
+  .ins-takeaways li + li { margin-top: 4px; }
+  .ins-takeaways a { color: var(--text-primary); font-weight: 650; text-decoration: none; }
+  .ins-takeaways a:hover { color: var(--series-1); text-decoration: underline; }
+  .ins-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 16px;
+    font-size: 11.5px;
+    color: var(--text-secondary);
+    margin: 0 0 10px;
+  }
+  .ins-legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .ins-swatch { width: 14px; height: 8px; border-radius: 0 3px 3px 0; }
+  .ins-swatch.spent { background: var(--series-1); }
+  .ins-swatch.allot { background: color-mix(in srgb, var(--series-1) 26%, var(--surface-1)); }
+  .ins-list {
     background: var(--surface-1);
     border: 1px solid var(--border);
     border-radius: 12px;
     padding: 4px 18px;
   }
-  .bar-row {
+  .ins-row {
     display: flex;
     flex-direction: column;
     gap: 7px;
     padding: 12px 0;
     border-bottom: 1px solid var(--gridline);
   }
-  .bar-row:last-child { border-bottom: none; }
-  .bar-row .bar-name {
+  .ins-row:last-child { border-bottom: none; }
+  .ins-name {
     font-size: 12.5px;
     font-weight: 600;
     line-height: 1.35;
+    color: var(--text-primary);
+    text-decoration: none;
   }
-  .bar-row .bar-viz {
+  a.ins-name:hover { color: var(--series-1); text-decoration: underline; }
+  .ins-bar { position: relative; height: 10px; }
+  .ins-bar > span { position: absolute; left: 0; top: 0; height: 100%; border-radius: 0 4px 4px 0; }
+  .ins-bar .allot { background: color-mix(in srgb, var(--series-1) 26%, var(--surface-1)); min-width: 3px; }
+  .ins-bar .spent { background: var(--series-1); min-width: 2px; }
+  .ins-meta {
     display: flex;
-    align-items: center;
-    gap: 12px;
     flex-wrap: wrap;
-  }
-  .bar-track {
-    flex: 1 1 140px;
-    height: 10px;
-    border-radius: 999px;
-    background: var(--gridline);
-    overflow: hidden;
-  }
-  .bar-fill {
-    height: 100%;
-    border-radius: 999px;
-    background: var(--series-1);
-    min-width: 3px;
-  }
-  .bar-meta {
-    flex: 0 0 auto;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    gap: 2px 14px;
     font-size: 12px;
+    color: var(--text-secondary);
     font-variant-numeric: tabular-nums;
   }
-  .bar-meta .bar-amount { color: var(--text-secondary); font-weight: 600; }
-  .bar-meta .bar-pct { font-weight: 700; min-width: 40px; text-align: right; }
+  .ins-meta b { color: var(--text-primary); font-weight: 650; }
+  .ins-meta .ins-pct { margin-left: auto; font-weight: 700; }
+  .stat-tile .sub { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
   .legend-note {
     font-size: 11.5px;
     color: var(--text-muted);
@@ -547,7 +650,7 @@ const app = document.getElementById('app');
 const districtTag = document.getElementById('districtTag');
 const themeBtn = document.getElementById('themeBtn');
 const insightsBtn = document.getElementById('insightsBtn');
-insightsBtn.addEventListener('click', () => { location.hash = '#/insights'; });
+insightsBtn.addEventListener('click', () => { insightsScrollY = 0; location.hash = '#/insights'; });
 
 /* ---------- theme toggle ---------- */
 function applyTheme(mode) {
@@ -790,16 +893,18 @@ async function renderList() {
 /* ---------- detail view ---------- */
 async function renderDetail(id) {
   app.innerHTML = '<div class="loading">Loading scheme...</div>';
+  const backHash = cameFrom === 'insights' ? '#/insights' : '#/';
+  const backLabel = cameFrom === 'insights' ? 'Back to insights' : 'Back to schemes';
   let data;
   try {
     data = await fetchJSON('data/' + id + '.json');
   } catch (e) {
-    app.innerHTML = '<button class="back-link" onclick="location.hash=\'#/\'">&larr; Back</button><div class="error-state">Could not load this scheme\'s data.</div>';
+    app.innerHTML = `<button class="back-link" onclick="location.hash='${backHash}'">&larr; Back</button><div class="error-state">Could not load this scheme's data.</div>`;
     return;
   }
 
   const header = `
-    <button class="back-link" onclick="location.hash='#/'">&larr; Back to schemes</button>
+    <button class="back-link" onclick="location.hash='${backHash}'">&larr; ${backLabel}</button>
     <div class="detail-header">
       <div class="detail-header-top">
         <h2>${escapeHtml(data.name)}</h2>
@@ -864,23 +969,187 @@ async function renderDetail(id) {
 }
 
 /* ---------- insights view ---------- */
+// Filter/sort choices live at module level so they survive opening a scheme
+// from here and coming back; "Reset" clears them.
+const INSIGHT_BANDS = [
+  { key: 'all',  label: 'All levels',    test: () => true },
+  { key: 'low',  label: 'Under 25%',     test: p => p < 25 },
+  { key: 'mid',  label: '25% to 59%',    test: p => p >= 25 && p < 60 },
+  { key: 'high', label: '60% and above', test: p => p >= 60 },
+];
+const INSIGHT_SORTS = {
+  spent: { label: 'Expenditure',  phrase: 'expenditure so far',            get: r => r.spent, natural: 'desc' },
+  allot: { label: 'Allotment',    phrase: 'allotment',                     get: r => r.allot, natural: 'desc' },
+  pct:   { label: '% spent',      phrase: 'percentage of allotment spent', get: r => r.pct,   natural: 'desc' },
+  left:  { label: 'Balance left', phrase: 'balance left',                  get: r => r.left,  natural: 'desc' },
+  month: { label: 'This month',   phrase: 'spending this month',           get: r => r.month, natural: 'desc' },
+  name:  { label: 'Name',         phrase: 'name',                          get: r => r.name,  natural: 'asc'  },
+};
+const INSIGHT_DEFAULTS = { q: '', band: 'all', monthOnly: false, sort: 'spent', dir: 'desc' };
+const INSIGHT_TOP_HEADS = 8;
+const INSIGHTS_CACHE_MS = 2 * 60 * 1000;
+let insightsState = { ...INSIGHT_DEFAULTS };
+let insightsCache = null;
+
+// `skip` leaves one filter out, so each chip can show the count it WOULD give.
+function insightsFilter(rows, st, skip) {
+  const q = st.q.trim().toLowerCase();
+  const band = INSIGHT_BANDS.find(b => b.key === st.band) || INSIGHT_BANDS[0];
+  return rows.filter(r =>
+    (!q || r.name.toLowerCase().includes(q) || r.code.includes(q)) &&
+    (skip === 'band' || band.test(r.pct)) &&
+    (skip === 'month' || !st.monthOnly || r.month > 0));
+}
+function insightsSort(list, st) {
+  const get = INSIGHT_SORTS[st.sort].get;
+  const sign = st.dir === 'asc' ? 1 : -1;
+  return [...list].sort((a, b) => {
+    const x = get(a), y = get(b);
+    const c = typeof x === 'string' ? x.localeCompare(y, 'hi') : x - y;
+    return c ? c * sign : a.name.localeCompare(b.name, 'hi');
+  });
+}
+function sumBy(list, key) { return list.reduce((n, r) => n + r[key], 0); }
+function pctOf(part, whole) { return whole ? Math.round((part / whole) * 10000) / 100 : 0; }
+function fmtLeft(n) { return n >= 0 ? fmtCurrency(n) + ' left' : fmtCurrency(-n) + ' over allotment'; }
+function insightLink(r, cls) {
+  return `<a${cls ? ` class="${cls}"` : ''} href="#/scheme/${encodeURIComponent(r.id)}">${escapeHtml(r.name)}</a>`;
+}
+
+// Bars share one scale so lengths compare across rows: light = allotted,
+// dark = spent, and the light part still showing is what is left to spend.
+function insightBar(allot, spent, scaleMax) {
+  const w = v => Math.min(100, Math.round((v / scaleMax) * 1000) / 10);
+  return '<div class="ins-bar" aria-hidden="true">' +
+    (allot > 0 ? `<span class="allot" style="width:${w(allot)}%"></span>` : '') +
+    (spent > 0 ? `<span class="spent" style="width:${w(spent)}%"></span>` : '') +
+    '</div>';
+}
+const INSIGHT_LEGEND = '<div class="ins-legend"><span><i class="ins-swatch spent"></i>Spent so far</span><span><i class="ins-swatch allot"></i>Allotted (the lighter part is still unspent)</span></div>';
+
+function schemeRowHtml(r, scaleMax, monthName) {
+  const tip = `Spent ${fmtCurrency(r.spent)} of ${fmtCurrency(r.allot)} (${r.pct}%)`;
+  return `
+    <div class="ins-row" title="${escapeHtml(tip)}">
+      ${insightLink(r, 'ins-name')}
+      ${insightBar(r.allot, r.spent, scaleMax)}
+      <div class="ins-meta">
+        <span><b>${fmtCurrency(r.spent)}</b> spent of ${fmtCurrency(r.allot)}</span>
+        <span>${fmtLeft(r.left)}</span>
+        ${r.month > 0 ? `<span>+${fmtCurrency(r.month)} in ${escapeHtml(monthName)}</span>` : ''}
+        <span class="ins-pct ${pctClass(r.pct)}">${r.pct}%</span>
+      </div>
+    </div>`;
+}
+
+// Adds the Standard Object column of every scheme's rows together, so the
+// reader can see what the money is actually spent on.
+function aggregateHeads(list) {
+  const map = new Map();
+  let covered = 0;
+  list.forEach(r => {
+    if (!r.rows) return;
+    covered++;
+    r.rows.forEach(row => {
+      const c = row.cells;
+      const num = i => parseFloat(String(c[i]).replace(/,/g, '')) || 0;
+      const key = c[1] || '(no label)';
+      const h = map.get(key) || { name: key, allot: 0, spent: 0 };
+      h.allot += num(4);
+      h.spent += num(7);
+      map.set(key, h);
+    });
+  });
+  const heads = [...map.values()].sort((a, b) => (b.allot - a.allot) || a.name.localeCompare(b.name, 'hi'));
+  return { heads, covered };
+}
+
+function headsHtml(list) {
+  const { heads, covered } = aggregateHeads(list);
+  if (!heads.length) return '';
+  const totalAllot = sumBy(heads, 'allot');
+  const display = heads.slice(0, INSIGHT_TOP_HEADS);
+  if (heads.length > INSIGHT_TOP_HEADS) {
+    const rest = heads.slice(INSIGHT_TOP_HEADS);
+    display.push({ name: `All other heads (${rest.length})`, allot: sumBy(rest, 'allot'), spent: sumBy(rest, 'spent') });
+  }
+  const scaleMax = Math.max(1, ...display.map(h => Math.max(h.allot, h.spent)));
+  const rowsHtml = display.map(h => {
+    const used = pctOf(h.spent, h.allot);
+    const tip = `${h.name}: spent ${fmtCurrency(h.spent)} of ${fmtCurrency(h.allot)} (${used}%)`;
+    return `
+      <div class="ins-row" title="${escapeHtml(tip)}">
+        <div class="ins-name">${escapeHtml(h.name)}</div>
+        ${insightBar(h.allot, h.spent, scaleMax)}
+        <div class="ins-meta">
+          <span><b>${fmtCurrency(h.spent)}</b> spent of ${fmtCurrency(h.allot)}</span>
+          <span>${pctOf(h.allot, totalAllot)}% of all allotment</span>
+          <span class="ins-pct ${pctClass(used)}">${used}%</span>
+        </div>
+      </div>`;
+  }).join('');
+  return `
+    <p class="section-label">Where the money goes, by expense head</p>
+    ${INSIGHT_LEGEND}
+    <div class="ins-list">${rowsHtml}</div>
+    <p class="legend-note">Expense heads are the government's own spending categories, added up across the ${covered} scheme${covered === 1 ? '' : 's'} shown.
+      The percentage is how much of that head's allotment has been spent.</p>`;
+}
+
+function takeawaysHtml(list) {
+  if (list.length < 2) return '';
+  const items = [];
+  const top = list.reduce((a, b) => (b.spent > a.spent ? b : a));
+  if (top.spent > 0) items.push(`${insightLink(top)} has spent the most: ${fmtCurrency(top.spent)} (${top.pct}% of its allotment).`);
+  const most = list.reduce((a, b) => (b.left > a.left ? b : a));
+  if (most.left > 0) items.push(`${insightLink(most)} has the most money still unspent: ${fmtCurrency(most.left)} of ${fmtCurrency(most.allot)}.`);
+  const zero = list.filter(r => r.spent === 0).length;
+  if (zero) items.push(`${zero} scheme${zero === 1 ? ' has' : 's have'} not spent anything yet.`);
+  const nearly = list.filter(r => r.pct >= 90).length;
+  if (nearly) items.push(`${nearly} scheme${nearly === 1 ? ' has' : 's have'} used 90% or more of ${nearly === 1 ? 'its' : 'their'} allotment.`);
+  return items.length ? `<p class="section-label">Quick takeaways</p><ul class="ins-takeaways">${items.map(i => `<li>${i}</li>`).join('')}</ul>` : '';
+}
+
+async function loadInsightsData() {
+  if (insightsCache && Date.now() - insightsCache.at < INSIGHTS_CACHE_MS) return insightsCache;
+  const idx = await fetchJSON('data/index.json');
+  const details = {};
+  await Promise.all((idx.schemes || []).filter(s => s.status === 'ok').map(async s => {
+    try { details[s.id] = await fetchJSON('data/' + s.id + '.json'); } catch (e) { /* this scheme just won't feed the monthly / expense-head views */ }
+  }));
+  insightsCache = { at: Date.now(), idx, details };
+  return insightsCache;
+}
+
 async function renderInsights() {
-  app.innerHTML = '<div class="loading">Loading insights...</div>';
-  let idx;
+  const fresh = insightsCache && Date.now() - insightsCache.at < INSIGHTS_CACHE_MS;
+  if (!fresh) app.innerHTML = '<div class="loading">Loading insights...</div>';
+  let data;
   try {
-    idx = await fetchJSON('data/index.json');
+    data = await loadInsightsData();
   } catch (e) {
     app.innerHTML = '<button class="back-link" onclick="location.hash=\'#/\'">&larr; Back</button><div class="error-state">Could not load dashboard data.</div>';
     return;
   }
   districtTag.textContent = 'G.B.NAGAR';
 
+  const { idx, details } = data;
   const schemes = idx.schemes || [];
-  const withData = schemes.filter(s => s.status === 'ok' && s.total_expenditure != null);
+  const monthName = (Object.values(details).find(d => d.current_month) || {}).current_month || '';
+  const fy = (schemes.find(s => s.fin_year) || {}).fin_year;
 
-  const totalAllotment = withData.reduce((sum, s) => sum + (s.progressive_allotment || 0), 0);
-  const totalExpenditure = withData.reduce((sum, s) => sum + (s.total_expenditure || 0), 0);
-  const overallPct = totalAllotment ? Math.round((totalExpenditure / totalAllotment) * 10000) / 100 : 0;
+  const rows = schemes.filter(s => s.status === 'ok' && s.total_expenditure != null).map(s => {
+    const d = details[s.id];
+    const allot = s.progressive_allotment || 0;
+    const spent = s.total_expenditure || 0;
+    return {
+      id: s.id, name: s.name, code: String(s.scheme_code || ''),
+      allot, spent, left: allot - spent,
+      pct: s.pct_expenditure_of_allotment ?? 0,
+      month: d ? ((d.totals || {}).current_month_expenditure || 0) : 0,
+      rows: d ? (d.rows || []) : null,
+    };
+  });
 
   const statusCounts = {};
   schemes.forEach(s => { statusCounts[s.status] = (statusCounts[s.status] || 0) + 1; });
@@ -888,57 +1157,139 @@ async function renderInsights() {
     .map(([status, count]) => `<span class="chip">${count} &times; ${escapeHtml(statusLabel(status))}</span>`)
     .join('');
 
-  const header = `
-    <button class="back-link" onclick="location.hash='#/'">&larr; Back to schemes</button>
-    <div class="detail-header">
-      <h2>Spending at a Glance</h2>
-      <p class="insights-intro">A combined view across all ${schemes.length} tracked scheme${schemes.length === 1 ? '' : 's'} for G.B.NAGAR &mdash; how much has been allotted, how much has actually been spent, and which schemes account for the most.</p>
-    </div>
-  `;
+  const sortOptions = Object.entries(INSIGHT_SORTS)
+    .map(([k, v]) => `<option value="${k}">${escapeHtml(v.label)}</option>`).join('');
+  const bandChips = INSIGHT_BANDS
+    .map(b => `<button type="button" class="ins-chip" data-band="${b.key}" aria-pressed="false">${escapeHtml(b.label)}<span class="n"></span></button>`).join('');
+  const monthChip = monthName
+    ? `<button type="button" class="ins-chip" id="insMonth" aria-pressed="false">Spent in ${escapeHtml(monthName)}<span class="n"></span></button>` : '';
 
-  const stats = `
-    <div class="stat-row">
-      <div class="stat-tile"><div class="label">Total Allotment</div><div class="num">${fmtCurrency(totalAllotment)}</div></div>
-      <div class="stat-tile"><div class="label">Total Expenditure</div><div class="num">${fmtCurrency(totalExpenditure)}</div></div>
-      <div class="stat-tile"><div class="label">Overall % Spent</div><div class="num ${pctClass(overallPct)}">${overallPct}%</div></div>
-    </div>
-    <div class="status-summary">${statusChips}</div>
-  `;
+  const controls = `
+    <div class="ins-controls" role="group" aria-label="Filter and sort schemes">
+      <div class="ins-line">
+        <input id="insQ" class="ins-input" type="search" placeholder="Search by scheme name or code" aria-label="Search schemes by name or code" autocomplete="off">
+        <span class="ins-sortwrap">
+          <label class="ins-label" for="insSort">Sort by</label>
+          <select id="insSort" class="ins-select">${sortOptions}</select>
+          <button id="insDir" class="ins-btn" type="button" title="Reverse the sort order"></button>
+        </span>
+      </div>
+      <div class="ins-line" id="insChips">
+        <span class="ins-group"><span class="ins-label">Spending level</span>${bandChips}</span>
+        ${monthChip ? `<span class="ins-group"><span class="ins-label">Activity</span>${monthChip}</span>` : ''}
+        <button type="button" class="ins-link" id="insReset" hidden>Reset</button>
+      </div>
+      <div class="ins-count" id="insCount" aria-live="polite"></div>
+    </div>`;
 
-  if (withData.length === 0) {
-    app.innerHTML = header + stats + '<div class="empty-state">No scheme has G.B.NAGAR expenditure data yet.</div>';
-    return;
+  app.innerHTML = `
+    <div class="insights-root">
+      <button class="back-link" onclick="location.hash='#/'">&larr; Back to schemes</button>
+      <div class="detail-header">
+        <h2>Spending at a Glance</h2>
+        <p class="insights-intro">A combined view across all ${schemes.length} tracked scheme${schemes.length === 1 ? '' : 's'} for G.B.NAGAR &mdash; how much has been allotted, how much has actually been spent, and where it went. Use the filters to look at any slice you like; everything below follows them.</p>
+      </div>
+      <p class="ins-asof">Updated ${fmtDate(idx.generated_at)}${fy ? ' &middot; FY ' + escapeHtml(fy) : ''}${monthName ? ' &middot; figures run up to ' + escapeHtml(monthName) + ' (the current month is provisional)' : ''}</p>
+      <div class="status-summary">${statusChips}</div>
+      ${rows.length === 0
+        ? '<div class="empty-state">No scheme has G.B.NAGAR expenditure data yet.</div>'
+        : controls + '<div id="insResults"></div>'}
+    </div>`;
+  if (rows.length === 0) return;
+
+  const byId = id => document.getElementById(id);
+  const qEl = byId('insQ'), sortEl = byId('insSort'), dirEl = byId('insDir');
+  const monthEl = byId('insMonth'), resetEl = byId('insReset');
+  const countEl = byId('insCount'), resultsEl = byId('insResults');
+  const bandEls = [...app.querySelectorAll('[data-band]')];
+  qEl.value = insightsState.q;
+  sortEl.value = insightsState.sort;
+
+  function resultsHtml(shown) {
+    const st = insightsState;
+    if (shown.length === 0) {
+      return '<div class="empty-state" style="margin-top:18px">No schemes match these filters. Try clearing the search or choosing a different spending level.</div>';
+    }
+    const allot = sumBy(shown, 'allot'), spent = sumBy(shown, 'spent'), month = sumBy(shown, 'month');
+    const pct = pctOf(spent, allot);
+    const missing = shown.filter(r => !r.rows).length;
+    const tiles = `
+      <div class="stat-row">
+        <div class="stat-tile"><div class="label">Total Allotment</div><div class="num">${fmtCurrency(allot)}</div></div>
+        <div class="stat-tile"><div class="label">Total Expenditure</div><div class="num">${fmtCurrency(spent)}</div></div>
+        <div class="stat-tile"><div class="label">Balance Left</div><div class="num">${allot - spent >= 0 ? fmtCurrency(allot - spent) : fmtCurrency(spent - allot) + ' over'}</div></div>
+        <div class="stat-tile"><div class="label">% Spent</div><div class="num ${pctClass(pct)}">${pct}%</div></div>
+        ${monthName ? `<div class="stat-tile"><div class="label">Spent in ${escapeHtml(monthName)}</div><div class="num">${fmtCurrency(month)}</div><div class="sub">provisional</div></div>` : ''}
+      </div>
+      ${missing ? `<p class="legend-note">Details for ${missing} of these schemes could not be loaded, so the monthly and expense-head figures leave them out.</p>` : ''}`;
+
+    const scaleMax = Math.max(1, ...shown.map(r => Math.max(r.allot, r.spent)));
+    const dirWord = st.sort === 'name'
+      ? (st.dir === 'asc' ? 'A to Z' : 'Z to A')
+      : (st.dir === 'desc' ? 'highest first' : 'lowest first');
+    const take = takeawaysHtml(shown);
+    return `
+      ${tiles}
+      <div class="ins-grid">
+        ${take ? `<section class="ins-take">${take}</section>` : ''}
+        <section class="ins-schemes">
+          <p class="section-label">Schemes (${shown.length}), sorted by ${escapeHtml(INSIGHT_SORTS[st.sort].phrase)}, ${dirWord}</p>
+          ${INSIGHT_LEGEND}
+          <div class="ins-list">${shown.map(r => schemeRowHtml(r, scaleMax, monthName)).join('')}</div>
+          <p class="legend-note">Each scheme's percentage is how much of its own allotment has been used &mdash;
+            <span class="pct-good" style="font-weight:700">green</span> is 60%+ used,
+            <span class="pct-warn" style="font-weight:700">red</span> is under 25% used. Select a scheme to see its full table.</p>
+        </section>
+        <section class="ins-heads">${headsHtml(shown)}</section>
+      </div>`;
   }
 
-  const sorted = [...withData].sort((a, b) => (b.total_expenditure || 0) - (a.total_expenditure || 0));
-  const maxExpenditure = sorted[0].total_expenditure || 1;
+  function update() {
+    const st = insightsState;
+    const shown = insightsSort(insightsFilter(rows, st), st);
 
-  const bars = sorted.map(s => {
-    const widthPct = Math.max(1, Math.round((s.total_expenditure / maxExpenditure) * 1000) / 10);
-    const cls = pctClass(s.pct_expenditure_of_allotment);
-    return `
-      <div class="bar-row">
-        <div class="bar-name">${escapeHtml(s.name)}</div>
-        <div class="bar-viz">
-          <div class="bar-track"><div class="bar-fill" style="width:${widthPct}%"></div></div>
-          <div class="bar-meta">
-            <span class="bar-amount">${fmtCurrency(s.total_expenditure)}</span>
-            <span class="bar-pct ${cls}">${s.pct_expenditure_of_allotment ?? '—'}%</span>
-          </div>
-        </div>
-      </div>
-    `;
-  }).join('');
+    const bandBase = insightsFilter(rows, st, 'band');
+    bandEls.forEach(el => {
+      const b = INSIGHT_BANDS.find(x => x.key === el.dataset.band);
+      el.querySelector('.n').textContent = bandBase.filter(r => b.test(r.pct)).length;
+      el.setAttribute('aria-pressed', String(st.band === b.key));
+    });
+    if (monthEl) {
+      monthEl.querySelector('.n').textContent = insightsFilter(rows, st, 'month').filter(r => r.month > 0).length;
+      monthEl.setAttribute('aria-pressed', String(st.monthOnly));
+    }
+    dirEl.textContent = st.sort === 'name'
+      ? (st.dir === 'asc' ? 'A → Z' : 'Z → A')
+      : (st.dir === 'desc' ? 'High → low' : 'Low → high');
+    resetEl.hidden = Object.keys(INSIGHT_DEFAULTS).every(k => st[k] === INSIGHT_DEFAULTS[k]);
+    countEl.textContent = `Showing ${shown.length} of ${rows.length} scheme${rows.length === 1 ? '' : 's'}`;
+    resultsEl.innerHTML = resultsHtml(shown);
+  }
 
-  const chart = `
-    <p class="section-label">Expenditure by scheme, highest first</p>
-    <div class="bar-list">${bars}</div>
-    <p class="legend-note">Bar length shows expenditure relative to the highest-spending scheme. The percentage is how much of that scheme's own allotment has been used &mdash;
-      <span class="pct-good" style="font-weight:700">green</span> is 60%+ used,
-      <span class="pct-warn" style="font-weight:700">red</span> is under 25% used.</p>
-  `;
-
-  app.innerHTML = header + stats + chart;
+  qEl.addEventListener('input', () => { insightsState.q = qEl.value; update(); });
+  sortEl.addEventListener('change', () => {
+    insightsState.sort = sortEl.value;
+    insightsState.dir = INSIGHT_SORTS[sortEl.value].natural;
+    update();
+  });
+  dirEl.addEventListener('click', () => {
+    insightsState.dir = insightsState.dir === 'asc' ? 'desc' : 'asc';
+    update();
+  });
+  byId('insChips').addEventListener('click', e => {
+    const chip = e.target.closest('.ins-chip');
+    if (!chip) return;
+    if (chip.id === 'insMonth') insightsState.monthOnly = !insightsState.monthOnly;
+    else insightsState.band = chip.dataset.band;
+    update();
+  });
+  resetEl.addEventListener('click', () => {
+    insightsState = { ...INSIGHT_DEFAULTS };
+    qEl.value = '';
+    sortEl.value = insightsState.sort;
+    update();
+  });
+  update();
 }
 
 /* ---------- routing ---------- */
@@ -947,23 +1298,31 @@ async function renderInsights() {
 // position is remembered here and put back once the list has re-rendered.
 if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 let listScrollY = 0;
+let insightsScrollY = 0;
+let currentView = null;   // 'list' | 'insights' | 'detail'
+let cameFrom = 'list';    // which view a scheme's detail page was opened from
 
 async function route() {
   const hash = location.hash || '#/';
 
-  // Only record while the fully rendered list is on screen - not while a
+  // Only record while the fully rendered view is on screen - not while a
   // loading placeholder has already clamped the scroll position to 0.
   if (app.querySelector('.scheme-grid')) listScrollY = window.scrollY;
+  else if (app.querySelector('.insights-root')) insightsScrollY = window.scrollY;
 
   const m = hash.match(/^#\/scheme\/(.+)$/);
   if (m) {
+    if (currentView === 'list' || currentView === 'insights') cameFrom = currentView;
+    currentView = 'detail';
     await renderDetail(decodeURIComponent(m[1]));
     window.scrollTo(0, 0);
   } else if (hash === '#/insights') {
+    currentView = 'insights';
     await renderInsights();
-    window.scrollTo(0, 0);
+    window.scrollTo(0, insightsScrollY);
   } else {
     districtTag.textContent = 'G.B.NAGAR';
+    currentView = 'list';
     await renderList();
     window.scrollTo(0, listScrollY);
   }
