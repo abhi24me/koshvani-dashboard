@@ -45,7 +45,10 @@ A phone on mobile data is a genuine residential-class connection too, and
 running a plain Python script is much lighter than trying to run a full
 browser or a GitHub Actions runner on Android. `run_daily.sh` (repo root)
 does the same pull-scrape-commit-push cycle as `refresh.bat`, meant to run
-on a schedule via [Termux](https://termux.dev/) + Termux:Boot:
+on a schedule via [Termux](https://termux.dev/) + Termux:Boot. If a run is cut
+short (killed by Android, a fatal error), what it had already scraped is
+committed and pushed anyway, and leftovers from a killed run are saved as a
+commit rather than discarded:
 
 ```
 pkg install python git -y
@@ -128,9 +131,73 @@ scheme name/link to Claude in a future session and ask it to add it for you.
 python scraper/scrape.py
 ```
 
-Writes `docs/data/index.json` and one `docs/data/<id>.json` per scheme. You
-can open `docs/index.html` via a local static server (e.g.
-`python -m http.server` from inside `docs/`) to preview before pushing.
+Writes `docs/data/index.json`, one `docs/data/<id>.json` per scheme, and
+`docs/data/crawler_status.json` (see below). You can open `docs/index.html`
+via a local static server (e.g. `python -m http.server` from inside `docs/`)
+to preview before pushing.
+
+## How a crawl is tracked
+
+Every scheme is an independent unit, and the run is built so that nothing
+already scraped can be lost:
+
+- **Per-scheme retries, in the same run.** Each scheme gets up to 3 attempts
+  (`MAX_ATTEMPTS`), one scheme at a time - there is no separate retry pass
+  afterwards, and a scheme that succeeded is never retried. Every attempt uses
+  a fresh session (fresh cookies and freshly generated portal links). The wait
+  before attempt 2 is random 5-15 s and before attempt 3 random 15-30 s
+  (`RETRY_1_DELAY_*`, `RETRY_2_DELAY_*` at the top of `scraper/scrape.py`).
+- **Saved immediately.** A scheme's `docs/data/<id>.json` is written (atomically:
+  temp file, then `os.replace`) the moment it has been scraped and validated,
+  so a later failure or crash can never take it away. `index.json` is refreshed
+  after every scheme, so it never claims more than what is really on disk.
+- **`docs/data/crawler_status.json`** - exactly one file, describing the
+  *current* execution only (git history keeps the previous ones), reset at the
+  start of every run. Keyed by the numeric scheme code from `schemes.json`:
+
+  ```json
+  {
+    "execution_id": "2026-09-19T14:30:12+00:00",
+    "started_at": "2026-09-19T14:30:12+00:00",
+    "updated_at": "2026-09-19T14:32:41+00:00",
+    "finished_at": "2026-09-19T14:32:41+00:00",
+    "overall_status": "WARNING",
+    "fatal_error": "",
+    "schemes": {
+      "2401000010500": {"status": 1,  "attempts": 1, "remark": ""},
+      "2401001020103": {"status": 1,  "attempts": 2, "remark": "Recovered on retry"},
+      "2401001020129": {"status": -1, "attempts": 3, "remark": "ReadTimeout: HTTPSConnectionPool(...): Read timed out."}
+    }
+  }
+  ```
+
+  `status`: **1** = scraped and validated, **-1** = failed (after the last
+  attempt it stays -1 with `attempts: 3` and the latest error), **0** = never
+  processed (only possible if the run was cut short, which makes the overall
+  status `PARTIAL`). It never stores links,
+  cookies or sessions; URLs in error messages are reduced to the page name.
+- **Overall status:** `SUCCESS` (all 24 = 1), `WARNING` (all attempted, some
+  -1), `PARTIAL` (cut short by a fatal error or a kill - some still 0),
+  `ERROR` (nothing could be attempted). The scraper exits 0 for the first two
+  and 3 otherwise; either way everything it saved is kept.
+- **Reports.** Telegram and Gmail are generated from this *final* state, after
+  the retries: a scheme that failed once and then recovered is not a failure.
+  Telegram stays short; the Gmail message carries the full 24-scheme table
+  (status, attempts, remark for every scheme).
+- **Baseline.** `.koshvani_previous_data/` still advances per scheme, only for
+  schemes freshly scraped in that run with healthy data, and only after the
+  report was delivered (updating it inside the scraper would erase the
+  before/after that "Data changes" needs).
+
+## Running the tests
+
+```
+python -m unittest discover -s tests -v
+```
+
+Standard library only and fully offline (fake portal, SMTP and Telegram; every
+test works in a temp directory). The `run_daily.sh` tests need `bash` and `git`
+and the dashboard tests need Playwright; each skips itself when unavailable.
 
 ## Notes
 

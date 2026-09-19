@@ -9,15 +9,16 @@ Two modes, called from run_daily.sh:
       (git operations, or the scraper process itself crashing).
 
   python telegram_alert.py report --start <epoch>
-      Called after a successful scraper run. Validates the configured
-      scrape/schemes.json schemes against docs/data/index.json (catching
-      missing/extra/duplicate entries), compares financial values against
-      the .koshvani_previous_data/ baseline (ignoring generated_at), and
-      sends a SUCCESS/WARNING/ERROR summary. The baseline is only refreshed
-      if the Telegram send succeeds, and even then only per scheme - a
-      scheme's baseline file is replaced solely when its current result is
-      healthy (status "ok"), so one bad run can neither lose change history
-      (failed send) nor corrupt a scheme's known-good history (failed run).
+      Called after the scraper has run (whether it finished or was cut
+      short). Reads the FINAL state of this execution from
+      docs/data/crawler_status.json - after every scheme's retries - and
+      sends a SUCCESS / WARNING / PARTIAL / ERROR report: concise on Telegram,
+      the full 24-scheme table on Gmail. Financial values are compared with
+      the .koshvani_previous_data/ baseline (ignoring generated_at). The
+      baseline is only refreshed if the Telegram send succeeds, and even then
+      only per scheme - for schemes freshly scraped this run with healthy
+      data - so one bad run can neither lose change history (failed send) nor
+      corrupt a scheme's known-good history (failed or unprocessed scheme).
 
 Channels are independent: Telegram is sent first and is the only channel that
 gates the baseline update; Gmail is sent last and can never delay, block or
@@ -36,8 +37,7 @@ import socket
 import ssl
 import sys
 import time
-from collections import Counter
-from datetime import datetime
+from datetime import datetime, timezone
 from email.message import EmailMessage
 from email.utils import formataddr, formatdate
 from html import escape as html_escape
@@ -66,7 +66,6 @@ FINANCIAL_FIELDS = [
     (6, "Current Month Expenditure"),
     (7, "Total Expenditure up to Month"),
 ]
-KNOWN_STATUSES = {"ok", "empty", "no_district_data", "error"}
 
 STAGE_MESSAGES = {
     "git-pull": "❌ Git pull failed.",
@@ -175,7 +174,7 @@ def send_telegram(text, env=None):
 
 # ---------- Gmail (second channel; same report, different formatting) ----------
 
-_LEVEL_COLORS = {"success": "#1a7f37", "warning": "#b45f06", "error": "#b3261e"}
+_LEVEL_COLORS = {"success": "#1a7f37", "warning": "#b45f06", "partial": "#6f42c1", "error": "#b3261e"}
 
 
 def gmail_config(env):
@@ -234,8 +233,8 @@ def build_email(report, sender, recipients):
     msg["From"] = formataddr(("Koshvani Alerts", sender))
     msg["To"] = ", ".join(recipients)
     msg["Date"] = formatdate(localtime=True)
-    msg.set_content(report["text"])
-    msg.add_alternative(text_to_html(report["text"], report["level"]), subtype="html")
+    msg.set_content(report.get("email_text") or report["text"])
+    msg.add_alternative(report.get("email_html") or text_to_html(report["text"], report["level"]), subtype="html")
     return msg
 
 
@@ -421,15 +420,39 @@ def diff_scheme_rows(prev_rows, curr_rows):
 
 
 # ---------- report building ----------
+# The report is ONE structured model of the FINAL state of the run (read from
+# docs/data/crawler_status.json), rendered three ways: concise Telegram text, a
+# plain-text email and an HTML email carrying the full per-scheme table. Every
+# channel therefore reports exactly the same facts.
+
+LEVELS = {
+    "success": ("🟢", "SUCCESS"),
+    "warning": ("🟠", "WARNING"),
+    "partial": ("🟣", "PARTIAL"),
+    "error": ("🔴", "ERROR"),
+}
+FOOTERS = {
+    "success": "✅ Job completed successfully.",
+    "warning": "⚠️ Review required.",
+    "partial": "⚠️ Execution incomplete. Review required.",
+    "error": "❌ Job failed. Review required.",
+}
+STATUS_LEGEND = "Status legend: 1 = SUCCESS, 0 = NOT PROCESSED, -1 = FAILED"
+
 
 def _headline(text):
     return text.split("\n", 1)[0]
 
 
-def _append_changes_section(lines, changes_by_scheme):
-    total_changes = sum(len(fc) for _, fc in changes_by_scheme)
-    lines.append(f"📈 Data changes: {total_changes}")
-    lines.append("")
+def _status_path():
+    return DATA_DIR / "crawler_status.json"
+
+
+def _change_count(changes_by_scheme):
+    return sum(len(fcs) for _, fcs in changes_by_scheme)
+
+
+def _append_change_blocks(lines, changes_by_scheme):
     for name, fcs in changes_by_scheme:
         lines.append(f"• {name}")
         multi_row = len({fc["row_label"] for fc in fcs}) > 1
@@ -442,172 +465,308 @@ def _append_changes_section(lines, changes_by_scheme):
         lines.append("")
 
 
-def _evaluate_scheme(sid, name, entry, detail):
-    """Checks one configured, present-in-results scheme against its baseline.
-    Returns (problem_or_None, field_changes)."""
-    status = entry.get("status")
+def _append_changes_section(lines, changes_by_scheme):
+    lines.append(f"📈 Data changes: {_change_count(changes_by_scheme)}")
+    lines.append("")
+    _append_change_blocks(lines, changes_by_scheme)
+
+
+def _baseline_review(sid, detail):
+    """Compares a freshly scraped scheme with its last-known-good baseline.
+    Returns (review_note_or_None, field_changes)."""
     if detail is None:
         return "Result file missing or unreadable", []
-    if status == "error":
-        return truncate(detail.get("message") or "Unknown scraper error", 140), []
-    if status not in KNOWN_STATUSES:
-        return f"Unexpected status: {status}", []
-
-    # status is "ok" / "empty" / "no_district_data" - a legitimate,
-    # non-error scraper outcome. Compare against the baseline if we have one.
     baseline_detail = load_json(BASELINE_DIR / f"{sid}.json")
     if baseline_detail is None:
         return None, []  # first run for this scheme - nothing to compare yet
 
     prev_status = baseline_detail.get("status")
     prev_rows = baseline_detail.get("rows") or []
+    status = detail.get("status")
     curr_rows = detail.get("rows") or []
 
     if prev_status == "ok" and prev_rows and status != "ok":
         return "Previously had financial data; now empty — needs review", []
-
     if status == "ok" and prev_status == "ok":
         field_changes, structural_notes = diff_scheme_rows(prev_rows, curr_rows)
         if structural_notes:
             return "; ".join(dict.fromkeys(structural_notes)), field_changes
         return None, field_changes
-
     return None, []
+
+
+def load_crawl_status(start_ts):
+    """The status of THIS execution, or None. A file left by an earlier run
+    must never be mistaken for it, so it has to have started after the job did."""
+    crawl = load_json(_status_path())
+    if not isinstance(crawl, dict) or not isinstance(crawl.get("schemes"), dict):
+        return None
+    try:
+        started = datetime.fromisoformat(str(crawl["started_at"]).replace("Z", "+00:00"))
+    except (KeyError, ValueError):
+        return None
+    if started.tzinfo is None:
+        started = started.replace(tzinfo=timezone.utc)
+    if started.timestamp() < start_ts - 2:
+        return None
+    return crawl
+
+
+def _scheme_table(crawl):
+    """[{code, id, name}] in schemes.json order - the configuration, not the
+    scraper's output, decides which schemes are expected."""
+    configured = load_configured_schemes()
+    if configured:
+        return [{"code": str(s["scheme_code"]), "id": s["id"], "name": s.get("name") or s["id"]} for s in configured]
+    index = load_json(INDEX_PATH) or {}
+    from_index = [{"code": str(e.get("scheme_code")), "id": e.get("id"), "name": e.get("name") or e.get("id")}
+                  for e in index.get("schemes", []) if isinstance(e, dict)]
+    return from_index or [{"code": code, "id": None, "name": code} for code in crawl["schemes"]]
+
+
+def _job_error_report(ts, duration, reason):
+    """A job-level failure (a git step, the scraper process): no per-scheme
+    facts exist, so this is the short message on every channel."""
+    text = ("🔴 KOSHVANI CRAWLER — ERROR\n\n"
+            f"⏱ {ts}\n⏳ Duration: {duration}\n\n"
+            f"{reason}\n\n"
+            f"{FOOTERS['error']}")
+    return {"kind": "job", "level": "error", "subject": _headline(text), "text": text, "email_text": text,
+            "email_html": text_to_html(text, "error"), "can_update_baseline": False, "fresh_ids": []}
+
+
+def _remark_display(row):
+    if row["remark"]:
+        return row["remark"]
+    if row["status"] == 1:
+        return "Recovered on retry" if row["attempts"] > 1 else "Success"
+    return "Not processed" if row["status"] == 0 else "Failed"
+
+
+def render_telegram(m):
+    """Concise: the headline numbers, what failed and why, what changed."""
+    emoji, word = LEVELS[m["level"]]
+    c = m["counts"]
+    lines = [f"{emoji} KOSHVANI CRAWLER — {word}", "", f"⏱ {m['ts']}", f"⏳ Duration: {m['duration']}", "",
+             f"📊 Schemes: {c['successful']}/{c['total']} successful"]
+    if c["recovered"]:
+        lines.append(f"🔁 Recovered by retry: {c['recovered']}")
+    if c["failed"]:
+        lines.append(f"❌ Failed: {c['failed']}")
+    if c["unprocessed"]:
+        lines.append(f"⏸ Unprocessed: {c['unprocessed']}")
+    if m["fatal_error"]:
+        lines.append(f"🛑 Fatal error: {truncate(m['fatal_error'], 200)}")
+    if m["level"] == "success":
+        lines.append(f"📈 Data changes: {_change_count(m['changes']) or 'None'}")
+    lines.append("")
+    if m["level"] == "success" and m["changes"]:
+        _append_change_blocks(lines, m["changes"])
+
+    failed = [r for r in m["rows"] if r["status"] == -1]
+    if failed:
+        lines.append("Failed:")
+        for r in failed:
+            lines += [f"• {r['name']} — {truncate(r['remark'] or 'Failed', 160)}", ""]
+    if m["review"]:
+        lines.append(f"🔎 Data review needed: {len(m['review'])}")
+        for name, note in m["review"]:
+            lines += [f"• {name} — {note}", ""]
+    if m["level"] != "success" and m["changes"]:
+        _append_changes_section(lines, m["changes"])
+    lines.append(FOOTERS[m["level"]])
+    return "\n".join(lines).strip() + "\n"
+
+
+def render_email_text(m):
+    """Plain-text alternative of the email: the full report, every scheme."""
+    emoji, word = LEVELS[m["level"]]
+    c = m["counts"]
+    lines = [f"{emoji} KOSHVANI CRAWLER — {word}", "",
+             f"Execution: {m['ts']}", f"Duration: {m['duration']}", "",
+             f"Schemes: {c['successful']}/{c['total']} successful",
+             f"Total: {c['total']} | Successful: {c['successful']} | Failed: {c['failed']} | Unprocessed: {c['unprocessed']}",
+             f"Recovered by retry: {c['recovered']}",
+             f"Data changes: {_change_count(m['changes']) or 'None'}"]
+    if m["fatal_error"]:
+        lines.append(f"Fatal error: {m['fatal_error']}")
+    lines += ["", f"ALL {c['total']} SCHEMES", "# | Scheme Code | Scheme Name | Status | Attempts | Remark"]
+    lines += [f"{r['n']} | {r['code']} | {r['name']} | {r['status']} | {r['attempts']} | {_remark_display(r)}" for r in m["rows"]]
+    lines += ["", STATUS_LEGEND, ""]
+    if m["review"]:
+        lines.append(f"DATA REVIEW NEEDED ({len(m['review'])})")
+        for name, note in m["review"]:
+            lines += [f"• {name}", f"  {note}", ""]
+    if m["changes"]:
+        lines += [f"DATA CHANGES ({_change_count(m['changes'])})", ""]
+        _append_change_blocks(lines, m["changes"])
+    lines.append(FOOTERS[m["level"]])
+    return "\n".join(lines).strip() + "\n"
+
+
+def render_email_html(m):
+    """HTML alternative: summary, then the full table of every scheme. Inline
+    styles only, no images/links/scripts; every dynamic value is escaped."""
+    e = html_escape
+    emoji, word = LEVELS[m["level"]]
+    accent = _LEVEL_COLORS[m["level"]]
+    c = m["counts"]
+    n_changes = _change_count(m["changes"])
+
+    def kv(label, value, bold=True):
+        return (f'<tr><td style="padding:3px 18px 3px 0;color:#57606a">{e(label)}</td>'
+                f'<td style="padding:3px 0;{"font-weight:bold" if bold else ""}">{value}</td></tr>')
+
+    summary = "".join([
+        kv("Execution", e(m["ts"])), kv("Duration", e(m["duration"])),
+        kv("Schemes", f"{c['successful']}/{c['total']} successful"),
+        kv("Total / Successful", f"{c['total']} / {c['successful']}"),
+        kv("Failed", f"{c['failed']}"), kv("Unprocessed", f"{c['unprocessed']}"),
+        kv("Recovered by retry", f"{c['recovered']}"), kv("Data changes", e(str(n_changes or "None"))),
+    ] + ([kv("Fatal error", e(m["fatal_error"]))] if m["fatal_error"] else []))
+
+    status_color = {1: "#1a7f37", 0: "#6b7280", -1: "#b3261e"}
+    status_bg = {1: "", 0: "background:#f3f4f6;", -1: "background:#fdecea;"}
+    cell = "padding:7px 10px;border-bottom:1px solid #e5e7eb;vertical-align:top;font-size:13px"
+    head = "".join(
+        f'<th style="text-align:left;padding:8px 10px;background:#f3f4f6;font-size:12px;color:#374151;'
+        f'border-bottom:2px solid #d1d5db;white-space:nowrap">{h}</th>'
+        for h in ("#", "Scheme Code", "Scheme Name", "Status", "Attempts", "Remark"))
+    body = []
+    for r in m["rows"]:
+        retried = r["status"] == 1 and r["attempts"] > 1
+        body.append(
+            f'<tr style="{status_bg[r["status"]]}">'
+            f'<td style="{cell}">{r["n"]}</td>'
+            f'<td style="{cell};white-space:nowrap">{e(r["code"])}</td>'
+            f'<td style="{cell}">{e(r["name"])}</td>'
+            f'<td style="{cell};white-space:nowrap"><b style="color:{status_color[r["status"]]}">{r["status"]}</b></td>'
+            f'<td style="{cell};{"background:#fff4e5;font-weight:bold" if retried else ""}">{r["attempts"]}</td>'
+            f'<td style="{cell};color:{"#b3261e" if r["status"] == -1 else "#374151"}">{e(_remark_display(r))}</td></tr>')
+    table = (f'<div style="overflow-x:auto"><table role="presentation" cellspacing="0" cellpadding="0" '
+             f'style="width:100%;border-collapse:collapse;border:1px solid #e5e7eb"><thead><tr>{head}</tr></thead>'
+             f'<tbody>{"".join(body)}</tbody></table></div>')
+
+    def card(title, lines):
+        detail = "<br>".join(e(l) for l in lines)
+        return (f'<div style="border-left:3px solid {accent};padding:2px 0 2px 12px;margin:12px 0">'
+                f'<div style="font-weight:bold">{e(title)}</div><div style="color:#4b5563;font-size:14px;line-height:1.5">{detail}</div></div>')
+
+    sections = []
+    if m["review"]:
+        sections.append(f'<h3 style="font-size:15px;margin:22px 0 6px">Data review needed ({len(m["review"])})</h3>'
+                        + "".join(card(name, [note]) for name, note in m["review"]))
+    if m["changes"]:
+        cards = []
+        for name, fcs in m["changes"]:
+            multi_row = len({fc["row_label"] for fc in fcs}) > 1
+            lines = []
+            for fc in fcs:
+                prefix = f"[{fc['row_label']}] " if multi_row else ""
+                lines.append(f"{prefix}{fc['field']}: {fmt_val(fc['old'])} → {fmt_val(fc['new'])}")
+                if fc["diff"] is not None:
+                    lines.append(f"Change: {'+' if fc['diff'] >= 0 else ''}{format_num(fc['diff'])}")
+            cards.append(card(name, lines))
+        sections.append(f'<h3 style="font-size:15px;margin:22px 0 6px">Data changes ({n_changes})</h3>' + "".join(cards))
+
+    return ('<!DOCTYPE html><html><head><meta charset="utf-8">'
+            '<meta name="viewport" content="width=device-width, initial-scale=1"></head>'
+            '<body style="margin:0;padding:16px;background:#f4f5f7">'
+            '<div style="max-width:760px;margin:0 auto;background:#ffffff;border:1px solid #e1e3e8;border-radius:8px;'
+            'font-family:Arial,Helvetica,sans-serif;font-size:15px;color:#1f2328">'
+            f'<div style="background:{accent};color:#ffffff;padding:16px 20px;font-size:18px;font-weight:bold;'
+            f'border-radius:8px 8px 0 0">{e(emoji)} KOSHVANI CRAWLER — {e(word)}</div>'
+            f'<div style="padding:14px 20px 20px"><table role="presentation" cellspacing="0" cellpadding="0" '
+            f'style="margin-bottom:18px;font-size:14px">{summary}</table>'
+            f'<h3 style="font-size:15px;margin:0 0 8px">All {c["total"]} schemes</h3>{table}'
+            f'<p style="margin:8px 0 0;font-size:12px;color:#6b7280">{e(STATUS_LEGEND)}</p>'
+            f'{"".join(sections)}'
+            f'<p style="margin:20px 0 0;font-weight:bold;color:{accent}">{e(FOOTERS[m["level"]])}</p></div></div></body></html>')
 
 
 def build_report(start_ts):
     duration = format_duration(time.time() - start_ts)
     ts = now_str()
 
-    index = load_json(INDEX_PATH)
-    if not index or "schemes" not in index:
-        text = (
-            "🔴 KOSHVANI CRAWLER — ERROR\n\n"
-            f"⏱ {ts}\n⏳ Duration: {duration}\n\n"
-            "❌ Scraper completed but produced no readable results (index.json missing/corrupt).\n\n"
-            "❌ Job failed. Review required."
-        )
-        return {"text": text, "level": "error", "subject": _headline(text), "can_update_baseline": False}
+    crawl = load_crawl_status(start_ts)
+    if crawl is None:
+        return _job_error_report(
+            ts, duration,
+            "❌ The scraper left no status for this run (crawler_status.json is missing, unreadable or from an earlier run).")
+    fatal = str(crawl.get("fatal_error") or "").strip()
 
-    schemes_index = index["schemes"]
+    rows, fresh_ids, changes, review = [], [], [], []
+    for n, scheme in enumerate(_scheme_table(crawl), 1):
+        entry = crawl["schemes"].get(scheme["code"])
+        if not isinstance(entry, dict) or entry.get("status") not in (1, 0, -1):
+            entry = {"status": 0, "attempts": 0, "remark": "Missing from crawler status"}
+        row = {"n": n, "code": scheme["code"], "name": scheme["name"], "status": entry["status"],
+               "attempts": int(entry.get("attempts") or 0), "remark": str(entry.get("remark") or "")}
+        rows.append(row)
+        if row["status"] == 1 and scheme["id"]:
+            fresh_ids.append(scheme["id"])
+            note, field_changes = _baseline_review(scheme["id"], load_json(DATA_DIR / f"{scheme['id']}.json"))
+            if note:
+                review.append((scheme["name"], note))
+            if field_changes:
+                changes.append((scheme["name"], field_changes))
+    if not rows:
+        return _job_error_report(ts, duration, f"❌ {fatal or 'No schemes were tracked for this run.'}")
 
-    # scraper/schemes.json (not len(index["schemes"])) is the source of truth
-    # for how many schemes are expected - so a run that silently drops a
-    # configured scheme is caught instead of reporting e.g. "23/23".
-    configured = load_configured_schemes()
-    configured_by_id = {s["id"]: s for s in configured} if configured else None
-
-    by_id = {}
-    duplicate_ids = set()
-    for entry in schemes_index:
-        sid = entry.get("id")
-        if sid in by_id:
-            duplicate_ids.add(sid)
-        by_id[sid] = entry
-
-    if configured_by_id is not None:
-        expected_ids = list(configured_by_id.keys())
-        dup_configured = {sid for sid, count in Counter(s["id"] for s in configured).items() if count > 1}
+    counts = {
+        "total": len(rows),
+        "successful": sum(1 for r in rows if r["status"] == 1),
+        "failed": sum(1 for r in rows if r["status"] == -1),
+        "unprocessed": sum(1 for r in rows if r["status"] == 0),
+        "recovered": sum(1 for r in rows if r["status"] == 1 and r["attempts"] > 1),
+    }
+    # Final level, from the FINAL per-scheme states (retries already applied):
+    if counts["unprocessed"]:
+        fatal = fatal or "The crawler stopped before every scheme was processed (interrupted or killed)."
+        level = "error" if counts["successful"] + counts["failed"] == 0 else "partial"
+    elif counts["failed"] or review:
+        level = "warning"
     else:
-        expected_ids = [entry.get("id") for entry in schemes_index]
-        dup_configured = set()
-    total = len(expected_ids)
+        level = "success"
 
-    attention = []          # [(name, concise problem)] - shown in the message
-    changes_by_scheme = []  # [(name, [field_change, ...])]
-    configured_issues = 0   # subset of `attention` that counts against `total`
-
-    for sid in dup_configured:
-        name = configured_by_id.get(sid, {}).get("name", sid)
-        attention.append((name, "Configured multiple times in scraper/schemes.json"))
-        configured_issues += 1
-
-    for sid in expected_ids:
-        entry = by_id.get(sid)
-        name = (configured_by_id.get(sid, {}).get("name") if configured_by_id else None) \
-            or (entry.get("name") if entry else sid)
-
-        if entry is None:
-            attention.append((name, "Missing from generated results"))
-            configured_issues += 1
-            continue
-        if sid in duplicate_ids:
-            attention.append((name, "Duplicate entry in generated results"))
-            configured_issues += 1
-            continue
-
-        detail = load_json(DATA_DIR / f"{sid}.json")
-        problem, field_changes = _evaluate_scheme(sid, name, entry, detail)
-        if problem:
-            attention.append((name, problem))
-            configured_issues += 1
-        if field_changes:
-            changes_by_scheme.append((name, field_changes))
-
-    # Schemes present in the generated results but not part of the configured
-    # 24 - flagged, but they don't count against the configured total.
-    if configured_by_id is not None:
-        for entry in schemes_index:
-            sid = entry.get("id")
-            if sid not in configured_by_id:
-                attention.append((entry.get("name", sid), "Unexpected scheme not in schemes.json configuration"))
-
-    successful = total - configured_issues
-    level = "warning" if attention else "success"
-
-    lines = []
-    if level == "success":
-        lines += ["🟢 KOSHVANI CRAWLER — SUCCESS", "", f"⏱ {ts}", f"⏳ Duration: {duration}", "",
-                  f"📊 Schemes: {successful}/{total} successful"]
-        if not changes_by_scheme:
-            lines.append("📈 Data changes: None")
-        else:
-            _append_changes_section(lines, changes_by_scheme)
-        lines.append("✅ Job completed successfully.")
-    else:  # level == "warning"
-        lines += ["🟠 KOSHVANI CRAWLER — WARNING", "", f"⏱ {ts}", f"⏳ Duration: {duration}", "",
-                  f"📊 Schemes: {successful}/{total} successful",
-                  f"⚠️ {len(attention)} scheme(s) need attention", ""]
-        for name, problem in attention:
-            lines += [f"• {name}", f"  {problem}", ""]
-        if changes_by_scheme:
-            _append_changes_section(lines, changes_by_scheme)
-        lines.append("⚠️ Review required.")
-
-    text = "\n".join(lines).strip() + "\n"
-    return {"text": text, "level": level, "subject": f"{lines[0]} | {successful}/{total} Schemes",
-            "can_update_baseline": True}
+    m = {"level": level, "ts": ts, "duration": duration, "counts": counts, "rows": rows,
+         "changes": changes, "review": review, "fatal_error": fatal}
+    emoji, word = LEVELS[level]
+    subject = f"{emoji} KOSHVANI CRAWLER — {word}"
+    if level != "error":
+        subject += f" | {counts['successful']}/{counts['total']} Schemes"
+    return {"kind": "crawl", "level": level, "subject": subject, "text": render_telegram(m),
+            "email_text": render_email_text(m), "email_html": render_email_html(m),
+            "can_update_baseline": level != "error", "fresh_ids": fresh_ids, "counts": counts, "model": m}
 
 
 def build_error_report(start_ts, stage):
-    """Job-level failure (git step / scraper process) - no per-scheme counts exist."""
+    """Job-level failure (a git step, the scraper process) - no per-scheme counts exist."""
     duration = format_duration(time.time() - start_ts)
-    reason = STAGE_MESSAGES.get(stage, f"❌ {stage} failed.")
-    text = (
-        "🔴 KOSHVANI CRAWLER — ERROR\n\n"
-        f"⏱ {now_str()}\n⏳ Duration: {duration}\n\n"
-        f"{reason}\n\n"
-        "❌ Job failed. Review required."
-    )
-    return {"text": text, "level": "error", "subject": _headline(text), "can_update_baseline": False}
+    return _job_error_report(now_str(), duration, STAGE_MESSAGES.get(stage, f"❌ {stage} failed."))
 
 
-def update_baseline():
+def _fresh_ids_from_status():
+    crawl = load_json(_status_path()) or {}
+    entries = crawl.get("schemes") if isinstance(crawl.get("schemes"), dict) else {}
+    return [s["id"] for s in _scheme_table({"schemes": entries})
+            if s["id"] and isinstance(entries.get(s["code"]), dict) and entries[s["code"]].get("status") == 1]
+
+
+def update_baseline(fresh_ids=None):
     """Per-scheme baseline update: a scheme's baseline file is only replaced
-    when its current result is healthy (status == "ok"). A scheme that
-    failed/came back empty/hit an unexpected status keeps its last
-    known-good baseline untouched, so one bad run can't wipe out valid
-    history - next time it succeeds, its baseline catches up again."""
-    index = load_json(INDEX_PATH)
-    schemes_index = index.get("schemes", []) if index else []
+    when the scheme was freshly scraped in THIS execution (crawl status 1) and
+    its data is healthy (status "ok"). A scheme that failed, was never
+    processed (its file on disk is last run's), came back empty or hit an
+    unexpected status keeps its last known-good baseline untouched."""
+    if fresh_ids is None:
+        fresh_ids = _fresh_ids_from_status()
 
     BASELINE_DIR.mkdir(parents=True, exist_ok=True)
-    for entry in schemes_index:
-        if entry.get("status") != "ok":
-            continue
-        sid = entry.get("id")
+    for sid in fresh_ids:
         src = DATA_DIR / f"{sid}.json"
-        if not src.exists():
+        detail = load_json(src)
+        if not detail or detail.get("status") != "ok":
             continue
         tmp = BASELINE_DIR / f"{sid}.json.tmp"
         shutil.copyfile(src, tmp)
@@ -633,7 +792,7 @@ def cmd_report(args):
         _log("Telegram send failed; baseline NOT updated so changes stay detectable next run.")
     else:
         if report["can_update_baseline"]:
-            _safely("Baseline update", update_baseline, env)
+            _safely("Baseline update", lambda: update_baseline(report.get("fresh_ids")), env)
         _log(f"Report sent ({report['level']}).")
 
     # Gmail last, after the baseline is settled: whatever happens here (bad

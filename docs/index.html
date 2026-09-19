@@ -263,6 +263,34 @@
   .status-badge.no_district_data { color: #1a1a19; background: var(--warning); }
   .status-badge.empty { color: var(--text-secondary); background: transparent; border: 1px solid var(--border); }
   .status-badge.error { color: #ffffff; background: var(--critical); }
+  .status-badge.pending { color: var(--text-secondary); background: transparent; border: 1px solid var(--border); }
+
+  /* latest crawler run (index.json: overall_status + counts) */
+  .crawl-status {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 14px;
+    font-size: 12.5px;
+    color: var(--text-secondary);
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 8px 14px;
+    margin-bottom: 14px;
+  }
+  .crawl-status b { color: var(--text-primary); font-weight: 650; }
+  .crawl-pill {
+    font-weight: 700;
+    border-radius: 999px;
+    padding: 2px 10px;
+    border: 1px solid currentColor;
+  }
+  .crawl-status.ok .crawl-pill { color: var(--success-text); }
+  .crawl-status.warn .crawl-pill { color: #b45f06; }
+  .crawl-status.bad .crawl-pill { color: var(--critical); }
+  .stale-note { color: #b45f06; font-weight: 600; white-space: nowrap; }
+  .status-badge.stale { color: #b45f06; background: transparent; border: 1px solid #b45f06; }
 
   /* ---- insights view ---- */
   .status-summary {
@@ -677,7 +705,22 @@ function fmtDate(iso) {
   return d.toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' });
 }
 function statusLabel(s) {
-  return { ok: 'Live data', no_district_data: 'No district rows', empty: 'No expenditure', error: 'Fetch error' }[s] || s;
+  return { ok: 'Live data', no_district_data: 'No district rows', empty: 'No expenditure', error: 'Fetch error', pending: 'Not fetched yet' }[s] || s;
+}
+// The latest crawler run, from the fields the scraper adds to index.json.
+// Older index.json files lack them - then nothing is shown, exactly as before.
+function crawlIndicatorHtml(idx) {
+  if (!idx.overall_status) return '';
+  const words = { SUCCESS: '✓ SUCCESS', WARNING: '! WARNING', PARTIAL: '◐ PARTIAL', ERROR: '✕ ERROR', RUNNING: '… RUNNING' };
+  const cls = { SUCCESS: 'ok', WARNING: 'warn', PARTIAL: 'warn', RUNNING: 'warn', ERROR: 'bad' }[idx.overall_status] || 'warn';
+  const n = v => (v == null ? '—' : v);
+  return `<div class="crawl-status ${cls}" role="status">
+    <span class="crawl-pill">Crawler: ${escapeHtml(words[idx.overall_status] || idx.overall_status)}</span>
+    <span>Successful <b>${n(idx.successful_scheme_count)}/${n(idx.expected_scheme_count)}</b></span>
+    <span>Failed <b>${n(idx.failed_scheme_count)}</b></span>
+    <span>Unprocessed <b>${n(idx.unprocessed_scheme_count)}</b></span>
+    <span>Run finished ${fmtDate(idx.generated_at)}</span>
+  </div>`;
 }
 function pctClass(pct) {
   const v = parseFloat(pct);
@@ -838,7 +881,9 @@ async function renderList() {
     <div class="scheme-card" data-id="${escapeHtml(s.id)}" tabindex="0" role="button" aria-label="Open ${escapeHtml(s.name)}">
       <div class="card-top">
         <div class="name">${escapeHtml(s.name)}</div>
-        <span class="status-badge ${s.status}">${statusLabel(s.status)}</span>
+        ${s.status === 'ok' && s.crawl_status === 0
+          ? '<span class="status-badge stale" title="The latest crawler run did not reach this scheme - this is its last known data">Last known data</span>'
+          : `<span class="status-badge ${s.status}">${statusLabel(s.status)}</span>`}
       </div>
       <div class="code-row">
         <span class="code-chip">Grant ${escapeHtml(s.grant_text)}</span>
@@ -851,12 +896,12 @@ async function renderList() {
         <div><div class="mini-label">% Spent</div><div class="mini-val ${pctClass(s.pct_expenditure_of_allotment)}">${s.pct_expenditure_of_allotment ?? '—'}${s.pct_expenditure_of_allotment != null ? '%' : ''}</div></div>
       </div>
       <div class="card-footer">
-        <div class="updated">Updated ${fmtDate(s.generated_at)}${s.fin_year ? ' &middot; FY ' + escapeHtml(s.fin_year) : ''}</div>
+        <div class="updated">Updated ${fmtDate(s.generated_at)}${s.fin_year ? ' &middot; FY ' + escapeHtml(s.fin_year) : ''}${s.crawl_status === 0 ? ' &middot; <span class="stale-note">not refreshed in the latest run</span>' : ''}</div>
         ${s.status === 'ok' ? `<button class="download-btn" data-id="${escapeHtml(s.id)}" type="button" title="Download this scheme's G.B.NAGAR data as Excel">&#8681; Download</button>` : ''}
       </div>
     </div>
   `).join('');
-  app.innerHTML = `<div class="scheme-grid">${cards}</div>`;
+  app.innerHTML = `${crawlIndicatorHtml(idx)}<div class="scheme-grid">${cards}</div>`;
   app.querySelectorAll('.scheme-card').forEach(card => {
     const go = () => { location.hash = '#/scheme/' + card.dataset.id; };
     card.addEventListener('click', go);
@@ -1016,6 +1061,7 @@ function schemeRowHtml(r, monthName, sortKey) {
         <span>${v(fmtCurrency(r.spent), 'spent')} spent of ${v(fmtCurrency(r.allot), 'allot')}</span>
         <span>${left}</span>
         ${r.month > 0 ? `<span>+${v(fmtCurrency(r.month), 'month')} in ${escapeHtml(monthName)}</span>` : ''}
+        ${r.crawl === 0 ? '<span class="stale-note">not refreshed in the latest run</span>' : ''}
       </div>
     </div>`;
 }
@@ -1127,6 +1173,7 @@ async function renderInsights() {
     const spent = s.total_expenditure || 0;
     return {
       id: s.id, name: s.name, code: String(s.scheme_code || ''),
+      crawl: s.crawl_status,
       allot, spent, left: allot - spent,
       pct: s.pct_expenditure_of_allotment ?? 0,
       month: d ? ((d.totals || {}).current_month_expenditure || 0) : 0,
@@ -1163,6 +1210,7 @@ async function renderInsights() {
     <div class="insights-root">
       <button class="back-link" onclick="location.hash='#/'">&larr; Back to schemes</button>
       <h2 class="sr-only">Insights</h2>
+      ${crawlIndicatorHtml(idx)}
       <p class="ins-asof">Updated ${fmtDate(idx.generated_at)}${fy ? ' &middot; FY ' + escapeHtml(fy) : ''}${monthName ? ' &middot; figures run up to ' + escapeHtml(monthName) + ' (the current month is provisional)' : ''}</p>
       <div class="status-summary">${statusChips}</div>
       ${rows.length === 0
