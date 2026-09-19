@@ -5,66 +5,13 @@
   "scheme_code": "2402001020111",
   "district": "G.B.NAGAR",
   "fin_year": "2026-2027",
-  "generated_at": "2026-09-18T06:03:07+00:00",
-  "status": "ok",
-  "message": null,
-  "prev_month": "August",
-  "current_month": "September",
-  "column_headers": [
-    "Treasury",
-    "Standard Object",
-    "Plan / Non-Plan",
-    "Voted / Charged",
-    "Progressive Allotment",
-    "Actual Progressive Expenditure upto month (August)",
-    "Provisional Current Month Expenditure(September)",
-    "Total Expenditure Upto Month (September)",
-    "% A/E"
-  ],
-  "column_widths": [
-    10.0,
-    15.0,
-    5.0,
-    5.0,
-    10.0,
-    15.0,
-    15.0,
-    20.0,
-    5.0
-  ],
-  "rows": [
-    {
-      "cells": [
-        "G.B.NAGAR",
-        "27-सब्सिडी",
-        "N",
-        "V",
-        "1718362.00",
-        "952000.00",
-        "0.00",
-        "952000.00",
-        "55.40"
-      ]
-    },
-    {
-      "cells": [
-        "",
-        "42-अन्य व्यय",
-        "N",
-        "V",
-        "1203013.00",
-        "530000.00",
-        "0.00",
-        "530000.00",
-        "44.06"
-      ]
-    }
-  ],
-  "totals": {
-    "progressive_allotment": 2921375.0,
-    "expenditure_upto_prev_month": 1482000.0,
-    "current_month_expenditure": 0.0,
-    "total_expenditure_upto_month": 1482000.0,
-    "pct_expenditure_of_allotment": 50.73
-  }
+  "generated_at": "2026-09-19T00:40:01+00:00",
+  "status": "no_district_data",
+  "message": "No G.B.NAGAR rows found for this scheme in the current period.",
+  "prev_month": null,
+  "current_month": null,
+  "column_headers": [],
+  "column_widths": null,
+  "rows": [],
+  "totals": {}
 }
