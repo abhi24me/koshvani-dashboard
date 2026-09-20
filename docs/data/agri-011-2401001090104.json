@@ -4,54 +4,12 @@
   "grant_text": "011",
   "scheme_code": "2401001090104",
   "district": "G.B.NAGAR",
-  "fin_year": "2026-2027",
-  "generated_at": "2026-09-19T06:43:24+00:00",
-  "status": "ok",
-  "message": null,
-  "prev_month": "August",
-  "current_month": "September",
-  "column_headers": [
-    "Treasury",
-    "Standard Object",
-    "Plan / Non-Plan",
-    "Voted / Charged",
-    "Progressive Allotment",
-    "Actual Progressive Expenditure upto month (August)",
-    "Provisional Current Month Expenditure(September)",
-    "Total Expenditure Upto Month (September)",
-    "% A/E"
-  ],
-  "column_widths": [
-    10.0,
-    15.0,
-    5.0,
-    5.0,
-    10.0,
-    15.0,
-    15.0,
-    20.0,
-    5.0
-  ],
-  "rows": [
-    {
-      "cells": [
-        "G.B.NAGAR",
-        "27-सब्सिडी",
-        "N",
-        "V",
-        "1000000.00",
-        "0.00",
-        "0.00",
-        "0.00",
-        ".00"
-      ]
-    }
-  ],
-  "totals": {
-    "progressive_allotment": 1000000.0,
-    "expenditure_upto_prev_month": 0.0,
-    "current_month_expenditure": 0.0,
-    "total_expenditure_upto_month": 0.0,
-    "pct_expenditure_of_allotment": 0.0
-  }
+  "fin_year": null,
+  "generated_at": "2026-09-20T00:00:18+00:00",
+  "status": "error",
+  "message": "UnexpectedPageError: Unexpected page after following 'Grant-wise expenditure': ClearSession.aspx",
+  "column_headers": [],
+  "column_widths": null,
+  "rows": [],
+  "totals": {}
 }

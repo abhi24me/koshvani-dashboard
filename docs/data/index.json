@@ -7,11 +7,12 @@
       "scheme_code": "2401000010500",
       "district": "G.B.NAGAR",
       "status": "ok",
-      "generated_at": "2026-09-19T06:32:16+00:00",
+      "generated_at": "2026-09-19T23:46:17+00:00",
       "fin_year": "2026-2027",
       "progressive_allotment": 9893000.0,
       "total_expenditure": 4209943.0,
-      "pct_expenditure_of_allotment": 42.55
+      "pct_expenditure_of_allotment": 42.55,
+      "crawl_status": 1
     },
     {
       "id": "agri-011-2401001020103",
@@ -20,11 +21,12 @@
       "scheme_code": "2401001020103",
       "district": "G.B.NAGAR",
       "status": "ok",
-      "generated_at": "2026-09-19T06:32:58+00:00",
+      "generated_at": "2026-09-19T23:46:36+00:00",
       "fin_year": "2026-2027",
       "progressive_allotment": 623900.0,
       "total_expenditure": 102180.0,
-      "pct_expenditure_of_allotment": 16.38
+      "pct_expenditure_of_allotment": 16.38,
+      "crawl_status": 1
     },
     {
       "id": "agri-011-2401001020129",
@@ -33,11 +35,12 @@
       "scheme_code": "2401001020129",
       "district": "G.B.NAGAR",
       "status": "ok",
-      "generated_at": "2026-09-19T06:33:54+00:00",
+      "generated_at": "2026-09-19T23:46:53+00:00",
       "fin_year": "2026-2027",
       "progressive_allotment": 249225.0,
       "total_expenditure": 12750.0,
-      "pct_expenditure_of_allotment": 5.12
+      "pct_expenditure_of_allotment": 5.12,
+      "crawl_status": 1
     },
     {
       "id": "agri-011-2401001030300",
@@ -46,11 +49,12 @@
       "scheme_code": "2401001030300",
       "district": "G.B.NAGAR",
       "status": "ok",
-      "generated_at": "2026-09-19T06:40:02+00:00",
+      "generated_at": "2026-09-19T23:47:37+00:00",
       "fin_year": "2026-2027",
       "progressive_allotment": 3270000.0,
       "total_expenditure": 1741002.0,
-      "pct_expenditure_of_allotment": 53.24
+      "pct_expenditure_of_allotment": 53.24,
+      "crawl_status": 1
     },
     {
       "id": "agri-011-2401001030500",
@@ -59,11 +63,12 @@
       "scheme_code": "2401001030500",
       "district": "G.B.NAGAR",
       "status": "ok",
-      "generated_at": "2026-09-19T06:40:32+00:00",
+      "generated_at": "2026-09-19T23:48:32+00:00",
       "fin_year": "2026-2027",
       "progressive_allotment": 226951.0,
       "total_expenditure": 25500.0,
-      "pct_expenditure_of_allotment": 11.24
+      "pct_expenditure_of_allotment": 11.24,
+      "crawl_status": 1
     },
     {
       "id": "agri-011-2401001030600",
@@ -72,11 +77,12 @@
       "scheme_code": "2401001030600",
       "district": "G.B.NAGAR",
       "status": "ok",
-      "generated_at": "2026-09-19T06:40:48+00:00",
+      "generated_at": "2026-09-19T23:48:47+00:00",
       "fin_year": "2026-2027",
       "progressive_allotment": 560000.0,
       "total_expenditure": 515000.0,
-      "pct_expenditure_of_allotment": 91.96
+      "pct_expenditure_of_allotment": 91.96,
+      "crawl_status": 1
     },
     {
       "id": "agri-011-2401001070300",
@@ -85,11 +91,12 @@
       "scheme_code": "2401001070300",
       "district": "G.B.NAGAR",
       "status": "ok",
-      "generated_at": "2026-09-19T06:41:43+00:00",
+      "generated_at": "2026-09-19T23:49:34+00:00",
       "fin_year": "2026-2027",
       "progressive_allotment": 10764820.0,
       "total_expenditure": 4145965.0,
-      "pct_expenditure_of_allotment": 38.51
+      "pct_expenditure_of_allotment": 38.51,
+      "crawl_status": 1
     },
     {
       "id": "agri-011-2401001070400",
@@ -98,11 +105,12 @@
       "scheme_code": "2401001070400",
       "district": "G.B.NAGAR",
       "status": "ok",
-      "generated_at": "2026-09-19T06:42:19+00:00",
+      "generated_at": "2026-09-19T23:50:15+00:00",
       "fin_year": "2026-2027",
       "progressive_allotment": 1083000.0,
       "total_expenditure": 317245.0,
-      "pct_expenditure_of_allotment": 29.29
+      "pct_expenditure_of_allotment": 29.29,
+      "crawl_status": 1
     },
     {
       "id": "agri-011-2401001090103",
@@ -110,12 +118,13 @@
       "grant_text": "011",
       "scheme_code": "2401001090103",
       "district": "G.B.NAGAR",
-      "status": "ok",
-      "generated_at": "2026-09-19T06:42:47+00:00",
-      "fin_year": "2026-2027",
-      "progressive_allotment": 2761483.0,
-      "total_expenditure": 2551257.0,
-      "pct_expenditure_of_allotment": 92.39
+      "status": "error",
+      "generated_at": "2026-09-19T23:55:58+00:00",
+      "fin_year": null,
+      "progressive_allotment": null,
+      "total_expenditure": null,
+      "pct_expenditure_of_allotment": null,
+      "crawl_status": -1
     },
     {
       "id": "agri-011-2401001090104",
@@ -123,12 +132,13 @@
       "grant_text": "011",
       "scheme_code": "2401001090104",
       "district": "G.B.NAGAR",
-      "status": "ok",
-      "generated_at": "2026-09-19T06:43:24+00:00",
-      "fin_year": "2026-2027",
-      "progressive_allotment": 1000000.0,
-      "total_expenditure": 0.0,
-      "pct_expenditure_of_allotment": 0.0
+      "status": "error",
+      "generated_at": "2026-09-20T00:00:18+00:00",
+      "fin_year": null,
+      "progressive_allotment": null,
+      "total_expenditure": null,
+      "pct_expenditure_of_allotment": null,
+      "crawl_status": -1
     },
     {
       "id": "agri-011-2401001090105",
@@ -137,11 +147,12 @@
       "scheme_code": "2401001090105",
       "district": "G.B.NAGAR",
       "status": "ok",
-      "generated_at": "2026-09-19T06:43:47+00:00",
+      "generated_at": "2026-09-20T00:04:06+00:00",
       "fin_year": "2026-2027",
       "progressive_allotment": 874400.0,
       "total_expenditure": 469156.0,
-      "pct_expenditure_of_allotment": 53.65
+      "pct_expenditure_of_allotment": 53.65,
+      "crawl_status": 1
     },
     {
       "id": "agri-011-2401001090300",
@@ -150,11 +161,12 @@
       "scheme_code": "2401001090300",
       "district": "G.B.NAGAR",
       "status": "ok",
-      "generated_at": "2026-09-19T06:44:48+00:00",
+      "generated_at": "2026-09-20T00:05:05+00:00",
       "fin_year": "2026-2027",
       "progressive_allotment": 31543600.0,
       "total_expenditure": 18191943.0,
-      "pct_expenditure_of_allotment": 57.67
+      "pct_expenditure_of_allotment": 57.67,
+      "crawl_status": 1
     },
     {
       "id": "agri-011-2401001090700",
@@ -163,11 +175,12 @@
       "scheme_code": "2401001090700",
       "district": "G.B.NAGAR",
       "status": "ok",
-      "generated_at": "2026-09-19T06:45:37+00:00",
+      "generated_at": "2026-09-20T00:05:35+00:00",
       "fin_year": "2026-2027",
       "progressive_allotment": 655000.0,
       "total_expenditure": 219000.0,
-      "pct_expenditure_of_allotment": 33.44
+      "pct_expenditure_of_allotment": 33.44,
+      "crawl_status": 1
     },
     {
       "id": "agri-011-2401001090900",
@@ -176,11 +189,12 @@
       "scheme_code": "2401001090900",
       "district": "G.B.NAGAR",
       "status": "ok",
-      "generated_at": "2026-09-19T06:46:06+00:00",
+      "generated_at": "2026-09-20T00:05:53+00:00",
       "fin_year": "2026-2027",
       "progressive_allotment": 235200.0,
       "total_expenditure": 10400.0,
-      "pct_expenditure_of_allotment": 4.42
+      "pct_expenditure_of_allotment": 4.42,
+      "crawl_status": 1
     },
     {
       "id": "agri-011-2401001130104",
@@ -189,11 +203,12 @@
       "scheme_code": "2401001130104",
       "district": "G.B.NAGAR",
       "status": "ok",
-      "generated_at": "2026-09-19T06:46:47+00:00",
+      "generated_at": "2026-09-20T00:06:08+00:00",
       "fin_year": "2026-2027",
       "progressive_allotment": 7365900.0,
       "total_expenditure": 200000.0,
-      "pct_expenditure_of_allotment": 2.72
+      "pct_expenditure_of_allotment": 2.72,
+      "crawl_status": 1
     },
     {
       "id": "agri-011-2401001140101",
@@ -202,11 +217,12 @@
       "scheme_code": "2401001140101",
       "district": "G.B.NAGAR",
       "status": "ok",
-      "generated_at": "2026-09-19T06:47:14+00:00",
+      "generated_at": "2026-09-20T00:06:22+00:00",
       "fin_year": "2026-2027",
       "progressive_allotment": 241250.0,
       "total_expenditure": 200000.0,
-      "pct_expenditure_of_allotment": 82.9
+      "pct_expenditure_of_allotment": 82.9,
+      "crawl_status": 1
     },
     {
       "id": "agri-011-2401001140300",
@@ -215,11 +231,12 @@
       "scheme_code": "2401001140300",
       "district": "G.B.NAGAR",
       "status": "ok",
-      "generated_at": "2026-09-19T06:47:33+00:00",
+      "generated_at": "2026-09-20T00:06:34+00:00",
       "fin_year": "2026-2027",
       "progressive_allotment": 26000.0,
       "total_expenditure": 26000.0,
-      "pct_expenditure_of_allotment": 100.0
+      "pct_expenditure_of_allotment": 100.0,
+      "crawl_status": 1
     },
     {
       "id": "agri-011-2401008000203",
@@ -228,11 +245,12 @@
       "scheme_code": "2401008000203",
       "district": "G.B.NAGAR",
       "status": "ok",
-      "generated_at": "2026-09-19T06:47:48+00:00",
+      "generated_at": "2026-09-20T00:07:08+00:00",
       "fin_year": "2026-2027",
       "progressive_allotment": 2622165.0,
       "total_expenditure": 0.0,
-      "pct_expenditure_of_allotment": 0.0
+      "pct_expenditure_of_allotment": 0.0,
+      "crawl_status": 1
     },
     {
       "id": "agri-011-2401008000400",
@@ -241,11 +259,12 @@
       "scheme_code": "2401008000400",
       "district": "G.B.NAGAR",
       "status": "ok",
-      "generated_at": "2026-09-19T06:48:10+00:00",
+      "generated_at": "2026-09-20T00:07:53+00:00",
       "fin_year": "2026-2027",
       "progressive_allotment": 390000.0,
       "total_expenditure": 283515.0,
-      "pct_expenditure_of_allotment": 72.7
+      "pct_expenditure_of_allotment": 72.7,
+      "crawl_status": 1
     },
     {
       "id": "agri-011-2402001020109",
@@ -254,11 +273,12 @@
       "scheme_code": "2402001020109",
       "district": "G.B.NAGAR",
       "status": "ok",
-      "generated_at": "2026-09-19T06:49:09+00:00",
+      "generated_at": "2026-09-20T00:08:26+00:00",
       "fin_year": "2026-2027",
       "progressive_allotment": 53700.0,
       "total_expenditure": 53400.0,
-      "pct_expenditure_of_allotment": 99.44
+      "pct_expenditure_of_allotment": 99.44,
+      "crawl_status": 1
     },
     {
       "id": "agri-011-2402001020111",
@@ -267,11 +287,12 @@
       "scheme_code": "2402001020111",
       "district": "G.B.NAGAR",
       "status": "ok",
-      "generated_at": "2026-09-19T06:49:53+00:00",
+      "generated_at": "2026-09-20T00:09:12+00:00",
       "fin_year": "2026-2027",
       "progressive_allotment": 2921375.0,
       "total_expenditure": 1482000.0,
-      "pct_expenditure_of_allotment": 50.73
+      "pct_expenditure_of_allotment": 50.73,
+      "crawl_status": 1
     },
     {
       "id": "agri-011-4401001030300",
@@ -280,11 +301,12 @@
       "scheme_code": "4401001030300",
       "district": "G.B.NAGAR",
       "status": "ok",
-      "generated_at": "2026-09-19T06:50:08+00:00",
+      "generated_at": "2026-09-20T00:09:55+00:00",
       "fin_year": "2026-2027",
       "progressive_allotment": 200000.0,
       "total_expenditure": 199950.0,
-      "pct_expenditure_of_allotment": 99.98
+      "pct_expenditure_of_allotment": 99.98,
+      "crawl_status": 1
     },
     {
       "id": "agri-011-4401001030401",
@@ -293,11 +315,12 @@
       "scheme_code": "4401001030401",
       "district": "G.B.NAGAR",
       "status": "ok",
-      "generated_at": "2026-09-19T06:50:34+00:00",
+      "generated_at": "2026-09-20T00:10:26+00:00",
       "fin_year": "2026-2027",
       "progressive_allotment": 2273000.0,
       "total_expenditure": 1959000.0,
-      "pct_expenditure_of_allotment": 86.19
+      "pct_expenditure_of_allotment": 86.19,
+      "crawl_status": 1
     },
     {
       "id": "agri-011-4401001030403",
@@ -306,12 +329,19 @@
       "scheme_code": "4401001030403",
       "district": "G.B.NAGAR",
       "status": "ok",
-      "generated_at": "2026-09-19T06:51:16+00:00",
+      "generated_at": "2026-09-20T00:11:11+00:00",
       "fin_year": "2026-2027",
       "progressive_allotment": 52000.0,
       "total_expenditure": 21665.0,
-      "pct_expenditure_of_allotment": 41.66
+      "pct_expenditure_of_allotment": 41.66,
+      "crawl_status": 1
     }
   ],
-  "generated_at": "2026-09-19T06:51:16+00:00"
+  "generated_at": "2026-09-20T00:11:11+00:00",
+  "execution_id": "2026-09-19T23:45:19+00:00",
+  "overall_status": "WARNING",
+  "expected_scheme_count": 24,
+  "successful_scheme_count": 22,
+  "failed_scheme_count": 2,
+  "unprocessed_scheme_count": 0
 }
