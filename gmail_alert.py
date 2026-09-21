@@ -1,36 +1,36 @@
 #!/usr/bin/env python3
-"""Sends concise monitoring alerts for the Koshvani daily crawler run, over
-Telegram and (optionally) Gmail - one report, delivered to both channels.
+"""Sends the monitoring e-mail for the Koshvani daily crawler run (Gmail is the
+only notification channel).
 
 Two modes, called from run_daily.sh:
 
-  python telegram_alert.py error --start <epoch> --stage git-pull|git-commit|git-push|scraper
+  python gmail_alert.py error --start <epoch> --stage git-pull|git-commit|git-push|log-push|scraper
       Job-level failure outside the scraper's own per-scheme handling
       (git operations, or the scraper process itself crashing).
 
-  python telegram_alert.py report --start <epoch>
+  python gmail_alert.py report --start <epoch>
       Called after the scraper has run (whether it finished or was cut
       short). Reads the FINAL state of this execution from
       docs/data/crawler_status.json - after every scheme's retries - and
-      sends a SUCCESS / WARNING / PARTIAL / ERROR report: concise on Telegram,
-      the full 24-scheme table on Gmail. Financial values are compared with
-      the .koshvani_previous_data/ baseline (ignoring generated_at). The
-      baseline is only refreshed if the Telegram send succeeds, and even then
-      only per scheme - for schemes freshly scraped this run with healthy
-      data - so one bad run can neither lose change history (failed send) nor
-      corrupt a scheme's known-good history (failed or unprocessed scheme).
+      e-mails a SUCCESS / WARNING / PARTIAL / ERROR report with the full
+      per-scheme table. Financial values are compared with the
+      .koshvani_previous_data/ baseline (ignoring generated_at).
 
-Channels are independent: Telegram is sent first and is the only channel that
-gates the baseline update; Gmail is sent last and can never delay, block or
-alter the baseline, and neither channel's failure can fail the crawler.
+The baseline only advances after the report was actually delivered (so a
+failed send never silently loses change history), and even then only per
+scheme - for schemes freshly scraped this run with healthy data - so one bad
+run can neither lose change history nor corrupt a scheme's known-good
+history (failed or unprocessed scheme). If Gmail is not configured at all,
+nothing is being reported and the baseline simply advances.
+
 Gmail needs GMAIL_SENDER, GMAIL_APP_PASSWORD and GMAIL_RECIPIENTS (comma
-separated) in .env; without them it is simply skipped.
-
-Never prints or logs TELEGRAM_BOT_TOKEN, GMAIL_APP_PASSWORD or any address.
+separated) in .env; without them the e-mail is skipped. An e-mail failure can
+never fail the crawler. Every log line is sanitized (logsafe.py); the
+password, the addresses and everything else in .env are never written out.
 """
 import argparse
 import json
-import re
+import os
 import shutil
 import smtplib
 import socket
@@ -43,17 +43,16 @@ from email.utils import formataddr, formatdate
 from html import escape as html_escape
 from pathlib import Path
 
-import requests
-
 ROOT = Path(__file__).resolve().parent
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+import logsafe  # noqa: E402  - the shared log sanitizer
+
 ENV_PATH = ROOT / ".env"
 DATA_DIR = ROOT / "docs" / "data"
 BASELINE_DIR = ROOT / ".koshvani_previous_data"
 INDEX_PATH = DATA_DIR / "index.json"
 SCHEMES_CONFIG_PATH = ROOT / "scraper" / "schemes.json"
-
-TELEGRAM_API = "https://api.telegram.org/bot{token}/sendMessage"
-TELEGRAM_MAX_LEN = 4000  # a little under Telegram's 4096 hard limit, for safety
 
 GMAIL_HOST = "smtp.gmail.com"
 GMAIL_PORT = 465
@@ -71,11 +70,12 @@ STAGE_MESSAGES = {
     "git-pull": "❌ Git pull failed.",
     "git-commit": "❌ Git commit failed.",
     "git-push": "❌ Git push failed.",
+    "log-push": "❌ The execution log could not be pushed to GitHub (it stays committed locally and goes out with the next push).",
     "scraper": "❌ Scraper process failed to run (crashed before completing).",
 }
 
 
-# ---------- .env, logging, Telegram send ----------
+# ---------- .env, logging ----------
 
 def load_env(path=ENV_PATH):
     env = {}
@@ -90,22 +90,24 @@ def load_env(path=ENV_PATH):
     return env
 
 
-def _log(message):
-    print(f"[telegram_alert] {message}", file=sys.stderr)
+def _log(message, level="INFO"):
+    now = datetime.now()
+    stamp = now.strftime("%Y-%m-%d %H:%M:%S.") + f"{now.microsecond // 1000:03d}"
+    print(f"{stamp} {level:<5} [gmail_alert] {logsafe.scrub(message)}", file=sys.stderr)
 
 
 def _redactions(env):
-    """Every value that must never reach a log line."""
+    """The mail credentials and addresses of THIS env, which must never reach a log line."""
     recipients = [r.strip() for r in (env.get("GMAIL_RECIPIENTS") or "").split(",")]
     password = env.get("GMAIL_APP_PASSWORD") or ""
-    values = [env.get("TELEGRAM_BOT_TOKEN"), password, "".join(password.split()), env.get("GMAIL_SENDER")] + recipients
+    values = [password, "".join(password.split()), env.get("GMAIL_SENDER")] + recipients
     return sorted({v.strip() for v in values if v and len(v.strip()) >= 4}, key=len, reverse=True)
 
 
 def _scrub(text, env=None):
-    """Strips credentials and addresses from text before it is logged. An
-    exception message can carry them: a requests error quotes the full Telegram
-    URL, and that URL contains the bot token."""
+    """Strips credentials and addresses from text before it is logged: the
+    values of the given env explicitly, then everything logsafe knows about
+    (.env values, tokens, cookies, encrypted query parameters, ...)."""
     if env is None:
         try:
             env = load_env()
@@ -113,66 +115,21 @@ def _scrub(text, env=None):
             env = {}
     text = str(text)
     for value in _redactions(env):
-        text = text.replace(value, "***")
-    return re.sub(r"bot\d+:[A-Za-z0-9_-]+", "bot***", text)
+        text = text.replace(value, logsafe.REDACTED)
+    return logsafe.scrub(text)
 
 
 def _safely(label, fn, env):
     """Runs one delivery step; whatever goes wrong, log a sanitized reason and
-    carry on - one channel must never stop another, or the crawler."""
+    carry on - a notification problem must never stop the crawler."""
     try:
         return fn()
     except Exception as exc:
-        _log(f"{label} step failed unexpectedly: {_scrub(type(exc).__name__ + ': ' + str(exc), env)}")
+        _log(f"{label} step failed unexpectedly: {_scrub(type(exc).__name__ + ': ' + str(exc), env)}", "WARN")
         return False
 
 
-def split_message(text, limit=TELEGRAM_MAX_LEN):
-    """Splits on blank-line block boundaries so a scheme's block is never cut
-    in half; only hard-splits if a single block is somehow still too long."""
-    if len(text) <= limit:
-        return [text]
-    blocks = text.split("\n\n")
-    parts, current = [], ""
-    for block in blocks:
-        candidate = f"{current}\n\n{block}" if current else block
-        if len(candidate) > limit and current:
-            parts.append(current)
-            current = block
-        else:
-            current = candidate
-    if current:
-        parts.append(current)
-    final = []
-    for p in parts:
-        if len(p) <= limit:
-            final.append(p)
-        else:
-            final.extend(p[i:i + limit] for i in range(0, len(p), limit))
-    return final
-
-
-def send_telegram(text, env=None):
-    env = load_env() if env is None else env
-    token = env.get("TELEGRAM_BOT_TOKEN")
-    chat_id = env.get("TELEGRAM_CHAT_ID")
-    if not token or not chat_id:
-        _log("TELEGRAM_BOT_TOKEN/TELEGRAM_CHAT_ID not configured; skipping send.")
-        return False
-    url = TELEGRAM_API.format(token=token)
-    for chunk in split_message(text):
-        try:
-            resp = requests.post(url, data={"chat_id": chat_id, "text": chunk}, timeout=20)
-            if resp.status_code != 200:
-                _log(f"Telegram API returned {resp.status_code}: {_scrub(resp.text[:200], env)}")
-                return False
-        except requests.exceptions.RequestException as exc:
-            _log(f"Telegram send failed: {_scrub(exc, env)}")
-            return False
-    return True
-
-
-# ---------- Gmail (second channel; same report, different formatting) ----------
+# ---------- Gmail ----------
 
 _LEVEL_COLORS = {"success": "#1a7f37", "warning": "#b45f06", "partial": "#6f42c1", "error": "#b3261e"}
 
@@ -233,8 +190,8 @@ def build_email(report, sender, recipients):
     msg["From"] = formataddr(("Koshvani Alerts", sender))
     msg["To"] = ", ".join(recipients)
     msg["Date"] = formatdate(localtime=True)
-    msg.set_content(report.get("email_text") or report["text"])
-    msg.add_alternative(report.get("email_html") or text_to_html(report["text"], report["level"]), subtype="html")
+    msg.set_content(report["email_text"])
+    msg.add_alternative(report["email_html"], subtype="html")
     return msg
 
 
@@ -277,7 +234,7 @@ def send_email(report, env=None):
     try:
         config = gmail_config(env)
         if config is None:
-            _log("Email notification skipped: Gmail is not configured.")
+            _log("Email notification skipped: Gmail is not configured.", "WARN")
             return False
         sender, password, recipients = config
         msg = build_email(report, sender, recipients)
@@ -287,12 +244,12 @@ def send_email(report, env=None):
         delivered = len(recipients) - len(refused)
         if refused:
             _log(f"Email notification sent to {delivered} of {len(recipients)} recipient(s); "
-                 f"{len(refused)} refused by the server.")
+                 f"{len(refused)} refused by the server.", "WARN")
         else:
             _log(f"Email notification sent successfully to {delivered} recipient(s).")
         return delivered > 0
     except Exception as exc:
-        _log(f"Email notification failed: {_scrub(_email_failure_reason(exc), env)}.")
+        _log(f"Email notification failed: {_scrub(_email_failure_reason(exc), env)}.", "WARN")
         return False
 
 
@@ -421,9 +378,8 @@ def diff_scheme_rows(prev_rows, curr_rows):
 
 # ---------- report building ----------
 # The report is ONE structured model of the FINAL state of the run (read from
-# docs/data/crawler_status.json), rendered three ways: concise Telegram text, a
-# plain-text email and an HTML email carrying the full per-scheme table. Every
-# channel therefore reports exactly the same facts.
+# docs/data/crawler_status.json), rendered as a plain-text e-mail and an HTML
+# e-mail that carries the full per-scheme table - both from the same facts.
 
 LEVELS = {
     "success": ("🟢", "SUCCESS"),
@@ -463,12 +419,6 @@ def _append_change_blocks(lines, changes_by_scheme):
                 sign = "+" if fc["diff"] >= 0 else ""
                 lines.append(f"  Change: {sign}{format_num(fc['diff'])}")
         lines.append("")
-
-
-def _append_changes_section(lines, changes_by_scheme):
-    lines.append(f"📈 Data changes: {_change_count(changes_by_scheme)}")
-    lines.append("")
-    _append_change_blocks(lines, changes_by_scheme)
 
 
 def _baseline_review(sid, detail):
@@ -524,14 +474,21 @@ def _scheme_table(crawl):
     return from_index or [{"code": code, "id": None, "name": code} for code in crawl["schemes"]]
 
 
+def _run_info():
+    """(execution id, log file) of this run, handed over by run_daily.sh."""
+    return os.environ.get("KOSHVANI_EXECUTION_ID", "").strip(), os.environ.get("KOSHVANI_LOG_FILE", "").strip()
+
+
 def _job_error_report(ts, duration, reason):
     """A job-level failure (a git step, the scraper process): no per-scheme
-    facts exist, so this is the short message on every channel."""
+    facts exist, so this is a short message."""
+    execution_id, log_file = _run_info()
+    info = "".join(f"\n{label}: {value}" for label, value in (("🆔 Execution ID", execution_id), ("📄 Log file", log_file)) if value)
     text = ("🔴 KOSHVANI CRAWLER — ERROR\n\n"
-            f"⏱ {ts}\n⏳ Duration: {duration}\n\n"
+            f"⏱ {ts}\n⏳ Duration: {duration}{info}\n\n"
             f"{reason}\n\n"
             f"{FOOTERS['error']}")
-    return {"kind": "job", "level": "error", "subject": _headline(text), "text": text, "email_text": text,
+    return {"kind": "job", "level": "error", "subject": _headline(text), "email_text": text,
             "email_html": text_to_html(text, "error"), "can_update_baseline": False, "fresh_ids": []}
 
 
@@ -543,51 +500,21 @@ def _remark_display(row):
     return "Not processed" if row["status"] == 0 else "Failed"
 
 
-def render_telegram(m):
-    """Concise: the headline numbers, what failed and why, what changed."""
-    emoji, word = LEVELS[m["level"]]
-    c = m["counts"]
-    lines = [f"{emoji} KOSHVANI CRAWLER — {word}", "", f"⏱ {m['ts']}", f"⏳ Duration: {m['duration']}", "",
-             f"📊 Schemes: {c['successful']}/{c['total']} successful"]
-    if c["recovered"]:
-        lines.append(f"🔁 Recovered by retry: {c['recovered']}")
-    if c["failed"]:
-        lines.append(f"❌ Failed: {c['failed']}")
-    if c["unprocessed"]:
-        lines.append(f"⏸ Unprocessed: {c['unprocessed']}")
-    if m["fatal_error"]:
-        lines.append(f"🛑 Fatal error: {truncate(m['fatal_error'], 200)}")
-    if m["level"] == "success":
-        lines.append(f"📈 Data changes: {_change_count(m['changes']) or 'None'}")
-    lines.append("")
-    if m["level"] == "success" and m["changes"]:
-        _append_change_blocks(lines, m["changes"])
-
-    failed = [r for r in m["rows"] if r["status"] == -1]
-    if failed:
-        lines.append("Failed:")
-        for r in failed:
-            lines += [f"• {r['name']} — {truncate(r['remark'] or 'Failed', 160)}", ""]
-    if m["review"]:
-        lines.append(f"🔎 Data review needed: {len(m['review'])}")
-        for name, note in m["review"]:
-            lines += [f"• {name} — {note}", ""]
-    if m["level"] != "success" and m["changes"]:
-        _append_changes_section(lines, m["changes"])
-    lines.append(FOOTERS[m["level"]])
-    return "\n".join(lines).strip() + "\n"
-
-
 def render_email_text(m):
     """Plain-text alternative of the email: the full report, every scheme."""
     emoji, word = LEVELS[m["level"]]
     c = m["counts"]
     lines = [f"{emoji} KOSHVANI CRAWLER — {word}", "",
-             f"Execution: {m['ts']}", f"Duration: {m['duration']}", "",
-             f"Schemes: {c['successful']}/{c['total']} successful",
-             f"Total: {c['total']} | Successful: {c['successful']} | Failed: {c['failed']} | Unprocessed: {c['unprocessed']}",
-             f"Recovered by retry: {c['recovered']}",
-             f"Data changes: {_change_count(m['changes']) or 'None'}"]
+             f"Execution: {m['ts']}", f"Duration: {m['duration']}"]
+    if m["execution_id"]:
+        lines.append(f"Execution ID: {m['execution_id']}")
+    if m["log_file"]:
+        lines.append(f"Log file: {m['log_file']}")
+    lines += ["",
+              f"Schemes: {c['successful']}/{c['total']} successful",
+              f"Total: {c['total']} | Successful: {c['successful']} | Failed: {c['failed']} | Unprocessed: {c['unprocessed']}",
+              f"Recovered by retry: {c['recovered']}",
+              f"Data changes: {_change_count(m['changes']) or 'None'}"]
     if m["fatal_error"]:
         lines.append(f"Fatal error: {m['fatal_error']}")
     lines += ["", f"ALL {c['total']} SCHEMES", "# | Scheme Code | Scheme Name | Status | Attempts | Remark"]
@@ -619,6 +546,8 @@ def render_email_html(m):
 
     summary = "".join([
         kv("Execution", e(m["ts"])), kv("Duration", e(m["duration"])),
+    ] + ([kv("Execution ID", e(m["execution_id"]))] if m["execution_id"] else [])
+      + ([kv("Log file", e(m["log_file"]))] if m["log_file"] else []) + [
         kv("Schemes", f"{c['successful']}/{c['total']} successful"),
         kv("Total / Successful", f"{c['total']} / {c['successful']}"),
         kv("Failed", f"{c['failed']}"), kv("Unprocessed", f"{c['unprocessed']}"),
@@ -729,13 +658,15 @@ def build_report(start_ts):
     else:
         level = "success"
 
+    execution_id, log_file = _run_info()
     m = {"level": level, "ts": ts, "duration": duration, "counts": counts, "rows": rows,
-         "changes": changes, "review": review, "fatal_error": fatal}
+         "changes": changes, "review": review, "fatal_error": fatal,
+         "execution_id": execution_id or str(crawl.get("execution_id") or ""), "log_file": log_file}
     emoji, word = LEVELS[level]
     subject = f"{emoji} KOSHVANI CRAWLER — {word}"
     if level != "error":
         subject += f" | {counts['successful']}/{counts['total']} Schemes"
-    return {"kind": "crawl", "level": level, "subject": subject, "text": render_telegram(m),
+    return {"kind": "crawl", "level": level, "subject": subject,
             "email_text": render_email_text(m), "email_html": render_email_html(m),
             "can_update_baseline": level != "error", "fresh_ids": fresh_ids, "counts": counts, "model": m}
 
@@ -784,27 +715,26 @@ def update_baseline(fresh_ids=None):
 def cmd_report(args):
     env = load_env()
     report = build_report(args.start)
+    configured = gmail_config(env) is not None
 
-    # Telegram first - and it alone gates the baseline, exactly as before, so a
-    # failed delivery never silently loses change history.
-    sent = _safely("Telegram", lambda: send_telegram(report["text"], env), env)
-    if not sent:
-        _log("Telegram send failed; baseline NOT updated so changes stay detectable next run.")
-    else:
+    delivered = _safely("Email", lambda: send_email(report, env), env)
+
+    # Gmail is the only channel, so it gates the baseline: the baseline only
+    # advances once the report (and with it every change since the last
+    # baseline) has really been delivered, so a failed send never silently loses
+    # change history. With no Gmail configured nothing is reported at all, so
+    # there is nothing to protect and the baseline just advances.
+    if delivered or not configured:
         if report["can_update_baseline"]:
             _safely("Baseline update", lambda: update_baseline(report.get("fresh_ids")), env)
-        _log(f"Report sent ({report['level']}).")
-
-    # Gmail last, after the baseline is settled: whatever happens here (bad
-    # credentials, timeout, a killed process) cannot reach the baseline, and it
-    # is attempted even when Telegram failed.
-    _safely("Email", lambda: send_email(report, env), env)
+        _log(f"Report {'e-mailed' if delivered else 'built (Gmail not configured - nothing to deliver)'} ({report['level']}).")
+    else:
+        _log("Email not delivered; baseline NOT updated so changes stay detectable next run.", "WARN")
 
 
 def cmd_error(args):
     env = load_env()
     report = build_error_report(args.start, args.stage)
-    _safely("Telegram", lambda: send_telegram(report["text"], env), env)
     _safely("Email", lambda: send_email(report, env), env)
 
 
@@ -825,7 +755,7 @@ def main():
     try:
         args.func(args)
     except Exception as exc:  # monitoring must never take the crawler job down with it
-        _log(f"Unexpected error in monitoring: {_scrub(exc)}")
+        _log(f"Unexpected error in monitoring: {_scrub(exc)}", "ERROR")
 
 
 if __name__ == "__main__":

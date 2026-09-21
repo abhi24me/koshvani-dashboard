@@ -48,7 +48,9 @@ does the same pull-scrape-commit-push cycle as `refresh.bat`, meant to run
 on a schedule via [Termux](https://termux.dev/) + Termux:Boot. If a run is cut
 short (killed by Android, a fatal error), what it had already scraped is
 committed and pushed anyway, and leftovers from a killed run are saved as a
-commit rather than discarded:
+commit rather than discarded. Every run also writes, commits and pushes its own
+[execution log](#execution-logs), and mails a report through
+[Gmail](#notifications-gmail-only):
 
 ```
 pkg install python git -y
@@ -141,23 +143,37 @@ to preview before pushing.
 Every scheme is an independent unit, and the run is built so that nothing
 already scraped can be lost:
 
+- **Concurrent, but isolated.** Schemes are processed by a
+  `ThreadPoolExecutor` with `MAX_WORKERS = 4` workers (top of
+  `scraper/scrape.py`; set it to 1 to get the old strictly sequential
+  behaviour, raise it cautiously - the portal is flaky even with one client).
+  Every attempt builds its own `requests.Session` with its own TLS adapter, so
+  no cookies, connection pools or portal links are ever shared between schemes.
+  Workers only touch their own scheme's file and the (locked) status; a fatal
+  error or a kill in any worker stops the run: in-flight schemes finish their
+  current attempt, queued ones are dropped and stay at status 0 (`PARTIAL`).
 - **Per-scheme retries, in the same run.** Each scheme gets up to 3 attempts
-  (`MAX_ATTEMPTS`), one scheme at a time - there is no separate retry pass
+  (`MAX_ATTEMPTS`) inside its own worker turn - there is no separate retry pass
   afterwards, and a scheme that succeeded is never retried. Every attempt uses
   a fresh session (fresh cookies and freshly generated portal links). The wait
   before attempt 2 is random 5-15 s and before attempt 3 random 15-30 s
-  (`RETRY_1_DELAY_*`, `RETRY_2_DELAY_*` at the top of `scraper/scrape.py`).
+  (`RETRY_1_DELAY_*`, `RETRY_2_DELAY_*` at the top of `scraper/scrape.py`); it
+  only holds up the worker that needs it.
 - **Saved immediately.** A scheme's `docs/data/<id>.json` is written (atomically:
-  temp file, then `os.replace`) the moment it has been scraped and validated,
-  so a later failure or crash can never take it away. `index.json` is refreshed
-  after every scheme, so it never claims more than what is really on disk.
+  unique temp file, `fsync`, JSON re-validated, then `os.replace`) the moment
+  it has been scraped and validated, so a later failure or crash can never take
+  it away. `crawler_status.json` is updated under a lock and written the same
+  atomic way, so every reader always sees a complete file. `index.json` is only
+  ever written by the main thread, from a consistent snapshot, each time a
+  scheme finishes and once more at the end - so it never claims more than what
+  is really on disk.
 - **`docs/data/crawler_status.json`** - exactly one file, describing the
   *current* execution only (git history keeps the previous ones), reset at the
   start of every run. Keyed by the numeric scheme code from `schemes.json`:
 
   ```json
   {
-    "execution_id": "2026-09-19T14:30:12+00:00",
+    "execution_id": "20260919-143012-9a80e1",
     "started_at": "2026-09-19T14:30:12+00:00",
     "updated_at": "2026-09-19T14:32:41+00:00",
     "finished_at": "2026-09-19T14:32:41+00:00",
@@ -180,14 +196,74 @@ already scraped can be lost:
   -1), `PARTIAL` (cut short by a fatal error or a kill - some still 0),
   `ERROR` (nothing could be attempted). The scraper exits 0 for the first two
   and 3 otherwise; either way everything it saved is kept.
-- **Reports.** Telegram and Gmail are generated from this *final* state, after
+- **Reports.** The Gmail report is generated from this *final* state, after
   the retries: a scheme that failed once and then recovered is not a failure.
-  Telegram stays short; the Gmail message carries the full 24-scheme table
-  (status, attempts, remark for every scheme).
+  It carries the full 24-scheme table (status, attempts, remark for every
+  scheme), the execution id and the name of the execution log.
 - **Baseline.** `.koshvani_previous_data/` still advances per scheme, only for
-  schemes freshly scraped in that run with healthy data, and only after the
-  report was delivered (updating it inside the scraper would erase the
-  before/after that "Data changes" needs).
+  schemes freshly scraped in that run with healthy data, and - since Gmail is
+  now the only channel - only once the report e-mail was actually delivered
+  (or when Gmail is not configured at all, when there is nothing to protect).
+  A failed send therefore never loses change history: the same changes are
+  reported by the next run. (Updating it inside the scraper would erase the
+  before/after that "Data changes" needs.)
+
+## Notifications (Gmail only)
+
+`gmail_alert.py` is the only notification mechanism. Put these in a local
+`.env` (never committed - it is in `.gitignore`):
+
+```
+GMAIL_SENDER=you@gmail.com
+GMAIL_APP_PASSWORD=xxxx xxxx xxxx xxxx     # a Google "app password", not your login password
+GMAIL_RECIPIENTS=you@gmail.com,someone@example.com
+```
+
+`run_daily.sh` calls it once per run, after the data has been pushed:
+`python gmail_alert.py report` (SUCCESS / WARNING / PARTIAL / ERROR, from the
+final state) or `python gmail_alert.py error --stage git-pull|git-commit|git-push|log-push`
+for a job-level failure. Without those three variables no mail is sent; a mail
+problem can never fail the crawler or touch the data.
+
+## Execution logs
+
+Every run of `run_daily.sh` creates **its own log**, never reused and never
+edited afterwards: `logs/daily-YYYY-MM-DD-HHMMSS.log` (a second run in the same
+second gets a `-2` suffix). Whatever the run does - a full success, a partial
+run, no data changes, a failed pull - the finished log is committed
+(`Add execution log <execution_id>`) and pushed to `main`, so the history of
+every run lives in git. Logs a run could not push (no network) go out with the
+next run.
+
+A log records, with millisecond timestamps, the level and the worker thread:
+
+- the unique **execution id** (`YYYYMMDD-HHMMSS-xxxxxx`), also written to
+  `crawler_status.json`, `index.json` and the Gmail report;
+- per scheme: which worker took it, every attempt, the retry waits, the total
+  time and the final status; and for every HTTP request its start, end, status,
+  size and elapsed time, or the failure kind (`timeout`, `connection-reset`,
+  `ssl`, `http-503`, `validation`, ...);
+- parsing and validation results, every file written (bytes, milliseconds),
+  every `crawler_status.json` update;
+- a performance summary: wall time, worker utilisation, slowest schemes,
+  request-latency average / p95 / max, failures by kind, time spent in retry
+  waits;
+- every Git operation with its exit code and duration, the result of the Gmail
+  step, and the final execution status.
+
+**Nothing sensitive is ever written.** All output passes through
+[logsafe.py](logsafe.py) (standard library only): cookies, `Authorization`
+headers, tokens, API keys, passwords, session ids, the portal's encrypted URL
+query parameters (URLs are logged as page names only), long opaque tokens,
+e-mail addresses and every value found in `.env` are replaced by `<redacted>`.
+It runs in three places: as the logging formatter of the scraper and the mailer,
+as a filter between `run_daily.sh` and the log file, and as a last check
+(`logsafe.py --scrub-file`, `--check`) on each log right before it is committed
+- a log that would still change under the sanitizer is not published. Only
+explicit paths are ever staged (`docs/data` and the execution logs), never the
+whole tree. The last lines of a log announce the publish step; what that step
+itself prints (it cannot be part of the file it commits) only goes to the
+screen.
 
 ## Running the tests
 
@@ -195,9 +271,14 @@ already scraped can be lost:
 python -m unittest discover -s tests -v
 ```
 
-Standard library only and fully offline (fake portal, SMTP and Telegram; every
-test works in a temp directory). The `run_daily.sh` tests need `bash` and `git`
-and the dashboard tests need Playwright; each skips itself when unavailable.
+Fully offline (fake portal and SMTP; every test works in a temp directory, so
+the suite never touches `docs/data`, `logs/`, the real baseline or `.env`). It
+covers the retry and status semantics, the thread pool (real parallelism, the
+`MAX_WORKERS` bound, isolation, atomic files under concurrent readers), the log
+format, the sanitizer, the Gmail reports and the baseline gate, and
+`run_daily.sh` in a sandbox git repo with a bare `origin` (about six minutes,
+most of it process start-up on Windows). Those need `bash` and `git`, and the
+dashboard tests need Playwright; each skips itself when unavailable.
 
 ## Notes
 

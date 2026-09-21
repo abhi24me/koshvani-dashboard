@@ -1,21 +1,26 @@
 """Shared fixtures for the Koshvani test suite.
 
-Standard library only (unittest), fully offline: the portal, SMTP and Telegram
-are always replaced by fakes, and every test works in its own temp directory,
-so running the suite never touches docs/data, the real baseline or .env.
+Standard library only (unittest), fully offline: the portal and SMTP are always
+replaced by fakes, and every test works in its own temp directory, so running
+the suite never touches docs/data, the real baseline, logs/ or .env.
 
     python -m unittest discover -s tests -v
 """
 import importlib.util
 import io
 import json
+import os
 import shutil
+import stat
+import sys
 import tempfile
 import unittest
 from contextlib import redirect_stderr
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
+if str(REPO) not in sys.path:
+    sys.path.insert(0, str(REPO))          # so the modules can import the shared logsafe.py
 
 
 def _load(name, path):
@@ -26,7 +31,7 @@ def _load(name, path):
 
 
 scrape = _load("koshvani_scrape", REPO / "scraper" / "scrape.py")
-alert = _load("koshvani_alert", REPO / "telegram_alert.py")
+alert = _load("koshvani_alert", REPO / "gmail_alert.py")
 
 COLUMN_HEADERS = [
     "Treasury", "Standard Object", "Plan / Non-Plan", "Voted / Charged", "Progressive Allotment",
@@ -37,6 +42,14 @@ LEGACY_INDEX_KEYS = {
     "id", "name", "grant_text", "scheme_code", "district", "status", "generated_at", "fin_year",
     "progressive_allotment", "total_expenditure", "pct_expenditure_of_allotment",
 }
+
+
+def rmtree_force(path):
+    """Delete a directory tree even when it holds read-only files (execution logs are made read-only)."""
+    def _writable(func, target, _exc):
+        os.chmod(target, stat.S_IWRITE)
+        func(target)
+    shutil.rmtree(path, onerror=_writable)
 
 
 def make_schemes(n=24):
@@ -54,19 +67,30 @@ def ok_result(scheme, allot=1000.0, spent=500.0, month=0.0):
 
 
 class ScraperCase(unittest.TestCase):
-    """Runs the real scrape.main() loop in a temp dir, with the portal replaced
-    by a script: self.script[scheme_code] = [outcome, ...] where each outcome is
-    a result dict (that attempt succeeds) or an exception (that attempt fails).
-    Attempts beyond the script succeed."""
+    """Runs the real scrape.main() in a temp dir, with the portal replaced by a
+    script: self.script[scheme_code] = [outcome, ...] where each outcome is a
+    result dict (that attempt succeeds) or an exception (that attempt fails).
+    Attempts beyond the script succeed.
+
+    MAX_WORKERS defaults to 1 here so the order of events is deterministic;
+    tests of the concurrent behaviour set scrape.MAX_WORKERS themselves."""
+
+    workers = 1
 
     def setUp(self):
         self.tmp = Path(tempfile.mkdtemp(prefix="koshvani_test_"))
         self.addCleanup(shutil.rmtree, self.tmp, True)
         self.schemes = make_schemes()
-        self._saved = {k: getattr(scrape, k) for k in ("DATA_DIR", "CONFIG_PATH", "_sleep", "attempt_scheme", "utc_now", "save_result")}
+        self._saved = {k: getattr(scrape, k) for k in
+                       ("DATA_DIR", "CONFIG_PATH", "_sleep", "attempt_scheme", "utc_now", "save_result", "MAX_WORKERS")}
+        self._saved_env = os.environ.get("KOSHVANI_EXECUTION_ID")
+        os.environ.pop("KOSHVANI_EXECUTION_ID", None)
         self.addCleanup(self._restore)
+        scrape._STOP.clear()
+        self.addCleanup(scrape._STOP.clear)
         scrape.DATA_DIR = self.tmp / "data"
         scrape.CONFIG_PATH = self.tmp / "schemes.json"
+        scrape.MAX_WORKERS = self.workers
         self.write_config(self.schemes)
         self.sleeps, self.calls, self.script, self.on_attempt = [], [], {}, None
         scrape._sleep = self.sleeps.append          # never really wait
@@ -75,6 +99,10 @@ class ScraperCase(unittest.TestCase):
     def _restore(self):
         for name, value in self._saved.items():
             setattr(scrape, name, value)
+        if self._saved_env is None:
+            os.environ.pop("KOSHVANI_EXECUTION_ID", None)
+        else:
+            os.environ["KOSHVANI_EXECUTION_ID"] = self._saved_env
 
     def write_config(self, schemes):
         scrape.CONFIG_PATH.write_text(json.dumps(schemes), encoding="utf-8")
@@ -98,7 +126,7 @@ class ScraperCase(unittest.TestCase):
         self.log = buf.getvalue()
         return rc
 
-    def code(self, i):          # 1-based, like the log's "[SCHEME i/24]"
+    def code(self, i):          # 1-based, like the log's "[01/24 code]"
         return self.schemes[i - 1]["scheme_code"]
 
     def status(self):

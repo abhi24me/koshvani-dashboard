@@ -35,20 +35,30 @@ Reliability model - every scheme is an independent unit:
   * docs/data/crawler_status.json (ONE file, current execution only) tracks each
     scheme by its numeric scheme code: 0 = not processed, 1 = success,
     -1 = failed, with the attempt count and the latest error;
-  * one bad scheme never stops the others; a fatal error stops the loop but
-    keeps everything already saved and leaves the rest at 0 (status PARTIAL).
+  * one bad scheme never stops the others; a fatal error stops the run but
+    keeps everything already saved and leaves the rest at 0 (status PARTIAL);
+  * schemes run concurrently on a ThreadPoolExecutor (MAX_WORKERS threads),
+    each attempt in its own session with its own TLS adapter; the status file is
+    updated under a lock, and only the main thread ever writes index.json;
+  * everything is logged in detail (every attempt, every HTTP request, timings,
+    file writes, status updates, performance metrics), and every log line is
+    sanitized by logsafe.py first.
 """
 import json
+import logging
 import os
 import random
 import re
 import signal
 import ssl
 import sys
+import threading
 import time
+import uuid
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
 from pathlib import Path
-from urllib.parse import urljoin, urlparse
+from urllib.parse import urljoin, urlparse, urlsplit
 
 import requests
 from bs4 import BeautifulSoup
@@ -58,6 +68,10 @@ ROOT = Path(__file__).resolve().parent.parent
 CONFIG_PATH = Path(__file__).resolve().parent / "schemes.json"
 DATA_DIR = ROOT / "docs" / "data"
 
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+import logsafe  # noqa: E402  - the shared log sanitizer lives at the repo root
+
 BASE_URL = "https://koshvani.up.nic.in"
 MAIN_URL = f"{BASE_URL}/KoshvaniStatic.aspx"
 REQUEST_TIMEOUT = 45
@@ -66,6 +80,11 @@ HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
                   "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
 }
+
+# How many schemes are scraped at the same time. Every worker runs its own
+# schemes with fresh sessions of its own; raise it cautiously - the portal is
+# already flaky under sequential access.
+MAX_WORKERS = 4
 
 # Per-scheme retry policy. Retries happen immediately, inside the same
 # execution and the same scheme's turn - never in a separate pass afterwards.
@@ -90,8 +109,6 @@ class LegacyTLSAdapter(HTTPAdapter):
         kwargs["ssl_context"] = context
         return super().init_poolmanager(*args, **kwargs)
 
-
-_LEGACY_TLS_ADAPTER = LegacyTLSAdapter()
 
 # Index of the numeric columns within a row's raw `cells` array, used only to
 # compute the derived totals block - the cells themselves are stored verbatim,
@@ -215,6 +232,30 @@ class ValidationError(ScrapeError):
     """The page loaded but the parsed result is not the expected structure."""
 
 
+# ---------------------------------------------------------------------------
+# Logging. Every line is sanitized by logsafe (no cookies, tokens, encrypted
+# query parameters, passwords or .env values can be written), and carries the
+# time, level, worker thread and - inside a scheme - "[position/total code]".
+# ---------------------------------------------------------------------------
+
+log = logging.getLogger("koshvani")
+_ctx = threading.local()          # the scheme this worker thread is currently on
+_STOP = threading.Event()         # set when the run must wind down (fatal error / interrupt)
+
+
+def setup_logging():
+    handler = logging.StreamHandler(sys.stderr)
+    handler.setFormatter(logsafe.SanitizingFormatter(
+        "%(asctime)s.%(msecs)03d %(levelname)-5s [%(threadName)s] %(message)s", datefmt="%Y-%m-%d %H:%M:%S"))
+    log.handlers[:] = [handler]
+    log.setLevel(logging.INFO)
+    log.propagate = False
+
+
+def say(message="", level=logging.INFO):
+    log.log(level, "%s%s", getattr(_ctx, "tag", ""), message)
+
+
 _URL_RE = re.compile(r"https?://[^\s'\")\]]+")
 _URL_PATH_RE = re.compile(r"url: (/[^\s'\")\]]*)")
 
@@ -227,8 +268,119 @@ def describe_error(exc):
     text = f"{type(exc).__name__}: {exc}"
     text = _URL_RE.sub(lambda m: urlparse(m.group(0)).path.rsplit("/", 1)[-1] or urlparse(m.group(0)).netloc, text)
     text = _URL_PATH_RE.sub(lambda m: "url: " + (m.group(1).split("?")[0].rsplit("/", 1)[-1] or "/"), text)
-    text = re.sub(r"\s+", " ", text).strip()
+    text = logsafe.scrub(re.sub(r"\s+", " ", text).strip())       # belt and braces: remarks are committed to git
     return text if len(text) <= MAX_REMARK_LENGTH else text[: MAX_REMARK_LENGTH - 1] + "…"
+
+
+def classify_error(exc):
+    """A short machine-friendly kind for logs and the performance summary."""
+    if isinstance(exc, ScrapeError):
+        return {"MissingLinkError": "missing-link", "UnexpectedPageError": "unexpected-page",
+                "ValidationError": "validation"}.get(type(exc).__name__, "scrape-error")
+    if isinstance(exc, requests.exceptions.Timeout):
+        return "timeout"
+    if isinstance(exc, requests.exceptions.SSLError):
+        return "ssl"
+    if isinstance(exc, requests.exceptions.HTTPError):
+        code = getattr(getattr(exc, "response", None), "status_code", None)
+        return f"http-{code}" if code else "http-error"
+    if isinstance(exc, requests.exceptions.ConnectionError):
+        text = str(exc).lower()
+        return "connection-reset" if ("reset" in text or "aborted" in text) else "connection-error"
+    return type(exc).__name__.lower()
+
+
+class Metrics:
+    """Thread-safe counters for the final performance summary."""
+
+    def __init__(self):
+        self._lock = threading.Lock()
+        self.requests = self.request_failures = self.bytes = 0
+        self.latencies, self.schemes, self.error_kinds = [], [], {}
+        self.retry_wait = 0.0
+
+    def request(self, seconds, nbytes=0, failed=False):
+        with self._lock:
+            self.requests += 1
+            self.request_failures += 1 if failed else 0
+            self.bytes += nbytes
+            self.latencies.append(seconds)
+
+    def failure(self, kind):
+        with self._lock:
+            self.error_kinds[kind] = self.error_kinds.get(kind, 0) + 1
+
+    def waited(self, seconds):
+        with self._lock:
+            self.retry_wait += seconds
+
+    def scheme(self, worker, code, seconds, attempts, ok):
+        with self._lock:
+            self.schemes.append({"worker": worker, "code": code, "seconds": seconds, "attempts": attempts, "ok": ok})
+
+    def summary_lines(self, workers, wall):
+        with self._lock:
+            lines = [f"Wall time: {wall:.1f}s | workers: {workers} | max attempts per scheme: {MAX_ATTEMPTS}"]
+            if self.schemes:
+                secs = [s["seconds"] for s in self.schemes]
+                lines.append(f"Scheme time: min {min(secs):.1f}s | avg {sum(secs) / len(secs):.1f}s | max {max(secs):.1f}s")
+                slowest = sorted(self.schemes, key=lambda s: -s["seconds"])[:3]
+                lines.append("Slowest schemes: " + ", ".join(
+                    f"{s['code']} {s['seconds']:.1f}s (attempts {s['attempts']}, {s['worker']})" for s in slowest))
+                per_worker = {}
+                for s in self.schemes:
+                    count, busy = per_worker.get(s["worker"], (0, 0.0))
+                    per_worker[s["worker"]] = (count + 1, busy + s["seconds"])
+                utilisation = sum(secs) / (workers * wall) * 100 if wall > 0 else 0
+                lines.append(f"Worker utilisation: {utilisation:.0f}% | " + ", ".join(
+                    f"{w}: {c} schemes {t:.0f}s" for w, (c, t) in sorted(per_worker.items())))
+            lat = sorted(self.latencies)
+            lines.append(f"HTTP requests: {self.requests} (ok {self.requests - self.request_failures}, "
+                         f"failed {self.request_failures}) | downloaded {self.bytes / 1024:.0f} KB")
+            if lat:
+                lines.append(f"Request latency: avg {sum(lat) / len(lat):.2f}s | p95 {lat[min(len(lat) - 1, int(len(lat) * 0.95))]:.2f}s | max {lat[-1]:.2f}s")
+            if self.error_kinds:
+                lines.append("Attempt failures by kind: " + ", ".join(f"{k}={v}" for k, v in sorted(self.error_kinds.items())))
+            lines.append(f"Time spent waiting between retries: {self.retry_wait:.1f}s (summed over workers)")
+            return lines
+
+
+_METRICS = Metrics()
+
+
+def _page_name(url):
+    parts = urlsplit(str(url))
+    return parts.path.rsplit("/", 1)[-1] or parts.netloc or "?"
+
+
+def _fetch(session, url, what):
+    """One logged HTTP GET: start, then end (status, size, elapsed) or the failure
+    kind. The URL is only ever logged as its page name - never its query string."""
+    page = _page_name(url)
+    say(f"HTTP GET {what} ({page}) START")
+    started = time.monotonic()
+    try:
+        response = session.get(url, timeout=REQUEST_TIMEOUT)
+    except Exception as exc:
+        elapsed = time.monotonic() - started
+        _METRICS.request(elapsed, failed=True)
+        say(f"HTTP GET {what} ({page}) FAILED after {elapsed:.2f}s kind={classify_error(exc)}: {describe_error(exc)}", logging.WARNING)
+        raise
+    elapsed = time.monotonic() - started
+    size = len(response.content)
+    _METRICS.request(elapsed, size)
+    redirects = len(response.history)
+    extra = f" redirects={redirects} final={_page_name(response.url)}" if redirects else ""
+    say(f"HTTP GET {what} ({page}) END status={response.status_code} bytes={size} elapsed={elapsed:.2f}s{extra}")
+    return response
+
+
+def _describe_page(soup, size):
+    """What a page that lacks the expected report table actually is - to diagnose it later."""
+    title = soup.title.get_text(strip=True) if soup.title else ""
+    text = " ".join(soup.get_text(" ", strip=True).split())[:160]
+    return (f"title={title!r} bytes={size} has_Table1={bool(soup.select_one('#Table1'))} "
+            f"has_myTable={bool(soup.select_one('#myTable'))} text={text!r}")
 
 
 def validate_result(result, scheme):
@@ -250,6 +402,7 @@ def validate_result(result, scheme):
         totals = result.get("totals") or {}
         if any(k not in totals for k in (*NUMERIC_CELL_INDEXES, "pct_expenditure_of_allotment")):
             raise ValidationError("Totals could not be computed from the report rows")
+    say(f"VALIDATE ok status={status} rows={len(result.get('rows') or [])}")
     return result
 
 
@@ -257,10 +410,12 @@ def attempt_scheme(scheme):
     """One clean attempt: a brand-new session (fresh cookie jar) that follows
     the portal's click path from the start, so freshly generated links are
     used. The portal occasionally bounces a request back to the main page
-    (session hiccup / light throttling) and a new session usually clears it."""
+    (session hiccup / light throttling) and a new session usually clears it.
+    The session gets its OWN TLS adapter: closing a session closes its adapters,
+    which would tear down a shared connection pool under the other workers."""
     session = requests.Session()
     session.headers.update(HEADERS)
-    session.mount("https://", _LEGACY_TLS_ADAPTER)
+    session.mount("https://", LegacyTLSAdapter())
     try:
         return validate_result(_scrape_scheme_once(session, scheme), scheme)
     finally:
@@ -268,7 +423,7 @@ def attempt_scheme(scheme):
 
 
 def _scrape_scheme_once(session, scheme):
-    r = session.get(MAIN_URL, timeout=REQUEST_TIMEOUT)
+    r = _fetch(session, MAIN_URL, "main page")
     r.raise_for_status()
     soup = BeautifulSoup(r.text, "html.parser")
     fin_year = get_selected_fin_year(soup)
@@ -277,7 +432,7 @@ def _scrape_scheme_once(session, scheme):
     if not href:
         raise MissingLinkError("Could not find 'Grant-wise expenditure' link on main page")
 
-    r = session.get(urljoin(r.url, href), timeout=REQUEST_TIMEOUT)
+    r = _fetch(session, urljoin(r.url, href), "grant list")
     r.raise_for_status()
     if "ddlAmountIn" not in r.text:
         raise UnexpectedPageError(f"Unexpected page after following 'Grant-wise expenditure': {r.url}")
@@ -287,7 +442,7 @@ def _scrape_scheme_once(session, scheme):
     if not href:
         raise MissingLinkError(f"Could not find grant link '{scheme['grant_text']}' on ExpGrant.aspx")
 
-    r = session.get(urljoin(r.url, href), timeout=REQUEST_TIMEOUT)
+    r = _fetch(session, urljoin(r.url, href), "scheme list")
     r.raise_for_status()
     if "ExpHead" not in r.url:
         raise UnexpectedPageError(f"Expected ExpHead.aspx after selecting grant, got {r.url}")
@@ -297,10 +452,11 @@ def _scrape_scheme_once(session, scheme):
     if not href:
         raise MissingLinkError(f"Could not find scheme code '{scheme['scheme_code']}' on ExpHead.aspx")
 
-    r = session.get(urljoin(r.url, href), timeout=REQUEST_TIMEOUT)
+    r = _fetch(session, urljoin(r.url, href), "scheme report")
     r.raise_for_status()
 
     if "NoRecordFound" in r.url:
+        say("PARSE portal answered NoRecordFound (no expenditure recorded for this scheme)")
         return {
             **base_meta(scheme, fin_year),
             "status": "empty",
@@ -320,6 +476,10 @@ def _scrape_scheme_once(session, scheme):
     month_labels = extract_month_labels(headers)
     rows = extract_district_rows(soup, scheme["district"])
     totals = compute_totals(rows) if rows else {}
+    if headers:
+        say(f"PARSE report table: columns={len(headers)} district_rows={len(rows)} fin_year={fin_year} months={month_labels}")
+    else:
+        say(f"PARSE report page has NO table header row: {_describe_page(soup, len(r.content))}", logging.WARNING)
 
     return {
         **base_meta(scheme, fin_year),
@@ -362,27 +522,45 @@ def error_result(scheme, message):
 
 # ---------------------------------------------------------------------------
 # Persistence: every write is atomic (temp file, then os.replace), so a kill
-# mid-write can never leave a half-written JSON file behind.
+# mid-write can never leave a half-written JSON file behind. Each writer uses
+# its own temp name, so concurrent workers can never trample each other's.
 # ---------------------------------------------------------------------------
 
 def utc_now():
     return datetime.now(timezone.utc).isoformat(timespec="seconds")
 
 
+def new_execution_id():
+    """Unique per run: local time + 6 random hex digits, e.g. 20260922-101530-a1b2c3."""
+    return datetime.now().strftime("%Y%m%d-%H%M%S") + "-" + uuid.uuid4().hex[:6]
+
+
 def write_json_atomic(path, data):
+    """Returns (bytes written, seconds taken)."""
+    started = time.monotonic()
     path = Path(path)
-    tmp = path.with_name(path.name + ".tmp")
+    tmp = path.with_name(f"{path.name}.{os.getpid()}-{threading.get_ident()}.tmp")
     payload = json.dumps(data, ensure_ascii=False, indent=2)
     with open(tmp, "w", encoding="utf-8", newline="\n") as f:
         f.write(payload)
         f.flush()
         os.fsync(f.fileno())
     json.loads(tmp.read_text(encoding="utf-8"))  # only ever publish a file that parses
-    os.replace(tmp, path)
+    for tries in range(6):
+        try:
+            os.replace(tmp, path)
+            break
+        except PermissionError:      # Windows: the destination is briefly open elsewhere (a reader, an antivirus scan)
+            if tries == 5:
+                raise
+            time.sleep(0.02 * (tries + 1))
+    return len(payload.encode("utf-8")), time.monotonic() - started
 
 
 def save_result(scheme, result):
-    write_json_atomic(DATA_DIR / f"{scheme['id']}.json", result)
+    size, seconds = write_json_atomic(DATA_DIR / f"{scheme['id']}.json", result)
+    say(f"FILE WRITE {scheme['id']}.json {size} bytes {seconds * 1000:.0f} ms "
+        f"(status={result.get('status')}, rows={len(result.get('rows') or [])})")
 
 
 def load_result(scheme):
@@ -397,60 +575,85 @@ def clean_stale_tmp_files():
     for tmp in DATA_DIR.glob("*.tmp"):
         try:
             tmp.unlink()
+            say(f"CLEANUP removed stale temp file {tmp.name}", logging.WARNING)
         except OSError:
             pass
+
+
+def _counts(entries):
+    entries = list(entries)
+    return {
+        "total": len(entries),
+        "successful": sum(1 for e in entries if e["status"] == STATUS_OK),
+        "failed": sum(1 for e in entries if e["status"] == STATUS_FAILED),
+        "unprocessed": sum(1 for e in entries if e["status"] == STATUS_PENDING),
+        "recovered": sum(1 for e in entries if e["status"] == STATUS_OK and e["attempts"] > 1),
+    }
 
 
 class CrawlStatus:
     """docs/data/crawler_status.json - the tracker for the CURRENT execution
     only (history lives in git). One entry per scheme, keyed by its numeric
-    scheme code:  status 0 = not processed, 1 = success, -1 = failed."""
+    scheme code:  status 0 = not processed, 1 = success, -1 = failed.
+
+    Shared by all worker threads: every read and write happens under one lock,
+    and the file itself is replaced atomically, so it is always complete and valid."""
 
     def __init__(self, schemes):
         self.codes = [str(s["scheme_code"]) for s in schemes]
         self.path = DATA_DIR / "crawler_status.json"
         self.data = None
+        self._lock = threading.RLock()
 
-    def start(self):
-        now = utc_now()
-        self.data = {
-            "execution_id": now,
-            "started_at": now,
-            "updated_at": now,
-            "finished_at": None,
-            "overall_status": "RUNNING",
-            "fatal_error": "",
-            "schemes": {c: {"status": STATUS_PENDING, "attempts": 0, "remark": ""} for c in self.codes},
-        }
-        self._save()
+    def start(self, execution_id=None):
+        with self._lock:
+            now = utc_now()
+            self.data = {
+                "execution_id": execution_id or new_execution_id(),
+                "started_at": now,
+                "updated_at": now,
+                "finished_at": None,
+                "overall_status": "RUNNING",
+                "fatal_error": "",
+                "schemes": {c: {"status": STATUS_PENDING, "attempts": 0, "remark": ""} for c in self.codes},
+            }
+            size, seconds = self._save()
+            say(f"STATUS RESET execution_id={self.data['execution_id']} schemes={len(self.codes)} all set to status=0 "
+                f"[crawler_status.json {size} bytes, {seconds * 1000:.0f} ms]")
 
     def record(self, code, status, attempts, remark):
-        self.data["schemes"][str(code)] = {"status": status, "attempts": attempts, "remark": remark}
-        self._save()
+        with self._lock:
+            self.data["schemes"][str(code)] = {"status": status, "attempts": attempts, "remark": remark}
+            size, seconds = self._save()
+            say(f"STATUS UPDATE scheme={code} status={status} attempts={attempts} remark={remark!r} "
+                f"[crawler_status.json {size} bytes, {seconds * 1000:.0f} ms]")
+
+    def snapshot(self):
+        with self._lock:
+            return json.loads(json.dumps(self.data))
 
     def status_of(self, scheme):
-        return self.data["schemes"][str(scheme["scheme_code"])]["status"]
+        with self._lock:
+            return self.data["schemes"][str(scheme["scheme_code"])]["status"]
 
     def counts(self):
-        entries = list(self.data["schemes"].values())
-        return {
-            "total": len(entries),
-            "successful": sum(1 for e in entries if e["status"] == STATUS_OK),
-            "failed": sum(1 for e in entries if e["status"] == STATUS_FAILED),
-            "unprocessed": sum(1 for e in entries if e["status"] == STATUS_PENDING),
-            "recovered": sum(1 for e in entries if e["status"] == STATUS_OK and e["attempts"] > 1),
-        }
+        with self._lock:
+            return _counts(self.data["schemes"].values())
 
     def finalize(self, fatal_error=""):
-        self.data["fatal_error"] = fatal_error
-        self.data["overall_status"] = compute_overall(self.counts())
-        now = utc_now()
-        self.data["finished_at"] = now
-        self._save(now)             # the last update IS the finish
+        with self._lock:
+            self.data["fatal_error"] = fatal_error
+            self.data["overall_status"] = compute_overall(_counts(self.data["schemes"].values()))
+            now = utc_now()
+            self.data["finished_at"] = now
+            size, seconds = self._save(now)             # the last update IS the finish
+            say(f"STATUS FINAL overall={self.data['overall_status']} fatal={fatal_error or 'no'} "
+                f"[crawler_status.json {size} bytes, {seconds * 1000:.0f} ms]")
 
     def _save(self, now=None):
+        """Callers hold the lock. Returns (bytes, seconds)."""
         self.data["updated_at"] = now or utc_now()
-        write_json_atomic(self.path, self.data)
+        return write_json_atomic(self.path, self.data)
 
 
 def compute_overall(counts):
@@ -464,8 +667,10 @@ def compute_overall(counts):
 
 def write_index(schemes, crawl):
     """docs/data/index.json for the dashboard: the fields it has always had,
-    plus the execution summary. Rebuilt from the scheme files after every
-    scheme, so it always describes what is really on disk."""
+    plus the execution summary. Only ever written by the coordinating (main)
+    thread, from a consistent snapshot of the status and the scheme files on
+    disk - the workers never touch it."""
+    snap = crawl.snapshot()
     entries = []
     for scheme in schemes:
         result = load_result(scheme) or {**base_meta(scheme, None), "status": "pending", "generated_at": None, "totals": {}}
@@ -482,31 +687,29 @@ def write_index(schemes, crawl):
             "progressive_allotment": totals.get("progressive_allotment"),
             "total_expenditure": totals.get("total_expenditure_upto_month"),
             "pct_expenditure_of_allotment": totals.get("pct_expenditure_of_allotment"),
-            "crawl_status": crawl.status_of(scheme),
+            "crawl_status": snap["schemes"][str(scheme["scheme_code"])]["status"],
         })
-    counts = crawl.counts()
-    write_json_atomic(DATA_DIR / "index.json", {
+    counts = _counts(snap["schemes"].values())
+    size, seconds = write_json_atomic(DATA_DIR / "index.json", {
         "schemes": entries,
         "generated_at": utc_now(),
-        "execution_id": crawl.data["execution_id"],
-        "overall_status": crawl.data["overall_status"],
+        "execution_id": snap["execution_id"],
+        "overall_status": snap["overall_status"],
         "expected_scheme_count": counts["total"],
         "successful_scheme_count": counts["successful"],
         "failed_scheme_count": counts["failed"],
         "unprocessed_scheme_count": counts["unprocessed"],
     })
+    say(f"FILE WRITE index.json {size} bytes {seconds * 1000:.0f} ms | overall={snap['overall_status']} "
+        f"successful={counts['successful']} failed={counts['failed']} unprocessed={counts['unprocessed']}")
 
 
 # ---------------------------------------------------------------------------
 # The crawl itself
 # ---------------------------------------------------------------------------
 
-def _log(message=""):
-    print(message, file=sys.stderr, flush=True)
-
-
 def _sleep(seconds):
-    time.sleep(seconds)
+    _STOP.wait(seconds)         # a plain sleep, except that a stop request wakes it early
 
 
 def retry_delay(retry_number):
@@ -516,24 +719,50 @@ def retry_delay(retry_number):
 
 
 def process_scheme(position, total, scheme, crawl):
-    """One scheme, start to finish, within this execution: up to MAX_ATTEMPTS
-    tries with a randomized pause between them. A scraping failure of ANY kind
-    is contained here (it is this scheme's failure, nobody else's); a failure to
-    persist is not - it propagates as a fatal error. Returns True on success."""
+    """One scheme, start to finish, on whichever worker thread picked it up: up
+    to MAX_ATTEMPTS tries with a randomized pause between them. A scraping
+    failure of ANY kind is contained here (it is this scheme's failure, nobody
+    else's). Anything that escapes - a failure to persist, an interrupt - is
+    fatal for the whole run: the stop flag is raised right here, from the
+    worker itself, so no other worker or queued scheme carries on meanwhile.
+    Returns True on success."""
+    try:
+        return _process_scheme(position, total, scheme, crawl)
+    except BaseException:
+        _STOP.set()
+        raise
+
+
+def _process_scheme(position, total, scheme, crawl):
     code = str(scheme["scheme_code"])
-    _log(f"[SCHEME {position}/{total}] {scheme['name']}")
-    last_error = ""
+    worker = threading.current_thread().name
+    _ctx.tag = f"[{position:02d}/{total:02d} {code}] "
+    if _STOP.is_set():
+        say("SCHEME SKIPPED: the run is winding down before this scheme started", logging.WARNING)
+        return False
+    began = time.monotonic()
+    say(f"SCHEME START {scheme['name']} (worker={worker})")
+    last_error, attempts_made = "", 0
     for attempt in range(1, MAX_ATTEMPTS + 1):
         if attempt > 1:
+            if _STOP.is_set():
+                say("SCHEME STOPPED: the run is winding down, no further attempts", logging.WARNING)
+                return False
             delay = retry_delay(attempt - 1)
-            _log(f"  Waiting {delay:g} seconds before retry...")
+            say(f"Waiting {delay:g} seconds before retry...")
+            _METRICS.waited(delay)
             _sleep(delay)
-        _log(f"  Attempt {attempt}/{MAX_ATTEMPTS}")
+        attempts_made = attempt
+        say(f"Attempt {attempt}/{MAX_ATTEMPTS} START")
+        attempt_began = time.monotonic()
         try:
             result = attempt_scheme(scheme)
         except Exception as exc:
             last_error = describe_error(exc)
-            _log(f"  Attempt {attempt}/{MAX_ATTEMPTS} failed: {last_error}")
+            kind = classify_error(exc)
+            _METRICS.failure(kind)
+            say(f"Attempt {attempt}/{MAX_ATTEMPTS} failed after {time.monotonic() - attempt_began:.2f}s "
+                f"kind={kind}: {last_error}", logging.WARNING)
             crawl.record(code, STATUS_FAILED, attempt, last_error)
             continue
         save_result(scheme, result)   # immediately - before anything else can go wrong
@@ -543,10 +772,16 @@ def process_scheme(position, total, scheme, crawl):
             remark = {"empty": "No expenditure recorded (portal reports no record)",
                       "no_district_data": "No district rows for this scheme"}.get(result["status"], "")
         crawl.record(code, STATUS_OK, attempt, remark)
-        _log(f"  Attempt {attempt}/{MAX_ATTEMPTS} succeeded.")
+        elapsed = time.monotonic() - began
+        say(f"Attempt {attempt}/{MAX_ATTEMPTS} succeeded in {time.monotonic() - attempt_began:.2f}s")
+        say(f"SCHEME DONE status=1 attempts={attempt} elapsed={elapsed:.2f}s worker={worker}")
+        _METRICS.scheme(worker, code, elapsed, attempt, True)
         return True
     save_result(scheme, error_result(scheme, last_error))
-    _log("  FINAL STATUS: FAILED")
+    elapsed = time.monotonic() - began
+    say(f"FINAL STATUS: FAILED after {attempts_made} attempts")
+    say(f"SCHEME DONE status=-1 attempts={attempts_made} elapsed={elapsed:.2f}s worker={worker}", logging.WARNING)
+    _METRICS.scheme(worker, code, elapsed, attempts_made, False)
     return False
 
 
@@ -559,6 +794,39 @@ def load_schemes():
     if duplicates:
         raise ValueError(f"Duplicate scheme_code in schemes.json: {', '.join(duplicates)}")
     return schemes
+
+
+def run_workers(schemes, crawl, workers):
+    """Runs every scheme on a pool of `workers` threads and returns the fatal
+    error text ('' if none). Workers only ever touch their own scheme's file
+    and the locked status; index.json is rebuilt here, on the main thread, as
+    each scheme completes and once more when all have finished."""
+    fatal, total = "", len(schemes)
+    pool = ThreadPoolExecutor(max_workers=workers, thread_name_prefix="worker")
+    try:
+        futures = [pool.submit(process_scheme, i, total, s, crawl) for i, s in enumerate(schemes, 1)]
+        for future in as_completed(futures):
+            if future.cancelled():
+                continue
+            try:
+                future.result()
+            except Exception as exc:        # scraping failures never get here; a failure to persist does
+                if not fatal:
+                    fatal = f"Fatal crawler error: {describe_error(exc)}"
+                    say(fatal, logging.ERROR)
+                    _STOP.set()
+                    for pending in futures:
+                        pending.cancel()
+            write_index(schemes, crawl)
+    except (KeyboardInterrupt, SystemExit) as exc:
+        _STOP.set()
+        fatal = f"Interrupted: {exc or type(exc).__name__}"
+        say(fatal, logging.ERROR)
+    finally:
+        # In-flight schemes finish their current attempt (so nothing they scraped is lost
+        # and the status stays consistent); queued ones are dropped and stay at status 0.
+        pool.shutdown(wait=True, cancel_futures=True)
+    return fatal
 
 
 def _install_signal_handlers():
@@ -575,66 +843,80 @@ def _install_signal_handlers():
                 pass
 
 
-def print_summary(counts, fatal_error, overall):
-    _log()
-    _log("=" * 50)
-    _log("KOSHVANI CRAWLER SUMMARY")
-    _log("=" * 50)
-    _log(f"Total schemes: {counts['total']}")
-    _log(f"Successful: {counts['successful']}")
-    _log(f"Failed: {counts['failed']}")
-    _log(f"Unprocessed: {counts['unprocessed']}")
-    _log(f"Recovered by retry: {counts['recovered']}")
-    _log(f"Fatal crawler error: {fatal_error or 'No'}")
-    _log(f"Execution status: {overall}")
-    _log("=" * 50)
+def print_summary(counts, fatal_error, overall, execution_id, workers, wall):
+    say("=" * 50)
+    say("KOSHVANI CRAWLER SUMMARY")
+    say("=" * 50)
+    say(f"Execution ID: {execution_id}")
+    say(f"Total schemes: {counts['total']}")
+    say(f"Successful: {counts['successful']}")
+    say(f"Failed: {counts['failed']}")
+    say(f"Unprocessed: {counts['unprocessed']}")
+    say(f"Recovered by retry: {counts['recovered']}")
+    say(f"Fatal crawler error: {fatal_error or 'No'}")
+    say(f"Execution status: {overall}")
+    for line in _METRICS.summary_lines(workers, wall):
+        say(line)
+    say("=" * 50)
 
 
 def main(install_signals=True):
     """Returns the process exit code: 0 when every scheme was attempted
     (SUCCESS or WARNING), EXIT_INCOMPLETE when the run was cut short."""
+    global _METRICS
+    setup_logging()
+    _STOP.clear()
+    _METRICS = Metrics()
+    _ctx.tag = ""
+    started = time.monotonic()
     if install_signals:
         _install_signal_handlers()
     DATA_DIR.mkdir(parents=True, exist_ok=True)
+    execution_id = os.environ.get("KOSHVANI_EXECUTION_ID") or new_execution_id()
+    say("=" * 50)
+    say("KOSHVANI CRAWLER START")
+    say(f"Execution ID: {execution_id}")
+    say(f"Python {sys.version.split()[0]} | requests {requests.__version__} | time zone offset {time.strftime('%z')}")
     clean_stale_tmp_files()
 
     try:
         schemes = load_schemes()
     except Exception as exc:
         fatal = f"Fatal crawler error: {describe_error(exc)}"
-        _log(fatal)
+        say(fatal, logging.ERROR)
         try:   # record it as this execution's status, with no schemes to track
             crawl = CrawlStatus([])
-            crawl.start()
+            crawl.start(execution_id)
             crawl.finalize(fatal)
         except Exception as write_exc:
-            _log(f"Could not write crawler_status.json: {describe_error(write_exc)}")
+            say(f"Could not write crawler_status.json: {describe_error(write_exc)}", logging.ERROR)
         return EXIT_INCOMPLETE
 
     crawl = CrawlStatus(schemes)
+    workers = max(1, min(MAX_WORKERS, len(schemes)))
+    say(f"Config: schemes={len(schemes)} workers={workers} max_attempts={MAX_ATTEMPTS} "
+        f"retry_delays={RETRY_1_DELAY_MIN}-{RETRY_1_DELAY_MAX}s/{RETRY_2_DELAY_MIN}-{RETRY_2_DELAY_MAX}s "
+        f"request_timeout={REQUEST_TIMEOUT}s")
     fatal = ""
     try:
-        crawl.start()
+        crawl.start(execution_id)
         write_index(schemes, crawl)
-        for position, scheme in enumerate(schemes, 1):
-            process_scheme(position, len(schemes), scheme, crawl)
-            write_index(schemes, crawl)
-            _log()
+        fatal = run_workers(schemes, crawl, workers)
     except (KeyboardInterrupt, SystemExit) as exc:
         fatal = f"Interrupted: {exc or type(exc).__name__}"
     except Exception as exc:
         fatal = f"Fatal crawler error: {describe_error(exc)}"
     if fatal:
-        _log(f"\n{fatal}")
+        say(fatal, logging.ERROR)
 
     try:
         crawl.finalize(fatal)
         write_index(schemes, crawl)
     except Exception as exc:
-        _log(f"Could not finalize crawler_status.json / index.json: {describe_error(exc)}")
+        say(f"Could not finalize crawler_status.json / index.json: {describe_error(exc)}", logging.ERROR)
         return EXIT_INCOMPLETE
 
-    print_summary(crawl.counts(), fatal, crawl.data["overall_status"])
+    print_summary(crawl.counts(), fatal, crawl.data["overall_status"], execution_id, workers, time.monotonic() - started)
     return EXIT_OK if crawl.data["overall_status"] in ("SUCCESS", "WARNING") else EXIT_INCOMPLETE
 
 

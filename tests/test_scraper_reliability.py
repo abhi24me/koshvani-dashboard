@@ -124,8 +124,9 @@ class TestStatusFile(ScraperCase):
         snaps, orig = [], scrape.CrawlStatus._save
 
         def spy(crawl, *args):
-            orig(crawl, *args)
+            result = orig(crawl, *args)
             snaps.append(self.status()["schemes"][self.code(5)])      # read back from DISK
+            return result
 
         with mock.patch.object(scrape.CrawlStatus, "_save", spy):
             self.run_main()
@@ -216,7 +217,8 @@ class TestStatusFile(ScraperCase):
         self.run_main()
         two = self.status()
         self.assertNotEqual(one["execution_id"], two["execution_id"])
-        self.assertEqual(two["execution_id"], two["started_at"])
+        for st in (one, two):
+            self.assertRegex(st["execution_id"], r"^\d{8}-\d{6}-[0-9a-f]{6}$")
         self.assertLess(one["started_at"], two["started_at"])
         for st in (one, two):
             self.assertLessEqual(st["started_at"], st["updated_at"])
