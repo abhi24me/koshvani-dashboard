@@ -1,7 +1,6 @@
 __pycache__/
 *.pyc
 .venv/
-logs/
 .env
 .koshvani_previous_data/
 docs/data/*.tmp

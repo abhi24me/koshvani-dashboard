@@ -1,0 +1,415 @@
+
+========================================
+KOSHVA​​NI JOB STARTED
+Time: Thu Sep 17 04:56:26 IST 2026
+========================================
+
+[1/4] Pulling latest code from GitHub...
+From https://github.com/abhi24me/koshvani-dashboard
+ * branch            main       -> FETCH_HEAD
+Already up to date.
+Git pull successful.
+
+[2/4] Starting Koshvani scraper...
+Time: Thu Sep 17 04:56:27 IST 2026
+
+Scraping agri-011-2401000010500 (कृषि विभाग — जिला संगठन (Grant 011))...
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/home/koshvani-dashboard/scraper/scrape.py", line 325, in <module>
+    main()
+    ~~~~^^
+  File "/data/data/com.termux/files/home/koshvani-dashboard/scraper/scrape.py", line 296, in main
+    result = scrape_scheme(scheme)
+  File "/data/data/com.termux/files/home/koshvani-dashboard/scraper/scrape.py", line 187, in scrape_scheme
+    last_result = _scrape_scheme_once(session, scheme)
+  File "/data/data/com.termux/files/home/koshvani-dashboard/scraper/scrape.py", line 229, in _scrape_scheme_once
+    r = session.get(urljoin(r.url, href), timeout=REQUEST_TIMEOUT)
+  File "/data/data/com.termux/files/usr/lib/python3.14/site-packages/requests/sessions.py", line 671, in get
+    return self.request("GET", url, params=params, **kwargs)
+           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.14/site-packages/requests/sessions.py", line 651, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/data/data/com.termux/files/usr/lib/python3.14/site-packages/requests/sessions.py", line 805, in send
+    history = [resp for resp in gen]
+                                ^^^
+  File "/data/data/com.termux/files/usr/lib/python3.14/site-packages/requests/sessions.py", line 292, in resolve_redirects
+    resp = self.send(
+        req,
+    ...<6 lines>...
+        **adapter_kwargs,
+    )
+  File "/data/data/com.termux/files/usr/lib/python3.14/site-packages/requests/sessions.py", line 827, in send
+    r.content
+  File "/data/data/com.termux/files/usr/lib/python3.14/site-packages/requests/models.py", line 1042, in content
+    self._content = b"".join(self.iter_content(CONTENT_CHUNK_SIZE)) or b""
+                    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.14/site-packages/requests/models.py", line 937, in generate
+    yield from self.raw.stream(chunk_size, decode_content=True)
+  File "/data/data/com.termux/files/usr/lib/python3.14/site-packages/urllib3/response.py", line 1291, in stream
+    data = self.read(amt=amt, decode_content=decode_content)
+  File "/data/data/com.termux/files/usr/lib/python3.14/site-packages/urllib3/response.py", line 1134, in read
+    data = self._raw_read(amt)
+  File "/data/data/com.termux/files/usr/lib/python3.14/site-packages/urllib3/response.py", line 1046, in _raw_read
+    data = self._fp_read(amt, read1=read1) if not fp_closed else b""
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.14/site-packages/urllib3/response.py", line 1029, in _fp_read
+    return self._fp.read(amt) if amt is not None else self._fp.read()
+           ~~~~~~~~~~~~~^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.14/http/client.py", line 484, in read
+    s = self.fp.read(amt)
+  File "/data/data/com.termux/files/usr/lib/python3.14/socket.py", line 729, in readinto
+    return self._sock.recv_into(b)
+           ~~~~~~~~~~~~~~~~~~~~^^^
+  File "/data/data/com.termux/files/usr/lib/python3.14/ssl.py", line 1304, in recv_into
+    return self.read(nbytes, buffer)
+           ~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.14/ssl.py", line 1138, in read
+    return self._sslobj.read(len, buffer)
+           ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+KeyboardInterrupt
+
+========================================
+KOSHVA​​NI JOB STARTED
+Time: Thu Sep 17 04:57:26 IST 2026
+========================================
+
+[1/4] Pulling latest code from GitHub...
+From https://github.com/abhi24me/koshvani-dashboard
+ * branch            main       -> FETCH_HEAD
+Already up to date.
+Git pull successful.
+
+[2/4] Starting Koshvani scraper...
+Time: Thu Sep 17 04:57:27 IST 2026
+
+Scraping agri-011-2401000010500 (कृषि विभाग — जिला संगठन (Grant 011))...
+  -> status=ok
+Scraping agri-011-2401001020103 (फूड एण्ड न्यूट्रिशन सिक्यूरिटी (कृषि उन्नति योजना) (के.60/रा.40-के.+ रा.) (Grant 011))...
+  -> status=ok
+Scraping agri-011-2401001020129 (मिशन फार आत्मनिर्भरता इन पल्सेस (के.60/रा.40-के.+रा.) (Grant 011))...
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/home/koshvani-dashboard/scraper/scrape.py", line 325, in <module>
+    main()
+    ~~~~^^
+  File "/data/data/com.termux/files/home/koshvani-dashboard/scraper/scrape.py", line 296, in main
+    result = scrape_scheme(scheme)
+  File "/data/data/com.termux/files/home/koshvani-dashboard/scraper/scrape.py", line 187, in scrape_scheme
+    last_result = _scrape_scheme_once(session, scheme)
+  File "/data/data/com.termux/files/home/koshvani-dashboard/scraper/scrape.py", line 219, in _scrape_scheme_once
+    r = session.get(urljoin(r.url, href), timeout=REQUEST_TIMEOUT)
+  File "/data/data/com.termux/files/usr/lib/python3.14/site-packages/requests/sessions.py", line 671, in get
+    return self.request("GET", url, params=params, **kwargs)
+           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.14/site-packages/requests/sessions.py", line 651, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/data/data/com.termux/files/usr/lib/python3.14/site-packages/requests/sessions.py", line 805, in send
+    history = [resp for resp in gen]
+                                ^^^
+  File "/data/data/com.termux/files/usr/lib/python3.14/site-packages/requests/sessions.py", line 292, in resolve_redirects
+    resp = self.send(
+        req,
+    ...<6 lines>...
+        **adapter_kwargs,
+    )
+  File "/data/data/com.termux/files/usr/lib/python3.14/site-packages/requests/sessions.py", line 784, in send
+    r = adapter.send(request, **kwargs)
+  File "/data/data/com.termux/files/usr/lib/python3.14/site-packages/requests/adapters.py", line 696, in send
+    resp = conn.urlopen(
+        method=request.method,
+    ...<9 lines>...
+        chunked=chunked,
+    )
+  File "/data/data/com.termux/files/usr/lib/python3.14/site-packages/urllib3/connectionpool.py", line 793, in urlopen
+    response = self._make_request(
+        conn,
+    ...<10 lines>...
+        **response_kw,
+    )
+  File "/data/data/com.termux/files/usr/lib/python3.14/site-packages/urllib3/connectionpool.py", line 540, in _make_request
+    response = conn.getresponse()
+  File "/data/data/com.termux/files/usr/lib/python3.14/site-packages/urllib3/connection.py", line 638, in getresponse
+    httplib_response = super().getresponse()
+  File "/data/data/com.termux/files/usr/lib/python3.14/http/client.py", line 1459, in getresponse
+    response.begin()
+    ~~~~~~~~~~~~~~^^
+  File "/data/data/com.termux/files/usr/lib/python3.14/http/client.py", line 336, in begin
+    version, status, reason = self._read_status()
+                              ~~~~~~~~~~~~~~~~~^^
+  File "/data/data/com.termux/files/usr/lib/python3.14/http/client.py", line 297, in _read_status
+    line = str(self.fp.readline(_MAXLINE + 1), "iso-8859-1")
+               ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.14/socket.py", line 729, in readinto
+    return self._sock.recv_into(b)
+           ~~~~~~~~~~~~~~~~~~~~^^^
+  File "/data/data/com.termux/files/usr/lib/python3.14/ssl.py", line 1304, in recv_into
+    return self.read(nbytes, buffer)
+           ~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.14/ssl.py", line 1138, in read
+    return self._sslobj.read(len, buffer)
+           ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+KeyboardInterrupt
+
+========================================
+KOSHVANI JOB STARTED
+Time: Thu Sep 17 05:06:36 IST 2026
+========================================
+
+[1/5] Checking Git status...
+ M run_daily.sh
+
+[2/5] Pulling latest code from GitHub...
+error: cannot pull with rebase: You have unstaged changes.
+error: Please commit or stash them.
+
+ERROR: Git pull failed.
+Please check Git status.
+Time: Thu Sep 17 05:06:36 IST 2026
+========================================
+
+========================================
+KOSHVANI JOB STARTED
+Time: Thu Sep 17 05:07:20 IST 2026
+========================================
+
+[1/5] Checking Git status...
+
+[2/5] Pulling latest code from GitHub...
+From https://github.com/abhi24me/koshvani-dashboard
+ * branch            main       -> FETCH_HEAD
+Already up to date.
+Git pull successful.
+
+[3/5] Starting Koshvani scraper...
+Time: Thu Sep 17 05:07:21 IST 2026
+
+Scraping agri-011-2401000010500 (कृषि विभाग — जिला संगठन (Grant 011))...
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/home/koshvani-dashboard/scraper/scrape.py", line 325, in <module>
+    main()
+    ~~~~^^
+  File "/data/data/com.termux/files/home/koshvani-dashboard/scraper/scrape.py", line 296, in main
+    result = scrape_scheme(scheme)
+  File "/data/data/com.termux/files/home/koshvani-dashboard/scraper/scrape.py", line 187, in scrape_scheme
+    last_result = _scrape_scheme_once(session, scheme)
+  File "/data/data/com.termux/files/home/koshvani-dashboard/scraper/scrape.py", line 219, in _scrape_scheme_once
+    r = session.get(urljoin(r.url, href), timeout=REQUEST_TIMEOUT)
+  File "/data/data/com.termux/files/usr/lib/python3.14/site-packages/requests/sessions.py", line 671, in get
+    return self.request("GET", url, params=params, **kwargs)
+           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.14/site-packages/requests/sessions.py", line 651, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/data/data/com.termux/files/usr/lib/python3.14/site-packages/requests/sessions.py", line 805, in send
+    history = [resp for resp in gen]
+                                ^^^
+  File "/data/data/com.termux/files/usr/lib/python3.14/site-packages/requests/sessions.py", line 292, in resolve_redirects
+    resp = self.send(
+        req,
+    ...<6 lines>...
+        **adapter_kwargs,
+    )
+  File "/data/data/com.termux/files/usr/lib/python3.14/site-packages/requests/sessions.py", line 784, in send
+    r = adapter.send(request, **kwargs)
+  File "/data/data/com.termux/files/usr/lib/python3.14/site-packages/requests/adapters.py", line 696, in send
+    resp = conn.urlopen(
+        method=request.method,
+    ...<9 lines>...
+        chunked=chunked,
+    )
+  File "/data/data/com.termux/files/usr/lib/python3.14/site-packages/urllib3/connectionpool.py", line 793, in urlopen
+    response = self._make_request(
+        conn,
+    ...<10 lines>...
+        **response_kw,
+    )
+  File "/data/data/com.termux/files/usr/lib/python3.14/site-packages/urllib3/connectionpool.py", line 540, in _make_request
+    response = conn.getresponse()
+  File "/data/data/com.termux/files/usr/lib/python3.14/site-packages/urllib3/connection.py", line 638, in getresponse
+    httplib_response = super().getresponse()
+  File "/data/data/com.termux/files/usr/lib/python3.14/http/client.py", line 1459, in getresponse
+    response.begin()
+    ~~~~~~~~~~~~~~^^
+  File "/data/data/com.termux/files/usr/lib/python3.14/http/client.py", line 336, in begin
+    version, status, reason = self._read_status()
+                              ~~~~~~~~~~~~~~~~~^^
+  File "/data/data/com.termux/files/usr/lib/python3.14/http/client.py", line 297, in _read_status
+    line = str(self.fp.readline(_MAXLINE + 1), "iso-8859-1")
+               ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.14/socket.py", line 729, in readinto
+    return self._sock.recv_into(b)
+           ~~~~~~~~~~~~~~~~~~~~^^^
+  File "/data/data/com.termux/files/usr/lib/python3.14/ssl.py", line 1304, in recv_into
+    return self.read(nbytes, buffer)
+           ~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.14/ssl.py", line 1138, in read
+    return self._sslobj.read(len, buffer)
+           ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+KeyboardInterrupt
+
+========================================
+KOSHVANI JOB STARTED
+Time: Thu Sep 17 05:07:57 IST 2026
+========================================
+
+[1/5] Checking Git status...
+
+[2/5] Pulling latest code from GitHub...
+From https://github.com/abhi24me/koshvani-dashboard
+ * branch            main       -> FETCH_HEAD
+Already up to date.
+Git pull successful.
+
+[3/5] Starting Koshvani scraper...
+Time: Thu Sep 17 05:07:58 IST 2026
+
+Scraping agri-011-2401000010500 (कृषि विभाग — जिला संगठन (Grant 011))...
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/home/koshvani-dashboard/scraper/scrape.py", line 325, in <module>
+    main()
+    ~~~~^^
+  File "/data/data/com.termux/files/home/koshvani-dashboard/scraper/scrape.py", line 296, in main
+    result = scrape_scheme(scheme)
+  File "/data/data/com.termux/files/home/koshvani-dashboard/scraper/scrape.py", line 187, in scrape_scheme
+    last_result = _scrape_scheme_once(session, scheme)
+  File "/data/data/com.termux/files/home/koshvani-dashboard/scraper/scrape.py", line 219, in _scrape_scheme_once
+    r = session.get(urljoin(r.url, href), timeout=REQUEST_TIMEOUT)
+  File "/data/data/com.termux/files/usr/lib/python3.14/site-packages/requests/sessions.py", line 671, in get
+    return self.request("GET", url, params=params, **kwargs)
+           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.14/site-packages/requests/sessions.py", line 651, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/data/data/com.termux/files/usr/lib/python3.14/site-packages/requests/sessions.py", line 805, in send
+    history = [resp for resp in gen]
+                                ^^^
+  File "/data/data/com.termux/files/usr/lib/python3.14/site-packages/requests/sessions.py", line 292, in resolve_redirects
+    resp = self.send(
+        req,
+    ...<6 lines>...
+        **adapter_kwargs,
+    )
+  File "/data/data/com.termux/files/usr/lib/python3.14/site-packages/requests/sessions.py", line 784, in send
+    r = adapter.send(request, **kwargs)
+  File "/data/data/com.termux/files/usr/lib/python3.14/site-packages/requests/adapters.py", line 696, in send
+    resp = conn.urlopen(
+        method=request.method,
+    ...<9 lines>...
+        chunked=chunked,
+    )
+  File "/data/data/com.termux/files/usr/lib/python3.14/site-packages/urllib3/connectionpool.py", line 793, in urlopen
+    response = self._make_request(
+        conn,
+    ...<10 lines>...
+        **response_kw,
+    )
+  File "/data/data/com.termux/files/usr/lib/python3.14/site-packages/urllib3/connectionpool.py", line 540, in _make_request
+    response = conn.getresponse()
+  File "/data/data/com.termux/files/usr/lib/python3.14/site-packages/urllib3/connection.py", line 638, in getresponse
+    httplib_response = super().getresponse()
+  File "/data/data/com.termux/files/usr/lib/python3.14/http/client.py", line 1459, in getresponse
+    response.begin()
+    ~~~~~~~~~~~~~~^^
+  File "/data/data/com.termux/files/usr/lib/python3.14/http/client.py", line 336, in begin
+    version, status, reason = self._read_status()
+                              ~~~~~~~~~~~~~~~~~^^
+  File "/data/data/com.termux/files/usr/lib/python3.14/http/client.py", line 297, in _read_status
+    line = str(self.fp.readline(_MAXLINE + 1), "iso-8859-1")
+               ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.14/socket.py", line 729, in readinto
+    return self._sock.recv_into(b)
+           ~~~~~~~~~~~~~~~~~~~~^^^
+  File "/data/data/com.termux/files/usr/lib/python3.14/ssl.py", line 1304, in recv_into
+    return self.read(nbytes, buffer)
+           ~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/data/data/com.termux/files/usr/lib/python3.14/ssl.py", line 1138, in read
+    return self._sslobj.read(len, buffer)
+           ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+KeyboardInterrupt
+
+========================================
+KOSHVANI JOB STARTED
+Time: Thu Sep 17 19:51:09 IST 2026
+========================================
+
+[1/6] Checking Git status...
+
+[2/6] Pulling latest code from GitHub...
+From https://github.com/abhi24me/koshvani-dashboard
+ * branch            main       -> FETCH_HEAD
+Already up to date.
+Git pull successful.
+
+[3/6] Starting Koshvani scraper...
+Time: Thu Sep 17 19:51:10 IST 2026
+
+Scraping agri-011-2401000010500 (कृषि विभाग — जिला संगठन (Grant 011))...
+  -> status=ok
+Scraping agri-011-2401001020103 (फूड एण्ड न्यूट्रिशन सिक्यूरिटी (कृषि उन्नति योजना) (के.60/रा.40-के.+ रा.) (Grant 011))...
+  -> status=ok
+Scraping agri-011-2401001020129 (मिशन फार आत्मनिर्भरता इन पल्सेस (के.60/रा.40-के.+रा.) (Grant 011))...
+  -> status=ok
+Scraping agri-011-2401001030300 (प्रयोगात्मक प्रक्षेत्र प्रदर्शन और बीज बर्द्धन प्रक्षेत्र (Grant 011))...
+  -> status=ok
+Scraping agri-011-2401001030500 (संकर बीजों के उपयोग को बढ़ावा देने की योजना (Grant 011))...
+  -> status=ok
+Scraping agri-011-2401001030600 (उत्तर प्रदेश मिलेट्स पुनरोद्धार कार्यक्रम (Grant 011))...
+  -> status=ok
+Scraping agri-011-2401001070300 (पौध संरक्षण सेवा तथा कृषि रक्षा सेवा (Grant 011))...
+  -> status=ok
+Scraping agri-011-2401001070400 (विभिन्न परिस्थितिकी संसाधनों द्वारा कीट / रोग नियंत्रण (Grant 011))...
+  -> status=ok
+Scraping agri-011-2401001090103 (नेशनल मिशन ऑन एग्रीकल्चर एक्सटेंशन एण्ड टेक्नोलाजी (एन.एम.ए.ई.टी.) के अर्न्तगत सबमिशन ऑन एग्रीकल्चर एक्स्टेंशन (के.60/रा.40-के.+ रा.) (Grant 011))...
+  -> status=ok
+Scraping agri-011-2401001090104 (नेशनल मिशन ऑन एग्रीकल्चर एक्सटेंशन एण्ड टेक्नोलाजी (एन.एम.ए.ई.टी.) के अर्न्तगत सबमिशन आफ एग्रीकल्चर मेकेनाइजेशन (के.60/रा.40-के.+ रा.) (Grant 011))...
+  -> status=ok
+Scraping agri-011-2401001090105 (नेशनल मिशन ऑन एग्रीकल्चर एक्सटेंशन एण्ड टेक्नोलाजी (एन.एम.ए.ई.टी.) के अर्न्तगत नेशनल ई-गर्वनेन्स प्रोग्राम (के.60/रा.40-के.+ रा.) (Grant 011))...
+  -> status=ok
+Scraping agri-011-2401001090300 (कृषि प्रसार प्रायोजना तथा प्रदर्शनियां (Grant 011))...
+  -> status=ok
+Scraping agri-011-2401001090700 (कृषि उत्पादन में वृद्धि के लिए कृषि प्रसार, कृषि निवेश तथा तकनीकी प्रबंधन (Grant 011))...
+  -> status=ok
+Scraping agri-011-2401001090900 (प्रशिक्षित कृषि उद्यमी स्वावलंबन योजना (Grant 011))...
+  -> status=ok
+Scraping agri-011-2401001130104 (प्रमोशन ऑफ एग्रीमल्चर मैकेनाइजेशन फार इनसीटू मैनेजमेंट ऑफ क्राप रेजडयू (CRM) (के.60/रा.40-के.+ रा.) (Grant 011))...
+  -> status=ok
+Scraping agri-011-2401001140101 (नेशनल फूड सिक्योरिटी मिशन (ओ0एस0 / टी0बी0ओ0) (के.60/रा.40-के.+ रा.) (Grant 011))...
+  -> status=ok
+Scraping agri-011-2401001140300 (तिलहन बीज मिनीकिट वितरण योजना (Grant 011))...
+  -> status=ok
+Scraping agri-011-2401008000203 (कृषि विकास योजनायें (के.60/रा.40-के.) (Grant 011))...
+  -> status=ok
+Scraping agri-011-2401008000400 (कृषि क्षेत्र की क्षमता एवं कौशल विकास तथा उत्पादन वृद्धि की योजना (Grant 011))...
+  -> status=ok
+Scraping agri-011-2402001020109 (नेशनल प्रोजेक्ट ऑन स्वायल हेल्थ फर्टिलिटी (के.60/रा.40-के.+ रा.) (Grant 011))...
+  -> status=ok
+Scraping agri-011-2402001020111 (नेशनल मिशन ऑन नेचुरल फार्मिग (के.60/रा.40-के.+ रा.) (Grant 011))...
+  -> status=ok
+Scraping agri-011-4401001030300 (प्रयोगात्मक प्रक्षेत्र प्रदर्शन और बीज वर्द्धन प्रक्षेत्र (जिला योजना) (Grant 011))...
+  -> status=ok
+Scraping agri-011-4401001030401 (खाद्यान्न/दलहन/तिलहन/बीज की लागत और प्रासंगिक व्यय (Grant 011))...
+  -> status=ok
+Scraping agri-011-4401001030403 (कपास और बिनोले के बीजों की लागत(प्रासंगिक व्यय सहित) (Grant 011))...
+  -> status=ok
+
+Koshvani scraper completed successfully.
+
+[4/6] Checking for data changes...
+Data changes detected.
+
+[5/6] Committing updated Koshvani data...
+[main 11c2fa6] Update Koshvani data
+ 25 files changed, 49 insertions(+), 49 deletions(-)
+Commit successful.
+
+Pushing to GitHub...
+To https://github.com/abhi24me/koshvani-dashboard.git
+   ac5a09e..11c2fa6  main -> main
+
+GitHub push successful.
+
+[6/6] Validating scheme results and notifying Telegram...
+[telegram_alert] Report sent (success).
+
+========================================
+KOSHVANI JOB COMPLETED
+Status: SUCCESS
+Time: Thu Sep 17 20:05:45 IST 2026
+========================================
