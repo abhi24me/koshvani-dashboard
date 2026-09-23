@@ -1,15 +1,15 @@
 {
-  "execution_id": "20260922-052625-18432a",
-  "started_at": "2026-09-21T23:56:28+00:00",
-  "updated_at": "2026-09-22T00:53:47+00:00",
-  "finished_at": "2026-09-22T00:53:47+00:00",
-  "overall_status": "SUCCESS",
+  "execution_id": "20260923-064243-5797a2",
+  "started_at": "2026-09-23T01:12:48+00:00",
+  "updated_at": "2026-09-23T03:10:09+00:00",
+  "finished_at": "2026-09-23T03:10:09+00:00",
+  "overall_status": "WARNING",
   "fatal_error": "",
   "schemes": {
     "2401000010500": {
       "status": 1,
-      "attempts": 1,
-      "remark": ""
+      "attempts": 2,
+      "remark": "Recovered on retry"
     },
     "2401001020103": {
       "status": 1,
@@ -62,9 +62,9 @@
       "remark": ""
     },
     "2401001090300": {
-      "status": 1,
-      "attempts": 1,
-      "remark": ""
+      "status": -1,
+      "attempts": 3,
+      "remark": "UnexpectedPageError: Unexpected page after following 'Grant-wise expenditure': ClearSession.aspx"
     },
     "2401001090700": {
       "status": 1,
@@ -82,24 +82,24 @@
       "remark": ""
     },
     "2401001140101": {
-      "status": 1,
-      "attempts": 1,
-      "remark": ""
+      "status": -1,
+      "attempts": 3,
+      "remark": "UnexpectedPageError: Expected ExpTreas.aspx after selecting scheme, got ClearSession.aspx"
     },
     "2401001140300": {
-      "status": 1,
-      "attempts": 1,
-      "remark": ""
+      "status": -1,
+      "attempts": 3,
+      "remark": "UnexpectedPageError: Expected ExpTreas.aspx after selecting scheme, got ClearSession.aspx"
     },
     "2401008000203": {
       "status": 1,
-      "attempts": 1,
-      "remark": ""
+      "attempts": 2,
+      "remark": "Recovered on retry"
     },
     "2401008000400": {
-      "status": 1,
-      "attempts": 1,
-      "remark": ""
+      "status": -1,
+      "attempts": 3,
+      "remark": "UnexpectedPageError: Unexpected page after following 'Grant-wise expenditure': ClearSession.aspx"
     },
     "2402001020109": {
       "status": 1,
@@ -108,7 +108,7 @@
     },
     "2402001020111": {
       "status": 1,
-      "attempts": 2,
+      "attempts": 3,
       "remark": "Recovered on retry"
     },
     "4401001030300": {
@@ -118,13 +118,13 @@
     },
     "4401001030401": {
       "status": 1,
-      "attempts": 3,
+      "attempts": 2,
       "remark": "Recovered on retry"
     },
     "4401001030403": {
       "status": 1,
-      "attempts": 1,
-      "remark": ""
+      "attempts": 3,
+      "remark": "Recovered on retry"
     }
   }
 }
