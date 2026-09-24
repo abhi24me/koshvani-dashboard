@@ -4,12 +4,67 @@
   "grant_text": "011",
   "scheme_code": "2401008000400",
   "district": "G.B.NAGAR",
-  "fin_year": null,
-  "generated_at": "2026-09-23T02:31:20+00:00",
-  "status": "error",
-  "message": "UnexpectedPageError: Unexpected page after following 'Grant-wise expenditure': ClearSession.aspx",
-  "column_headers": [],
-  "column_widths": null,
-  "rows": [],
-  "totals": {}
+  "fin_year": "2026-2027",
+  "generated_at": "2026-09-24T00:31:35+00:00",
+  "status": "ok",
+  "message": null,
+  "prev_month": "August",
+  "current_month": "September",
+  "column_headers": [
+    "Treasury",
+    "Standard Object",
+    "Plan / Non-Plan",
+    "Voted / Charged",
+    "Progressive Allotment",
+    "Actual Progressive Expenditure upto month (August)",
+    "Provisional Current Month Expenditure(September)",
+    "Total Expenditure Upto Month (September)",
+    "% A/E"
+  ],
+  "column_widths": [
+    10.0,
+    15.0,
+    5.0,
+    5.0,
+    10.0,
+    15.0,
+    15.0,
+    20.0,
+    5.0
+  ],
+  "rows": [
+    {
+      "cells": [
+        "G.B.NAGAR",
+        "42-अन्य व्यय",
+        "N",
+        "V",
+        "145000.00",
+        "0.00",
+        "44570.00",
+        "44570.00",
+        "30.74"
+      ]
+    },
+    {
+      "cells": [
+        "",
+        "46-कम्प्यूटर हार्डवेयर/साफ्टवेयर का क्रय",
+        "N",
+        "V",
+        "245000.00",
+        "0.00",
+        "238945.00",
+        "238945.00",
+        "97.53"
+      ]
+    }
+  ],
+  "totals": {
+    "progressive_allotment": 390000.0,
+    "expenditure_upto_prev_month": 0.0,
+    "current_month_expenditure": 283515.0,
+    "total_expenditure_upto_month": 283515.0,
+    "pct_expenditure_of_allotment": 72.7
+  }
 }
