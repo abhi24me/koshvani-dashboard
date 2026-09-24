@@ -4,12 +4,80 @@
   "grant_text": "011",
   "scheme_code": "2401008000203",
   "district": "G.B.NAGAR",
-  "fin_year": null,
-  "generated_at": "2026-09-24T00:41:23+00:00",
-  "status": "error",
-  "message": "MissingLinkError: Could not find scheme code '2401008000203' on ExpHead.aspx",
-  "column_headers": [],
-  "column_widths": null,
-  "rows": [],
-  "totals": {}
+  "fin_year": "2026-2027",
+  "generated_at": "2026-09-24T10:30:30+00:00",
+  "status": "ok",
+  "message": null,
+  "prev_month": "August",
+  "current_month": "September",
+  "column_headers": [
+    "Treasury",
+    "Standard Object",
+    "Plan / Non-Plan",
+    "Voted / Charged",
+    "Progressive Allotment",
+    "Actual Progressive Expenditure upto month (August)",
+    "Provisional Current Month Expenditure(September)",
+    "Total Expenditure Upto Month (September)",
+    "% A/E"
+  ],
+  "column_widths": [
+    10.0,
+    15.0,
+    5.0,
+    5.0,
+    10.0,
+    15.0,
+    15.0,
+    20.0,
+    5.0
+  ],
+  "rows": [
+    {
+      "cells": [
+        "G.B.NAGAR",
+        "27-सब्सिडी",
+        "N",
+        "V",
+        "638765.00",
+        "0.00",
+        "55170.00",
+        "55170.00",
+        "8.64"
+      ]
+    },
+    {
+      "cells": [
+        "",
+        "42-अन्य व्यय",
+        "N",
+        "V",
+        "1935400.00",
+        "0.00",
+        "0.00",
+        "0.00",
+        ".00"
+      ]
+    },
+    {
+      "cells": [
+        "",
+        "44-प्रशिक्षण हेतु यात्रा एवं अन्य प्रासंगिक व्यय",
+        "N",
+        "V",
+        "48000.00",
+        "0.00",
+        "0.00",
+        "0.00",
+        ".00"
+      ]
+    }
+  ],
+  "totals": {
+    "progressive_allotment": 2622165.0,
+    "expenditure_upto_prev_month": 0.0,
+    "current_month_expenditure": 55170.0,
+    "total_expenditure_upto_month": 55170.0,
+    "pct_expenditure_of_allotment": 2.1
+  }
 }
