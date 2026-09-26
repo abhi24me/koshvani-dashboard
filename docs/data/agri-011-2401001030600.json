@@ -4,67 +4,12 @@
   "grant_text": "011",
   "scheme_code": "2401001030600",
   "district": "G.B.NAGAR",
-  "fin_year": "2026-2027",
-  "generated_at": "2026-09-25T02:01:14+00:00",
-  "status": "ok",
-  "message": null,
-  "prev_month": "August",
-  "current_month": "September",
-  "column_headers": [
-    "Treasury",
-    "Standard Object",
-    "Plan / Non-Plan",
-    "Voted / Charged",
-    "Progressive Allotment",
-    "Actual Progressive Expenditure upto month (August)",
-    "Provisional Current Month Expenditure(September)",
-    "Total Expenditure Upto Month (September)",
-    "% A/E"
-  ],
-  "column_widths": [
-    10.0,
-    15.0,
-    5.0,
-    5.0,
-    10.0,
-    15.0,
-    15.0,
-    20.0,
-    5.0
-  ],
-  "rows": [
-    {
-      "cells": [
-        "G.B.NAGAR",
-        "42-अन्य व्यय",
-        "N",
-        "V",
-        "75000.00",
-        "75000.00",
-        "0.00",
-        "75000.00",
-        "100.00"
-      ]
-    },
-    {
-      "cells": [
-        "",
-        "44-प्रशिक्षण हेतु यात्रा एवं अन्य प्रासंगिक व्यय",
-        "N",
-        "V",
-        "485000.00",
-        "440000.00",
-        "45000.00",
-        "485000.00",
-        "100.00"
-      ]
-    }
-  ],
-  "totals": {
-    "progressive_allotment": 560000.0,
-    "expenditure_upto_prev_month": 515000.0,
-    "current_month_expenditure": 45000.0,
-    "total_expenditure_upto_month": 560000.0,
-    "pct_expenditure_of_allotment": 100.0
-  }
+  "fin_year": null,
+  "generated_at": "2026-09-26T05:10:27+00:00",
+  "status": "error",
+  "message": "ReadTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Read timed out. (read timeout=45)",
+  "column_headers": [],
+  "column_widths": null,
+  "rows": [],
+  "totals": {}
 }
