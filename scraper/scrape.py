@@ -86,6 +86,22 @@ HEADERS = {
 # already flaky under sequential access.
 MAX_WORKERS = 4
 
+# Politeness towards a flaky portal. No two attempts (of any worker, retries included)
+# start within STAGGER_SECONDS (+ up to STAGGER_JITTER random) of each other, so the
+# workers never hit it in the same second. When the portal answers with its
+# "ClearSession" bounce - which the logs show hits every session at once - ALL workers
+# hold for BOUNCE_HOLD_MIN..MAX seconds instead of retrying on their own short timers.
+STAGGER_SECONDS = 4
+STAGGER_JITTER = 2
+BOUNCE_HOLD_MIN = 60
+BOUNCE_HOLD_MAX = 120
+
+# After the first pass, schemes that still failed get COOLDOWN_ROUNDS more rounds
+# (each a full MAX_ATTEMPTS-attempt turn) after a COOLDOWN_WAIT-second pause: the
+# portal's bad spells last minutes, longer than the 5-30 s retry waits can outlast.
+COOLDOWN_ROUNDS = 2
+COOLDOWN_WAIT = 300
+
 # Per-scheme retry policy. Retries happen immediately, inside the same
 # execution and the same scheme's turn - never in a separate pass afterwards.
 MAX_ATTEMPTS = 3                                # total tries per scheme (1 initial + 2 retries)
@@ -298,6 +314,16 @@ class Metrics:
         self.requests = self.request_failures = self.bytes = 0
         self.latencies, self.schemes, self.error_kinds = [], [], {}
         self.retry_wait = 0.0
+        self.gate_wait, self.gate_waits, self.bounces = 0.0, 0, 0
+
+    def gated(self, seconds):
+        with self._lock:
+            self.gate_wait += seconds
+            self.gate_waits += 1
+
+    def bounce(self):
+        with self._lock:
+            self.bounces += 1
 
     def request(self, seconds, nbytes=0, failed=False):
         with self._lock:
@@ -342,10 +368,66 @@ class Metrics:
             if self.error_kinds:
                 lines.append("Attempt failures by kind: " + ", ".join(f"{k}={v}" for k, v in sorted(self.error_kinds.items())))
             lines.append(f"Time spent waiting between retries: {self.retry_wait:.1f}s (summed over workers)")
+            lines.append(f"Start stagger / bounce hold: {self.gate_waits} waits, {self.gate_wait:.1f}s (summed over workers) | "
+                         f"portal bounces seen: {self.bounces}")
             return lines
 
 
 _METRICS = Metrics()
+
+
+class StartGate:
+    """Spreads out the starts of attempts across ALL workers, and lets every worker
+    hold together when the portal is having one of its bad spells."""
+
+    def __init__(self):
+        self._lock = threading.Lock()
+        self._next_slot = 0.0
+        self._hold_until = 0.0
+
+    def reserve(self):
+        """Seconds this attempt must wait for its start slot (0 = go now)."""
+        with self._lock:
+            now = time.monotonic()
+            slot = max(now, self._next_slot)
+            self._next_slot = slot + STAGGER_SECONDS + (random.uniform(0, STAGGER_JITTER) if STAGGER_JITTER else 0)
+            return slot - now if STAGGER_SECONDS else 0.0
+
+    def hold(self, seconds):
+        with self._lock:
+            self._hold_until = max(self._hold_until, time.monotonic() + seconds)
+
+    def hold_remaining(self):
+        with self._lock:
+            return max(0.0, self._hold_until - time.monotonic())
+
+
+_GATE = StartGate()
+
+
+def wait_for_turn():
+    """Called before every attempt: the stagger slot first, then any portal-wide hold."""
+    began = time.monotonic()
+    delay = _GATE.reserve()
+    if delay > 0:
+        say(f"Start stagger: waiting {delay:.1f}s so workers do not hit the portal together")
+        _sleep(delay)
+    hold = _GATE.hold_remaining()
+    if hold > 0:
+        say(f"Portal hold: the portal is bouncing sessions, waiting {hold:.0f}s with the other workers", logging.WARNING)
+        _sleep(hold)
+    waited = time.monotonic() - began
+    if delay > 0 or hold > 0:
+        _METRICS.gated(waited)
+
+
+def _note_portal_bounce(where):
+    """The portal bounced this session to its ClearSession page. The logs show it does that to
+    every session at once, so everybody pauses, not just this worker."""
+    seconds = round(random.uniform(BOUNCE_HOLD_MIN, BOUNCE_HOLD_MAX), 0)
+    _GATE.hold(seconds)
+    _METRICS.bounce()
+    say(f"PORTAL BOUNCE at {where}: all workers will hold for up to {seconds:g}s", logging.WARNING)
 
 
 def _page_name(url):
@@ -372,6 +454,8 @@ def _fetch(session, url, what):
     redirects = len(response.history)
     extra = f" redirects={redirects} final={_page_name(response.url)}" if redirects else ""
     say(f"HTTP GET {what} ({page}) END status={response.status_code} bytes={size} elapsed={elapsed:.2f}s{extra}")
+    if "ClearSession" in str(response.url) or (size < 2000 and "ClearSession" in response.text):
+        _note_portal_bounce(what)
     return response
 
 
@@ -718,7 +802,7 @@ def retry_delay(retry_number):
     return round(random.uniform(low, high), 1)
 
 
-def process_scheme(position, total, scheme, crawl):
+def process_scheme(position, total, scheme, crawl, round_no=1):
     """One scheme, start to finish, on whichever worker thread picked it up: up
     to MAX_ATTEMPTS tries with a randomized pause between them. A scraping
     failure of ANY kind is contained here (it is this scheme's failure, nobody
@@ -727,13 +811,13 @@ def process_scheme(position, total, scheme, crawl):
     worker itself, so no other worker or queued scheme carries on meanwhile.
     Returns True on success."""
     try:
-        return _process_scheme(position, total, scheme, crawl)
+        return _process_scheme(position, total, scheme, crawl, round_no)
     except BaseException:
         _STOP.set()
         raise
 
 
-def _process_scheme(position, total, scheme, crawl):
+def _process_scheme(position, total, scheme, crawl, round_no=1):
     code = str(scheme["scheme_code"])
     worker = threading.current_thread().name
     _ctx.tag = f"[{position:02d}/{total:02d} {code}] "
@@ -741,7 +825,9 @@ def _process_scheme(position, total, scheme, crawl):
         say("SCHEME SKIPPED: the run is winding down before this scheme started", logging.WARNING)
         return False
     began = time.monotonic()
-    say(f"SCHEME START {scheme['name']} (worker={worker})")
+    prior = (round_no - 1) * MAX_ATTEMPTS          # attempts spent in earlier rounds: the status shows the running total
+    round_note = f" [cool-down round {round_no - 1}/{COOLDOWN_ROUNDS}]" if round_no > 1 else ""
+    say(f"SCHEME START{round_note} {scheme['name']} (worker={worker})")
     last_error, attempts_made = "", 0
     for attempt in range(1, MAX_ATTEMPTS + 1):
         if attempt > 1:
@@ -753,6 +839,7 @@ def _process_scheme(position, total, scheme, crawl):
             _METRICS.waited(delay)
             _sleep(delay)
         attempts_made = attempt
+        wait_for_turn()
         say(f"Attempt {attempt}/{MAX_ATTEMPTS} START")
         attempt_began = time.monotonic()
         try:
@@ -763,25 +850,27 @@ def _process_scheme(position, total, scheme, crawl):
             _METRICS.failure(kind)
             say(f"Attempt {attempt}/{MAX_ATTEMPTS} failed after {time.monotonic() - attempt_began:.2f}s "
                 f"kind={kind}: {last_error}", logging.WARNING)
-            crawl.record(code, STATUS_FAILED, attempt, last_error)
+            crawl.record(code, STATUS_FAILED, prior + attempt, last_error)
             continue
         save_result(scheme, result)   # immediately - before anything else can go wrong
-        if attempt > 1:
+        if round_no > 1:
+            remark = f"Recovered in cool-down round {round_no - 1}"
+        elif attempt > 1:
             remark = "Recovered on retry"
         else:
             remark = {"empty": "No expenditure recorded (portal reports no record)",
                       "no_district_data": "No district rows for this scheme"}.get(result["status"], "")
-        crawl.record(code, STATUS_OK, attempt, remark)
+        crawl.record(code, STATUS_OK, prior + attempt, remark)
         elapsed = time.monotonic() - began
         say(f"Attempt {attempt}/{MAX_ATTEMPTS} succeeded in {time.monotonic() - attempt_began:.2f}s")
-        say(f"SCHEME DONE status=1 attempts={attempt} elapsed={elapsed:.2f}s worker={worker}")
-        _METRICS.scheme(worker, code, elapsed, attempt, True)
+        say(f"SCHEME DONE status=1 attempts={prior + attempt} elapsed={elapsed:.2f}s worker={worker}")
+        _METRICS.scheme(worker, code, elapsed, prior + attempt, True)
         return True
     save_result(scheme, error_result(scheme, last_error))
     elapsed = time.monotonic() - began
-    say(f"FINAL STATUS: FAILED after {attempts_made} attempts")
-    say(f"SCHEME DONE status=-1 attempts={attempts_made} elapsed={elapsed:.2f}s worker={worker}", logging.WARNING)
-    _METRICS.scheme(worker, code, elapsed, attempts_made, False)
+    say(f"FINAL STATUS: FAILED after {prior + attempts_made} attempts")
+    say(f"SCHEME DONE status=-1 attempts={prior + attempts_made} elapsed={elapsed:.2f}s worker={worker}", logging.WARNING)
+    _METRICS.scheme(worker, code, elapsed, prior + attempts_made, False)
     return False
 
 
@@ -800,11 +889,16 @@ def run_workers(schemes, crawl, workers):
     """Runs every scheme on a pool of `workers` threads and returns the fatal
     error text ('' if none). Workers only ever touch their own scheme's file
     and the locked status; index.json is rebuilt here, on the main thread, as
-    each scheme completes and once more when all have finished."""
+    each scheme completes and once more when all have finished.
+
+    After the first pass, schemes that still failed get up to COOLDOWN_ROUNDS more
+    rounds, each after a COOLDOWN_WAIT pause (a full MAX_ATTEMPTS-attempt turn each)."""
     fatal, total = "", len(schemes)
     pool = ThreadPoolExecutor(max_workers=workers, thread_name_prefix="worker")
-    try:
-        futures = [pool.submit(process_scheme, i, total, s, crawl) for i, s in enumerate(schemes, 1)]
+
+    def run_pass(items, round_no):
+        nonlocal fatal
+        futures = [pool.submit(process_scheme, i, total, s, crawl, round_no) for i, s in items]
         for future in as_completed(futures):
             if future.cancelled():
                 continue
@@ -818,6 +912,21 @@ def run_workers(schemes, crawl, workers):
                     for pending in futures:
                         pending.cancel()
             write_index(schemes, crawl)
+
+    try:
+        run_pass(list(enumerate(schemes, 1)), 1)
+        for round_no in range(2, COOLDOWN_ROUNDS + 2):
+            if fatal or _STOP.is_set():
+                break
+            failed = [(i, s) for i, s in enumerate(schemes, 1) if crawl.status_of(s) == STATUS_FAILED]
+            if not failed:
+                break
+            say(f"COOL-DOWN round {round_no - 1}/{COOLDOWN_ROUNDS}: {len(failed)} scheme(s) still failed; "
+                f"waiting {COOLDOWN_WAIT}s for the portal to settle", logging.WARNING)
+            _sleep(COOLDOWN_WAIT)
+            if _STOP.is_set():
+                break
+            run_pass(failed, round_no)
     except (KeyboardInterrupt, SystemExit) as exc:
         _STOP.set()
         fatal = f"Interrupted: {exc or type(exc).__name__}"
@@ -863,10 +972,11 @@ def print_summary(counts, fatal_error, overall, execution_id, workers, wall):
 def main(install_signals=True):
     """Returns the process exit code: 0 when every scheme was attempted
     (SUCCESS or WARNING), EXIT_INCOMPLETE when the run was cut short."""
-    global _METRICS
+    global _METRICS, _GATE
     setup_logging()
     _STOP.clear()
     _METRICS = Metrics()
+    _GATE = StartGate()
     _ctx.tag = ""
     started = time.monotonic()
     if install_signals:
@@ -896,7 +1006,8 @@ def main(install_signals=True):
     workers = max(1, min(MAX_WORKERS, len(schemes)))
     say(f"Config: schemes={len(schemes)} workers={workers} max_attempts={MAX_ATTEMPTS} "
         f"retry_delays={RETRY_1_DELAY_MIN}-{RETRY_1_DELAY_MAX}s/{RETRY_2_DELAY_MIN}-{RETRY_2_DELAY_MAX}s "
-        f"request_timeout={REQUEST_TIMEOUT}s")
+        f"request_timeout={REQUEST_TIMEOUT}s stagger={STAGGER_SECONDS}+0-{STAGGER_JITTER}s "
+        f"bounce_hold={BOUNCE_HOLD_MIN}-{BOUNCE_HOLD_MAX}s cooldown_rounds={COOLDOWN_ROUNDS}x{COOLDOWN_WAIT}s")
     fatal = ""
     try:
         crawl.start(execution_id)

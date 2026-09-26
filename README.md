@@ -152,13 +152,29 @@ already scraped can be lost:
   Workers only touch their own scheme's file and the (locked) status; a fatal
   error or a kill in any worker stops the run: in-flight schemes finish their
   current attempt, queued ones are dropped and stay at status 0 (`PARTIAL`).
+- **Staggered, and polite when the portal is unwell.** No two attempts - of
+  any worker, retries included - start within `STAGGER_SECONDS` (4 s, plus up
+  to `STAGGER_JITTER` = 2 s random) of each other, so the workers never hit the
+  portal in the same second. The execution logs showed the portal bouncing
+  sessions to `ClearSession.aspx` in bursts that hit every session at once
+  (mostly early morning): when a response is such a bounce, **all** workers
+  hold for `BOUNCE_HOLD_MIN`..`MAX` (60-120 s) before their next attempt,
+  instead of each retrying on its own short timer.
+- **Cool-down rounds.** Retry waits of 5-30 s cannot outlast a bad spell that
+  lasts minutes. So after the first pass, every scheme that still failed gets up
+  to `COOLDOWN_ROUNDS` (2) more rounds, each after a `COOLDOWN_WAIT` (300 s)
+  pause and each a full 3-attempt turn. The status file shows the running
+  total (`attempts` up to 9) and a scheme saved this way is remarked `Recovered
+  in cool-down round N`. Skipped after a fatal error or a stop request. Set
+  `COOLDOWN_ROUNDS = 0` and `STAGGER_SECONDS = 0` to switch both off.
 - **Per-scheme retries, in the same run.** Each scheme gets up to 3 attempts
   (`MAX_ATTEMPTS`) inside its own worker turn - there is no separate retry pass
   afterwards, and a scheme that succeeded is never retried. Every attempt uses
   a fresh session (fresh cookies and freshly generated portal links). The wait
   before attempt 2 is random 5-15 s and before attempt 3 random 15-30 s
   (`RETRY_1_DELAY_*`, `RETRY_2_DELAY_*` at the top of `scraper/scrape.py`); it
-  only holds up the worker that needs it.
+  only holds up the worker that needs it (unless the portal is bouncing, see
+  above).
 - **Saved immediately.** A scheme's `docs/data/<id>.json` is written (atomically:
   unique temp file, `fsync`, JSON re-validated, then `os.replace`) the moment
   it has been scraped and validated, so a later failure or crash can never take
@@ -188,7 +204,8 @@ already scraped can be lost:
   ```
 
   `status`: **1** = scraped and validated, **-1** = failed (after the last
-  attempt it stays -1 with `attempts: 3` and the latest error), **0** = never
+  attempt of the last cool-down round it stays -1 with `attempts: 9` and the
+  latest error), **0** = never
   processed (only possible if the run was cut short, which makes the overall
   status `PARTIAL`). It never stores links,
   cookies or sessions; URLs in error messages are reduced to the page name.
@@ -247,7 +264,8 @@ A log records, with millisecond timestamps, the level and the worker thread:
   every `crawler_status.json` update;
 - a performance summary: wall time, worker utilisation, slowest schemes,
   request-latency average / p95 / max, failures by kind, time spent in retry
-  waits;
+  waits, time spent in start staggers / portal holds, and how many portal
+  bounces were seen;
 - every Git operation with its exit code and duration, the result of the Gmail
   step, and the final execution status.
 

@@ -82,7 +82,8 @@ class ScraperCase(unittest.TestCase):
         self.addCleanup(shutil.rmtree, self.tmp, True)
         self.schemes = make_schemes()
         self._saved = {k: getattr(scrape, k) for k in
-                       ("DATA_DIR", "CONFIG_PATH", "_sleep", "attempt_scheme", "utc_now", "save_result", "MAX_WORKERS")}
+                       ("DATA_DIR", "CONFIG_PATH", "_sleep", "attempt_scheme", "utc_now", "save_result", "MAX_WORKERS",
+                                                    "STAGGER_SECONDS", "STAGGER_JITTER", "COOLDOWN_ROUNDS", "COOLDOWN_WAIT")}
         self._saved_env = os.environ.get("KOSHVANI_EXECUTION_ID")
         os.environ.pop("KOSHVANI_EXECUTION_ID", None)
         self.addCleanup(self._restore)
@@ -91,6 +92,7 @@ class ScraperCase(unittest.TestCase):
         scrape.DATA_DIR = self.tmp / "data"
         scrape.CONFIG_PATH = self.tmp / "schemes.json"
         scrape.MAX_WORKERS = self.workers
+        scrape.STAGGER_SECONDS = scrape.STAGGER_JITTER = scrape.COOLDOWN_ROUNDS = 0     # opt in per test (see test_resilience)
         self.write_config(self.schemes)
         self.sleeps, self.calls, self.script, self.on_attempt = [], [], {}, None
         scrape._sleep = self.sleeps.append          # never really wait
