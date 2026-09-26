@@ -288,6 +288,83 @@ class TestCoolDownRounds(ScraperCase):
         self.assertIn("bounce_hold=60-120s", self.log)
 
 
+class TestKeepLastGoodFile(ScraperCase):
+    def first_good_run(self):
+        self.run_main()
+        self.before = {i: (scrape.DATA_DIR / f"{self.schemes[i - 1]['id']}.json").read_bytes() for i in range(1, 25)}
+        self.script, self.calls = {}, []
+
+    def test_a_scheme_that_fails_every_attempt_keeps_its_previous_good_file(self):
+        self.first_good_run()
+        self.script[self.code(5)] = [TIMEOUT] * 3
+        self.assertEqual(self.run_main(), 0)
+        path = scrape.DATA_DIR / f"{self.schemes[4]['id']}.json"
+        self.assertEqual(path.read_bytes(), self.before[5], "the good data is byte-for-byte untouched")
+        self.assertEqual(self.scheme_file(5)["status"], "ok")
+        self.assertEqual(self.entry(5)["status"], -1, "the failure is still recorded honestly")
+        self.assertTrue(self.entry(5)["remark"].startswith("ReadTimeout:"))
+        self.assertEqual(self.status()["overall_status"], "WARNING")
+        self.assertRegex(self.log, r"KEEPING last good data for agri-011-2401000000005 \(from [^)]+\)")
+
+    def test_the_index_still_shows_the_kept_data_but_marks_the_crawl_failure(self):
+        self.first_good_run()
+        self.script[self.code(5)] = [TIMEOUT] * 3
+        self.run_main()
+        entry = self.index()["schemes"][4]
+        self.assertEqual((entry["status"], entry["crawl_status"]), ("ok", -1))
+        self.assertEqual(self.index()["failed_scheme_count"], 1)
+        self.assertEqual(self.index()["successful_scheme_count"], 23, "never claims 24/24")
+
+    def test_the_baseline_and_reports_are_not_fooled_by_a_kept_file(self):
+        self.first_good_run()
+        self.script[self.code(5)] = [TIMEOUT] * 3
+        self.run_main()
+        from support import alert
+        fresh = [s["id"] for s in self.schemes if self.status()["schemes"][s["scheme_code"]]["status"] == 1]
+        self.assertNotIn(self.schemes[4]["id"], fresh, "only freshly scraped schemes may advance the baseline")
+        self.assertEqual(len(fresh), 23)
+        self.assertTrue(callable(alert.update_baseline))
+
+    def test_a_scheme_with_nothing_good_on_disk_still_gets_the_error_stub(self):
+        self.script[self.code(5)] = [TIMEOUT] * 3
+        self.run_main()
+        self.assertEqual(self.scheme_file(5)["status"], "error")
+        self.assertNotIn("KEEPING", self.log)
+
+    def test_an_old_error_stub_is_refreshed_with_the_newest_error(self):
+        self.script[self.code(5)] = [TIMEOUT] * 3
+        self.run_main()
+        self.script, self.calls = {self.code(5): [ValueError("a different failure")] * 3}, []
+        self.run_main()
+        self.assertEqual(self.scheme_file(5)["status"], "error")
+        self.assertIn("a different failure", self.scheme_file(5)["message"])
+
+    def test_previously_empty_results_are_kept_too(self):
+        empty = {**scrape.base_meta(self.schemes[4], "2026-2027"), "status": "empty", "message": "none", "column_headers": [],
+                 "column_widths": None, "rows": [], "totals": {}}
+        scrape.DATA_DIR.mkdir(parents=True)
+        scrape.write_json_atomic(scrape.DATA_DIR / f"{self.schemes[4]['id']}.json", empty)
+        self.script[self.code(5)] = [TIMEOUT] * 3
+        self.run_main()
+        self.assertEqual(self.scheme_file(5)["status"], "empty")
+
+    def test_a_cool_down_recovery_replaces_the_kept_file_with_fresh_data(self):
+        self.first_good_run()
+        scrape.COOLDOWN_ROUNDS, scrape.COOLDOWN_WAIT = 2, 300
+        self.script[self.code(5)] = [TIMEOUT] * 3
+        self.run_main()
+        self.assertEqual(self.entry(5)["status"], 1)
+        self.assertEqual(self.scheme_file(5)["status"], "ok")
+        self.assertNotEqual((scrape.DATA_DIR / f"{self.schemes[4]['id']}.json").read_bytes(), self.before[5], "fresh data was written")
+
+    def test_a_corrupt_previous_file_is_replaced_not_kept(self):
+        scrape.DATA_DIR.mkdir(parents=True)
+        (scrape.DATA_DIR / f"{self.schemes[4]['id']}.json").write_text("{ not json", encoding="utf-8")
+        self.script[self.code(5)] = [TIMEOUT] * 3
+        self.run_main()
+        self.assertEqual(self.scheme_file(5)["status"], "error")
+
+
 class TestCoolDownWithWorkers(ScraperCase):
     workers = 4
 

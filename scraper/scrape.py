@@ -647,6 +647,23 @@ def save_result(scheme, result):
         f"(status={result.get('status')}, rows={len(result.get('rows') or [])})")
 
 
+GOOD_STATUSES = ("ok", "empty", "no_district_data")
+
+
+def keep_last_good(scheme, error):
+    """A scheme that failed every attempt must not destroy what the dashboard already
+    shows: if its data file holds real data from an earlier run, that file is kept
+    untouched (crawler_status.json still records the failure, so reports and the
+    baseline are not fooled). Only a scheme with nothing good on disk gets the
+    error stub that makes the dashboard show its 'Fetch error' state."""
+    previous = load_result(scheme)
+    if previous and previous.get("status") in GOOD_STATUSES:
+        say(f"KEEPING last good data for {scheme['id']} (from {previous.get('generated_at')}); "
+            f"the failure is only recorded in crawler_status.json", logging.WARNING)
+        return
+    save_result(scheme, error_result(scheme, error))
+
+
 def load_result(scheme):
     try:
         return json.loads((DATA_DIR / f"{scheme['id']}.json").read_text(encoding="utf-8"))
@@ -866,7 +883,7 @@ def _process_scheme(position, total, scheme, crawl, round_no=1):
         say(f"SCHEME DONE status=1 attempts={prior + attempt} elapsed={elapsed:.2f}s worker={worker}")
         _METRICS.scheme(worker, code, elapsed, prior + attempt, True)
         return True
-    save_result(scheme, error_result(scheme, last_error))
+    keep_last_good(scheme, last_error)
     elapsed = time.monotonic() - began
     say(f"FINAL STATUS: FAILED after {prior + attempts_made} attempts")
     say(f"SCHEME DONE status=-1 attempts={prior + attempts_made} elapsed={elapsed:.2f}s worker={worker}", logging.WARNING)

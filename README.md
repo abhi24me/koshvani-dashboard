@@ -167,6 +167,13 @@ already scraped can be lost:
   total (`attempts` up to 9) and a scheme saved this way is remarked `Recovered
   in cool-down round N`. Skipped after a fatal error or a stop request. Set
   `COOLDOWN_ROUNDS = 0` and `STAGGER_SECONDS = 0` to switch both off.
+- **Last good data is kept.** A scheme that fails every attempt (and every
+  cool-down round) does **not** overwrite its data file if that file already
+  holds real data from an earlier run: the dashboard keeps showing the last good
+  numbers (with their old `generated_at`), while `crawler_status.json` still
+  records `-1` and the error, `index.json` marks it (`crawl_status: -1`), the
+  report counts it as failed and the baseline does not advance for it. Only a
+  scheme with nothing good on disk gets the "Fetch error" stub.
 - **Per-scheme retries, in the same run.** Each scheme gets up to 3 attempts
   (`MAX_ATTEMPTS`) inside its own worker turn - there is no separate retry pass
   afterwards, and a scheme that succeeded is never retried. Every attempt uses
