@@ -5,20 +5,20 @@
   "scheme_code": "2401001090300",
   "district": "G.B.NAGAR",
   "fin_year": "2026-2027",
-  "generated_at": "2026-09-29T00:35:40+00:00",
+  "generated_at": "2026-10-01T09:57:11+00:00",
   "status": "ok",
   "message": null,
-  "prev_month": "August",
-  "current_month": "September",
+  "prev_month": "September",
+  "current_month": "October",
   "column_headers": [
     "Treasury",
     "Standard Object",
     "Plan / Non-Plan",
     "Voted / Charged",
     "Progressive Allotment",
-    "Actual Progressive Expenditure upto month (August)",
-    "Provisional Current Month Expenditure(September)",
-    "Total Expenditure Upto Month (September)",
+    "Actual Progressive Expenditure upto month (September)",
+    "Provisional Current Month Expenditure(October)",
+    "Total Expenditure Upto Month (October)",
     "% A/E"
   ],
   "column_widths": [
@@ -70,6 +70,19 @@
         "0.00",
         "14000.00",
         "77.78"
+      ]
+    },
+    {
+      "cells": [
+        "",
+        "05-स्थानान्तरण यात्रा व्यय",
+        "N",
+        "V",
+        "2000.00",
+        "0.00",
+        "0.00",
+        "0.00",
+        ".00"
       ]
     },
     {
@@ -153,6 +166,19 @@
     {
       "cells": [
         "",
+        "45-अवकाश यात्रा व्यय",
+        "N",
+        "V",
+        "40772.00",
+        "0.00",
+        "0.00",
+        "0.00",
+        ".00"
+      ]
+    },
+    {
+      "cells": [
+        "",
         "50-मंहगाई वेतन",
         "N",
         "V",
@@ -204,10 +230,10 @@
     }
   ],
   "totals": {
-    "progressive_allotment": 31543600.0,
+    "progressive_allotment": 31586372.0,
     "expenditure_upto_prev_month": 18191943.0,
     "current_month_expenditure": 0.0,
     "total_expenditure_upto_month": 18191943.0,
-    "pct_expenditure_of_allotment": 57.67
+    "pct_expenditure_of_allotment": 57.59
   }
 }
