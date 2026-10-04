@@ -222,8 +222,9 @@ already scraped can be lost:
   and 3 otherwise; either way everything it saved is kept.
 - **Reports.** The Gmail report is generated from this *final* state, after
   the retries: a scheme that failed once and then recovered is not a failure.
-  It carries the full 24-scheme table (status, attempts, remark for every
-  scheme), the execution id and the name of the execution log.
+  It is a summary (totals, execution id, log file name) plus a table of
+  exactly what changed since the last report - not a scheme-by-scheme status
+  listing, since the people it's forwarded to don't need that.
 - **Baseline.** `.koshvani_previous_data/` still advances per scheme, only for
   schemes freshly scraped in that run with healthy data, and - since Gmail is
   now the only channel - only once the report e-mail was actually delivered

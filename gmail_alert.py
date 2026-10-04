@@ -12,9 +12,11 @@ Two modes, called from run_daily.sh:
       Called after the scraper has run (whether it finished or was cut
       short). Reads the FINAL state of this execution from
       docs/data/crawler_status.json - after every scheme's retries - and
-      e-mails a SUCCESS / WARNING / PARTIAL / ERROR report with the full
-      per-scheme table. Financial values are compared with the
-      .koshvani_previous_data/ baseline (ignoring generated_at).
+      e-mails a SUCCESS / WARNING / PARTIAL / ERROR report with the run's
+      totals and a table of what changed since the last report. Financial
+      values are compared with the .koshvani_previous_data/ baseline
+      (ignoring generated_at); a scheme with nothing changed is left out of
+      the e-mail entirely - it is not a scheme-by-scheme status report.
 
 The baseline only advances after the report was actually delivered (so a
 failed send never silently loses change history), and even then only per
@@ -379,7 +381,9 @@ def diff_scheme_rows(prev_rows, curr_rows):
 # ---------- report building ----------
 # The report is ONE structured model of the FINAL state of the run (read from
 # docs/data/crawler_status.json), rendered as a plain-text e-mail and an HTML
-# e-mail that carries the full per-scheme table - both from the same facts.
+# e-mail - both from the same facts. Neither lists every scheme: that table
+# was dropped as noise for the people this gets forwarded to. What is kept is
+# the run's totals and a table of exactly what changed since the last report.
 
 LEVELS = {
     "success": ("🟢", "SUCCESS"),
@@ -393,9 +397,6 @@ FOOTERS = {
     "partial": "⚠️ Execution incomplete. Review required.",
     "error": "❌ Job failed. Review required.",
 }
-STATUS_LEGEND = "Status legend: 1 = SUCCESS, 0 = NOT PROCESSED, -1 = FAILED"
-
-
 def _headline(text):
     return text.split("\n", 1)[0]
 
@@ -408,17 +409,25 @@ def _change_count(changes_by_scheme):
     return sum(len(fcs) for _, fcs in changes_by_scheme)
 
 
-def _append_change_blocks(lines, changes_by_scheme):
-    for name, fcs in changes_by_scheme:
-        lines.append(f"• {name}")
-        multi_row = len({fc["row_label"] for fc in fcs}) > 1
-        for fc in fcs:
-            prefix = f"[{fc['row_label']}] " if multi_row else ""
-            lines.append(f"  {prefix}{fc['field']}: {fmt_val(fc['old'])} → {fmt_val(fc['new'])}")
-            if fc["diff"] is not None:
-                sign = "+" if fc["diff"] >= 0 else ""
-                lines.append(f"  Change: {sign}{format_num(fc['diff'])}")
-        lines.append("")
+def _flatten_changes(changes_by_scheme):
+    """[(scheme_name, row_label, field, old, new, diff), ...] - one row per changed
+    field, in the shape a table (text or HTML) can render directly."""
+    return [(name, fc["row_label"], fc["field"], fc["old"], fc["new"], fc["diff"])
+            for name, fcs in changes_by_scheme for fc in fcs]
+
+
+def _change_cell(diff):
+    if diff is None:
+        return "—"
+    sign = "+" if diff >= 0 else ""
+    return f"{sign}{format_num(diff)}"
+
+
+def _append_changes_table(lines, changes_by_scheme):
+    lines.append("Scheme | Row | Field | Old → New | Change")
+    for name, row_label, field, old, new, diff in _flatten_changes(changes_by_scheme):
+        lines.append(f"{name} | {row_label} | {field} | {fmt_val(old)} → {fmt_val(new)} | {_change_cell(diff)}")
+    lines.append("")
 
 
 def _baseline_review(sid, detail):
@@ -492,16 +501,9 @@ def _job_error_report(ts, duration, reason):
             "email_html": text_to_html(text, "error"), "can_update_baseline": False, "fresh_ids": []}
 
 
-def _remark_display(row):
-    if row["remark"]:
-        return row["remark"]
-    if row["status"] == 1:
-        return "Recovered on retry" if row["attempts"] > 1 else "Success"
-    return "Not processed" if row["status"] == 0 else "Failed"
-
-
 def render_email_text(m):
-    """Plain-text alternative of the email: the full report, every scheme."""
+    """Plain-text alternative of the email: the run's totals, then what changed
+    since the last report - not a scheme-by-scheme status listing."""
     emoji, word = LEVELS[m["level"]]
     c = m["counts"]
     lines = [f"{emoji} KOSHVANI CRAWLER — {word}", "",
@@ -517,23 +519,44 @@ def render_email_text(m):
               f"Data changes: {_change_count(m['changes']) or 'None'}"]
     if m["fatal_error"]:
         lines.append(f"Fatal error: {m['fatal_error']}")
-    lines += ["", f"ALL {c['total']} SCHEMES", "# | Scheme Code | Scheme Name | Status | Attempts | Remark"]
-    lines += [f"{r['n']} | {r['code']} | {r['name']} | {r['status']} | {r['attempts']} | {_remark_display(r)}" for r in m["rows"]]
-    lines += ["", STATUS_LEGEND, ""]
+    lines.append("")
     if m["review"]:
         lines.append(f"DATA REVIEW NEEDED ({len(m['review'])})")
         for name, note in m["review"]:
             lines += [f"• {name}", f"  {note}", ""]
     if m["changes"]:
         lines += [f"DATA CHANGES ({_change_count(m['changes'])})", ""]
-        _append_change_blocks(lines, m["changes"])
+        _append_changes_table(lines, m["changes"])
     lines.append(FOOTERS[m["level"]])
     return "\n".join(lines).strip() + "\n"
 
 
+def _changes_table_html(changes_by_scheme):
+    e = html_escape
+    cell = "padding:7px 10px;border-bottom:1px solid #e5e7eb;vertical-align:top;font-size:13px"
+    head = "".join(
+        f'<th style="text-align:left;padding:8px 10px;background:#f3f4f6;font-size:12px;color:#374151;'
+        f'border-bottom:2px solid #d1d5db;white-space:nowrap">{h}</th>'
+        for h in ("Scheme", "Row", "Field", "Old → New", "Change"))
+    body = []
+    for name, row_label, field, old, new, diff in _flatten_changes(changes_by_scheme):
+        change_color = "#6b7280" if diff is None else ("#1a7f37" if diff >= 0 else "#b3261e")
+        body.append(
+            f'<tr>'
+            f'<td style="{cell}">{e(name)}</td>'
+            f'<td style="{cell}">{e(row_label)}</td>'
+            f'<td style="{cell}">{e(field)}</td>'
+            f'<td style="{cell};white-space:nowrap">{e(fmt_val(old))} &rarr; {e(fmt_val(new))}</td>'
+            f'<td style="{cell};white-space:nowrap"><b style="color:{change_color}">{e(_change_cell(diff))}</b></td></tr>')
+    return (f'<div style="overflow-x:auto"><table role="presentation" cellspacing="0" cellpadding="0" '
+            f'style="width:100%;border-collapse:collapse;border:1px solid #e5e7eb"><thead><tr>{head}</tr></thead>'
+            f'<tbody>{"".join(body)}</tbody></table></div>')
+
+
 def render_email_html(m):
-    """HTML alternative: summary, then the full table of every scheme. Inline
-    styles only, no images/links/scripts; every dynamic value is escaped."""
+    """HTML alternative: the run's totals, then what changed since the last
+    report - not a scheme-by-scheme status listing. Inline styles only, no
+    images/links/scripts; every dynamic value is escaped."""
     e = html_escape
     emoji, word = LEVELS[m["level"]]
     accent = _LEVEL_COLORS[m["level"]]
@@ -554,28 +577,6 @@ def render_email_html(m):
         kv("Recovered by retry", f"{c['recovered']}"), kv("Data changes", e(str(n_changes or "None"))),
     ] + ([kv("Fatal error", e(m["fatal_error"]))] if m["fatal_error"] else []))
 
-    status_color = {1: "#1a7f37", 0: "#6b7280", -1: "#b3261e"}
-    status_bg = {1: "", 0: "background:#f3f4f6;", -1: "background:#fdecea;"}
-    cell = "padding:7px 10px;border-bottom:1px solid #e5e7eb;vertical-align:top;font-size:13px"
-    head = "".join(
-        f'<th style="text-align:left;padding:8px 10px;background:#f3f4f6;font-size:12px;color:#374151;'
-        f'border-bottom:2px solid #d1d5db;white-space:nowrap">{h}</th>'
-        for h in ("#", "Scheme Code", "Scheme Name", "Status", "Attempts", "Remark"))
-    body = []
-    for r in m["rows"]:
-        retried = r["status"] == 1 and r["attempts"] > 1
-        body.append(
-            f'<tr style="{status_bg[r["status"]]}">'
-            f'<td style="{cell}">{r["n"]}</td>'
-            f'<td style="{cell};white-space:nowrap">{e(r["code"])}</td>'
-            f'<td style="{cell}">{e(r["name"])}</td>'
-            f'<td style="{cell};white-space:nowrap"><b style="color:{status_color[r["status"]]}">{r["status"]}</b></td>'
-            f'<td style="{cell};{"background:#fff4e5;font-weight:bold" if retried else ""}">{r["attempts"]}</td>'
-            f'<td style="{cell};color:{"#b3261e" if r["status"] == -1 else "#374151"}">{e(_remark_display(r))}</td></tr>')
-    table = (f'<div style="overflow-x:auto"><table role="presentation" cellspacing="0" cellpadding="0" '
-             f'style="width:100%;border-collapse:collapse;border:1px solid #e5e7eb"><thead><tr>{head}</tr></thead>'
-             f'<tbody>{"".join(body)}</tbody></table></div>')
-
     def card(title, lines):
         detail = "<br>".join(e(l) for l in lines)
         return (f'<div style="border-left:3px solid {accent};padding:2px 0 2px 12px;margin:12px 0">'
@@ -586,17 +587,8 @@ def render_email_html(m):
         sections.append(f'<h3 style="font-size:15px;margin:22px 0 6px">Data review needed ({len(m["review"])})</h3>'
                         + "".join(card(name, [note]) for name, note in m["review"]))
     if m["changes"]:
-        cards = []
-        for name, fcs in m["changes"]:
-            multi_row = len({fc["row_label"] for fc in fcs}) > 1
-            lines = []
-            for fc in fcs:
-                prefix = f"[{fc['row_label']}] " if multi_row else ""
-                lines.append(f"{prefix}{fc['field']}: {fmt_val(fc['old'])} → {fmt_val(fc['new'])}")
-                if fc["diff"] is not None:
-                    lines.append(f"Change: {'+' if fc['diff'] >= 0 else ''}{format_num(fc['diff'])}")
-            cards.append(card(name, lines))
-        sections.append(f'<h3 style="font-size:15px;margin:22px 0 6px">Data changes ({n_changes})</h3>' + "".join(cards))
+        sections.append(f'<h3 style="font-size:15px;margin:22px 0 6px">Data changes ({n_changes})</h3>'
+                        + _changes_table_html(m["changes"]))
 
     return ('<!DOCTYPE html><html><head><meta charset="utf-8">'
             '<meta name="viewport" content="width=device-width, initial-scale=1"></head>'
@@ -607,8 +599,6 @@ def render_email_html(m):
             f'border-radius:8px 8px 0 0">{e(emoji)} KOSHVANI CRAWLER — {e(word)}</div>'
             f'<div style="padding:14px 20px 20px"><table role="presentation" cellspacing="0" cellpadding="0" '
             f'style="margin-bottom:18px;font-size:14px">{summary}</table>'
-            f'<h3 style="font-size:15px;margin:0 0 8px">All {c["total"]} schemes</h3>{table}'
-            f'<p style="margin:8px 0 0;font-size:12px;color:#6b7280">{e(STATUS_LEGEND)}</p>'
             f'{"".join(sections)}'
             f'<p style="margin:20px 0 0;font-weight:bold;color:{accent}">{e(FOOTERS[m["level"]])}</p></div></div></body></html>')
 

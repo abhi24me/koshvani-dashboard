@@ -177,10 +177,10 @@ class TestReportFromFinalState(AlertCase):
         self.write_run({5: (-1, 3, "ReadTimeout: HTTPSConnectionPool read timed out"), 8: (1, 2, "Recovered on retry")})
         r = self.report()
         self.assertEqual((r["level"], r["subject"]), ("warning", "🟠 KOSHVANI CRAWLER — WARNING | 23/24 Schemes"))
-        for expected in ("Schemes: 23/24 successful", "Recovered by retry: 1", "Failed: 1",
-                         "5 | 2401000000005 | Scheme 5 | -1 | 3 | ReadTimeout: HTTPSConnectionPool read timed out", "⚠️ Review required."):
+        for expected in ("Schemes: 23/24 successful", "Recovered by retry: 1", "Failed: 1", "⚠️ Review required."):
             self.assertIn(expected, r["email_text"])
         self.assertIn("Unprocessed: 0", r["email_text"])
+        self.assertNotIn("Scheme 5", r["email_text"], "a failed scheme with no data change is not listed - only totals say it failed")
         self.assertEqual(r["fresh_ids"].count(self.schemes[4]["id"]), 0)
 
     def test_partial_after_a_fatal_interruption(self):
@@ -232,18 +232,20 @@ class TestReportFromFinalState(AlertCase):
         r = self.report()
         self.assertEqual(r["level"], "success")
         self.assertIn("Data changes: 2", r["email_text"])
-        self.assertIn("• Scheme 3", r["email_text"])
-        self.assertIn("Total Expenditure up to Month: 100 → 500", r["email_text"])
-        self.assertIn("Change: +400", r["email_text"])
+        self.assertIn("Scheme | Row | Field | Old → New | Change", r["email_text"])
+        self.assertIn("Scheme 3 | 01-Pay | Expenditure up to Previous Month | 100 → 500 | +400", r["email_text"])
+        self.assertIn("Scheme 3 | 01-Pay | Total Expenditure up to Month | 100 → 500 | +400", r["email_text"])
+        self.assertNotIn("ALL 24 SCHEMES", r["email_text"])
+        self.assertNotIn("Status legend", r["email_text"])
 
-    def test_warning_still_shows_data_changes(self):
+    def test_warning_still_shows_data_changes_after_the_summary(self):
         self.write_run({6: (-1, 3, "ConnectionError: down")})
         self.baseline_all_current()
         self.write_baseline(3, ok_result(self.schemes[2], spent=100))
         r = self.report()
         self.assertEqual(r["level"], "warning")
         self.assertIn("Data changes: 2", r["email_text"])
-        self.assertLess(r["email_text"].index("ALL 24 SCHEMES"), r["email_text"].index("DATA CHANGES"))
+        self.assertLess(r["email_text"].index("Recovered by retry:"), r["email_text"].index("DATA CHANGES"))
 
     def test_no_changes_section_for_a_warning_without_changes(self):
         self.write_run({6: (-1, 3, "ConnectionError: down")})
@@ -284,42 +286,49 @@ class TestRendering(AlertCase):
         out["partial"] = self.report()
         return out
 
-    def test_12_the_html_email_lists_every_scheme_in_a_table(self):
+    def changes_scenario(self):
+        """One scheme increased, one decreased, so both change colors appear."""
+        self.write_run()
+        self.baseline_all_current()
+        self.write_baseline(3, ok_result(self.schemes[2], spent=100))          # 100 -> 500: up
+        self.write_baseline(7, ok_result(self.schemes[6], spent=900))          # 900 -> 500: down
+        return self.report()
+
+    def test_no_report_lists_every_scheme_any_more(self):
+        """The person this is forwarded to does not need a 24-row status table."""
         for level, r in self.scenarios().items():
             with self.subTest(level):
-                page = r["email_html"]
-                tbody = page[page.index("<tbody>"):page.index("</tbody>")]
-                self.assertEqual(tbody.count("<tr"), 24, "one table row per scheme")
-                self.assertEqual(page.count("<th "), 6, "six column headers")
-                for h in ("#", "Scheme Code", "Scheme Name", "Status", "Attempts", "Remark"):
-                    self.assertIn(f">{h}</th>", page)
-                for scheme in self.schemes:
-                    self.assertIn(scheme["scheme_code"], page)
-                    self.assertIn(f">{scheme['name']}</td>", page)
-                self.assertIn("1 = SUCCESS, 0 = NOT PROCESSED, -1 = FAILED", page)
-                self.assertIn("All 24 schemes", page)
-                self.assertNotRegex(page, r"https?://")
+                for marker in ("ALL 24 SCHEMES", "Status legend", "Scheme Code", "Scheme Name", "Attempts | Remark"):
+                    self.assertNotIn(marker, r["email_text"], marker)
+                    self.assertNotIn(marker, r["email_html"], marker)
+                self.assertNotRegex(r["email_html"], r"<th[^>]*>#</th>")
 
-    def test_12_status_attempts_and_remarks_are_visible_in_the_html_table(self):
-        page = self.scenarios()["warning"]["email_html"]
-        text = re.sub(r"\s+", " ", unescape(re.sub(r"<[^>]+>", " ", page)))
-        self.assertIn("ReadTimeout: x", text)
-        self.assertIn("Recovered on retry", text)
-        self.assertRegex(page, r"<b style=\"color:#b3261e\">-1</b>")
-        self.assertRegex(page, r"<b style=\"color:#1a7f37\">1</b>")
-        partial = self.scenarios()["partial"]["email_html"]
-        self.assertRegex(partial, r"<b style=\"color:#6b7280\">0</b>")
-        self.assertIn("Not processed", partial)
+    def test_the_html_changes_table_lists_only_what_changed(self):
+        r = self.changes_scenario()
+        page = r["email_html"]
+        tbody = page[page.index("<tbody>"):page.index("</tbody>")]
+        self.assertEqual(tbody.count("<tr"), 4, "one row per changed field (2 schemes x 2 financial fields)")
+        for h in ("Scheme", "Row", "Field", "Old → New", "Change"):
+            self.assertIn(f">{h}</th>", page)
+        self.assertIn(">Scheme 3</td>", page)
+        self.assertIn(">Scheme 7</td>", page)
+        for scheme in self.schemes[3:]:            # only schemes 3 and 7 changed
+            if scheme["name"] not in ("Scheme 3", "Scheme 7"):
+                self.assertNotIn(f">{scheme['name']}</td>", page)
+        self.assertNotRegex(page, r"https?://")
 
-    def test_13_the_plain_text_email_lists_every_scheme(self):
-        for level, r in self.scenarios().items():
-            with self.subTest(level):
-                lines = [ln for ln in r["email_text"].splitlines() if re.match(r"^\d+ \| ", ln)]
-                self.assertEqual(len(lines), 24)
-                for i, scheme in enumerate(self.schemes, 1):
-                    self.assertTrue(any(ln.startswith(f"{i} | {scheme['scheme_code']} | {scheme['name']} | ") for ln in lines), scheme["name"])
-                self.assertIn("# | Scheme Code | Scheme Name | Status | Attempts | Remark", r["email_text"])
-                self.assertIn("Status legend: 1 = SUCCESS, 0 = NOT PROCESSED, -1 = FAILED", r["email_text"])
+    def test_an_increase_and_a_decrease_are_colored_differently(self):
+        page = self.changes_scenario()["email_html"]
+        self.assertRegex(page, r'<b style="color:#1a7f37">\+400</b>', "scheme 3 went up")
+        self.assertRegex(page, r'<b style="color:#b3261e">-400</b>', "scheme 7 went down")
+
+    def test_the_plain_text_changes_table_matches_the_html_one(self):
+        r = self.changes_scenario()
+        lines = [ln for ln in r["email_text"].splitlines() if ln.startswith("Scheme ")]
+        self.assertEqual(len(lines), 5)         # the header row + 4 change rows
+        self.assertEqual(lines[0], "Scheme | Row | Field | Old → New | Change")
+        self.assertIn("Scheme 3 | 01-Pay | Expenditure up to Previous Month | 100 → 500 | +400", lines)
+        self.assertIn("Scheme 7 | 01-Pay | Total Expenditure up to Month | 900 → 500 | -400", lines)
 
     def test_the_email_summary_block_has_every_required_figure(self):
         text = self.scenarios()["warning"]["email_text"]
@@ -331,18 +340,18 @@ class TestRendering(AlertCase):
             self.assertIn(f">{label}</td>", html)
 
     def test_dynamic_values_are_html_escaped_but_plain_text_is_raw(self):
-        names = {5: '<b>Evil</b> & "co"'}
-        self.write_run({5: (-1, 3, "<img src=x onerror=alert(1)> & more")}, names=names)
+        names = {3: '<b>Evil</b> & "co"'}
+        self.write_run(names=names)
+        self.baseline_all_current()
+        self.write_baseline(3, ok_result(self.schemes[2], spent=100))
         r = self.report()
         self.assertNotIn("<b>Evil", r["email_html"])
-        self.assertNotIn("<img", r["email_html"])
         self.assertIn("&lt;b&gt;Evil&lt;/b&gt; &amp; &quot;co&quot;", r["email_html"])
-        self.assertIn("&lt;img src=x onerror=alert(1)&gt; &amp; more", r["email_html"])
         self.assertIn('<b>Evil</b> & "co"', r["email_text"])
 
     def test_the_plain_text_and_html_emails_report_the_same_facts(self):
-        r = self.scenarios()["warning"]
-        for fact in ("23/24", "Scheme 5", "ReadTimeout: x"):
+        r = self.changes_scenario()
+        for fact in ("Scheme 3", "Scheme 7", "100", "900", "500"):
             self.assertIn(fact, r["email_text"])
             self.assertIn(fact, unescape(r["email_html"]))
 
