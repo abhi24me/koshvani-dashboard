@@ -883,6 +883,8 @@ async function renderList() {
         <div class="name">${escapeHtml(s.name)}</div>
         ${s.status === 'ok' && s.crawl_status === 0
           ? '<span class="status-badge stale" title="The latest crawler run did not reach this scheme - this is its last known data">Last known data</span>'
+          : s.status === 'ok' && s.crawl_status === -1
+          ? '<span class="status-badge stale" title="The latest crawler run failed for this scheme after every retry - this is its last known good data, not fresh">Refresh failed</span>'
           : `<span class="status-badge ${s.status}">${statusLabel(s.status)}</span>`}
       </div>
       <div class="code-row">
@@ -896,7 +898,7 @@ async function renderList() {
         <div><div class="mini-label">% Spent</div><div class="mini-val ${pctClass(s.pct_expenditure_of_allotment)}">${s.pct_expenditure_of_allotment ?? '—'}${s.pct_expenditure_of_allotment != null ? '%' : ''}</div></div>
       </div>
       <div class="card-footer">
-        <div class="updated">Updated ${fmtDate(s.generated_at)}${s.fin_year ? ' &middot; FY ' + escapeHtml(s.fin_year) : ''}${s.crawl_status === 0 ? ' &middot; <span class="stale-note">not refreshed in the latest run</span>' : ''}</div>
+        <div class="updated">Updated ${fmtDate(s.generated_at)}${s.fin_year ? ' &middot; FY ' + escapeHtml(s.fin_year) : ''}${s.crawl_status === 0 ? ' &middot; <span class="stale-note">not refreshed in the latest run</span>' : ''}${s.crawl_status === -1 ? ' &middot; <span class="stale-note">latest refresh failed - showing last known good data</span>' : ''}</div>
         ${s.status === 'ok' ? `<button class="download-btn" data-id="${escapeHtml(s.id)}" type="button" title="Download this scheme's G.B.NAGAR data as Excel">&#8681; Download</button>` : ''}
       </div>
     </div>
@@ -1062,6 +1064,7 @@ function schemeRowHtml(r, monthName, sortKey) {
         <span>${left}</span>
         ${r.month > 0 ? `<span>+${v(fmtCurrency(r.month), 'month')} in ${escapeHtml(monthName)}</span>` : ''}
         ${r.crawl === 0 ? '<span class="stale-note">not refreshed in the latest run</span>' : ''}
+        ${r.crawl === -1 ? '<span class="stale-note">latest refresh failed - showing last known good data</span>' : ''}
       </div>
     </div>`;
 }

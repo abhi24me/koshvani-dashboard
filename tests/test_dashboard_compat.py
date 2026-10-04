@@ -93,6 +93,26 @@ class TestDashboard(ScraperCase):
         self.assertEqual(page.locator(".scheme-card").count(), 24, "every other scheme's data is still there")
         self.assertEqual(self.errors, [])
 
+    def test_a_scheme_that_fails_after_once_succeeding_keeps_showing_its_last_good_data(self):
+        self.run_main()                                              # yesterday: everything scraped, including scheme 4
+        e = requests.exceptions.ConnectionError("down")
+        self.script[self.code(4)] = [e, e, e]
+        self.calls = []
+        self.run_main()                                              # today: scheme 4 fails every attempt
+        self.publish()
+        page = self.open()
+        bar = page.inner_text(".crawl-status")
+        self.assertIn("Crawler: ! WARNING", bar)
+        self.assertIn("Successful 23/24", bar)
+        self.assertIn("Failed 1", bar)
+        card = page.locator(".scheme-card").nth(3).inner_text()
+        self.assertIn("Refresh failed", card, "the card keeps its data but says the refresh did not work")
+        self.assertIn("latest refresh failed - showing last known good data", card)
+        self.assertEqual(page.locator(".status-badge.error").count(), 0, "yesterday's good data is not an error")
+        self.assertEqual(page.locator(".status-badge.stale").count(), 1)
+        self.assertEqual(page.locator(".scheme-card").count(), 24)
+        self.assertEqual(self.errors, [])
+
     def test_a_partial_run_keeps_data_visible_but_never_claims_24_of_24(self):
         self.run_main()                                              # yesterday: everything scraped
         self.script[self.code(11)] = [KeyboardInterrupt("killed")]
@@ -123,6 +143,18 @@ class TestDashboard(ScraperCase):
         self.assertIn("Crawler: ◐ PARTIAL", page.inner_text(".crawl-status"))
         self.assertEqual(page.locator(".ins-schemes .ins-row").count(), 24)
         self.assertEqual(page.locator(".ins-schemes .stale-note").count(), 14)
+        self.assertEqual(self.errors, [])
+
+    def test_insights_also_flags_a_refresh_failure_not_just_unprocessed(self):
+        self.run_main()
+        e = requests.exceptions.ConnectionError("down")
+        self.script[self.code(4)] = [e, e, e]
+        self.calls = []
+        self.run_main()
+        self.publish()
+        page = self.open("#/insights")
+        self.assertEqual(page.locator(".ins-schemes .stale-note").count(), 1)
+        self.assertIn("latest refresh failed", page.inner_text(".ins-schemes"))
         self.assertEqual(self.errors, [])
 
     def test_a_scheme_never_scraped_yet_shows_as_not_fetched(self):
