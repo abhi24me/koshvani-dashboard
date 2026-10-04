@@ -303,6 +303,28 @@ class TestRendering(AlertCase):
                     self.assertNotIn(marker, r["email_html"], marker)
                 self.assertNotRegex(r["email_html"], r"<th[^>]*>#</th>")
 
+    def test_every_report_links_to_the_live_dashboard(self):
+        for level, r in self.scenarios().items():
+            with self.subTest(level):
+                self.assertIn(f"Dashboard: {alert.DASHBOARD_URL}", r["email_text"])
+                self.assertIn(f'href="{alert.DASHBOARD_URL}"', r["email_html"])
+                self.assertIn("Open Dashboard", r["email_html"])
+        job = alert.build_error_report(time.time() - 5, "git-push")
+        self.assertIn(f"Dashboard: {alert.DASHBOARD_URL}", job["email_text"])
+        self.assertIn(f'href="{alert.DASHBOARD_URL}"', job["email_html"])
+        self.assertEqual(job["email_text"].count(alert.DASHBOARD_URL), 1, "the link appears once, not duplicated as a plain line too")
+
+    def test_repeated_scheme_and_row_cells_are_blanked_in_the_html_table_not_the_text_one(self):
+        """Consecutive rows for the same scheme/row only name it once in the HTML
+        table (the same convention the scraper uses for repeated district names);
+        the plain-text table always repeats both, since it has no cell borders."""
+        r = self.changes_scenario()
+        page, text = r["email_html"], r["email_text"]
+        self.assertEqual(page.count(">Scheme 3<"), 1, "named once in the HTML table")
+        self.assertEqual(page.count(">Scheme 7<"), 1)
+        self.assertEqual(text.count("Scheme 3 |"), 2, "repeated on every line of the plain-text table")
+        self.assertEqual(text.count("Scheme 7 |"), 2)
+
     def test_the_html_changes_table_lists_only_what_changed(self):
         r = self.changes_scenario()
         page = r["email_html"]
@@ -315,7 +337,8 @@ class TestRendering(AlertCase):
         for scheme in self.schemes[3:]:            # only schemes 3 and 7 changed
             if scheme["name"] not in ("Scheme 3", "Scheme 7"):
                 self.assertNotIn(f">{scheme['name']}</td>", page)
-        self.assertNotRegex(page, r"https?://")
+        self.assertEqual(re.findall(r"https?://\S+?(?=[\"'])", page), [alert.DASHBOARD_URL],
+                         "the only link in the email is the dashboard button - no scheme or baseline data leaks a URL")
 
     def test_an_increase_and_a_decrease_are_colored_differently(self):
         page = self.changes_scenario()["email_html"]
@@ -336,8 +359,17 @@ class TestRendering(AlertCase):
                          "Recovered by retry: 1", "Data changes: None"):
             self.assertIn(expected, text)
         html = self.scenarios()["warning"]["email_html"]
-        for label in ("Execution", "Duration", "Schemes", "Recovered by retry", "Failed", "Unprocessed", "Data changes"):
+        for label in ("Execution", "Duration"):
             self.assertIn(f">{label}</td>", html)
+        for label, value in (("Successful", "23/24"), ("Failed", "1"), ("Unprocessed", "0"), ("Recovered", "1"), ("Data Changes", "0")):
+            self.assertIn(f">{label}<", html)
+            self.assertIn(f">{value}<", html)
+
+    def test_the_summary_is_kpi_tiles_not_a_plain_key_value_row(self):
+        html = self.scenarios()["warning"]["email_html"]
+        self.assertNotIn(">Schemes</td>", html, "the old plain-row summary is gone")
+        self.assertNotIn(">Recovered by retry</td>", html)
+        self.assertRegex(html, r'<table role="presentation" width="100%" cellspacing="6"')
 
     def test_dynamic_values_are_html_escaped_but_plain_text_is_raw(self):
         names = {3: '<b>Evil</b> & "co"'}

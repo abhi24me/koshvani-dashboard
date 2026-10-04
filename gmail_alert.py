@@ -13,10 +13,11 @@ Two modes, called from run_daily.sh:
       short). Reads the FINAL state of this execution from
       docs/data/crawler_status.json - after every scheme's retries - and
       e-mails a SUCCESS / WARNING / PARTIAL / ERROR report with the run's
-      totals and a table of what changed since the last report. Financial
-      values are compared with the .koshvani_previous_data/ baseline
-      (ignoring generated_at); a scheme with nothing changed is left out of
-      the e-mail entirely - it is not a scheme-by-scheme status report.
+      totals, a link to the live dashboard, and a table of what changed
+      since the last report. Financial values are compared with the
+      .koshvani_previous_data/ baseline (ignoring generated_at); a scheme
+      with nothing changed is left out of the e-mail entirely - it is not a
+      scheme-by-scheme status report.
 
 The baseline only advances after the report was actually delivered (so a
 failed send never silently loses change history), and even then only per
@@ -55,6 +56,7 @@ DATA_DIR = ROOT / "docs" / "data"
 BASELINE_DIR = ROOT / ".koshvani_previous_data"
 INDEX_PATH = DATA_DIR / "index.json"
 SCHEMES_CONFIG_PATH = ROOT / "scraper" / "schemes.json"
+DASHBOARD_URL = "https://abhi24me.github.io/koshvani-dashboard/"  # the live GitHub Pages dashboard, linked in every report
 
 GMAIL_HOST = "smtp.gmail.com"
 GMAIL_PORT = 465
@@ -152,17 +154,28 @@ def gmail_config(env):
     return sender, password, recipients
 
 
+def _dashboard_button(accent):
+    return (f'<div style="text-align:center;padding:16px 20px 0"><a href="{html_escape(DASHBOARD_URL)}" '
+            f'style="display:inline-block;background:{accent};color:#ffffff;text-decoration:none;'
+            f'font-weight:bold;font-size:13px;letter-spacing:.2px;padding:10px 24px;border-radius:6px">'
+            f'Open Dashboard &rarr;</a></div>')
+
+
 def text_to_html(text, level):
     """A light HTML rendering of the SAME report text (nothing is recomputed,
-    so the two channels can't drift). Inline styles only, no images, links or
-    external assets; every piece of report text is escaped."""
+    so the two channels can't drift). Inline styles only, no images or
+    external assets; every piece of report text is escaped. The one
+    exception is the dashboard link - a fixed constant, not user data - which
+    is rendered as a real button instead of its plain-text line."""
     accent = _LEVEL_COLORS.get(level, "#444444")
+    text = text.replace(f"Dashboard: {DASHBOARD_URL}\n\n", "")
     blocks = [b.split("\n") for b in text.strip().split("\n\n") if b.strip()]
     banner, body = "", []
     for i, lines in enumerate(blocks):
         if i == 0:
             banner = (f'<div style="background:{accent};color:#ffffff;padding:16px 20px;font-size:18px;'
                       f'font-weight:bold;border-radius:8px 8px 0 0">{html_escape(lines[0])}</div>')
+            body.append(_dashboard_button(accent))
             lines = lines[1:]
             if not lines:
                 continue
@@ -380,10 +393,11 @@ def diff_scheme_rows(prev_rows, curr_rows):
 
 # ---------- report building ----------
 # The report is ONE structured model of the FINAL state of the run (read from
-# docs/data/crawler_status.json), rendered as a plain-text e-mail and an HTML
-# e-mail - both from the same facts. Neither lists every scheme: that table
-# was dropped as noise for the people this gets forwarded to. What is kept is
-# the run's totals and a table of exactly what changed since the last report.
+# docs/data/crawler_status.json), rendered as a plain-text e-mail and a
+# dashboard-style HTML e-mail - both from the same facts. Neither lists every
+# scheme: that table was dropped as noise for the people this gets forwarded
+# to. What is kept is the run's totals, a link to the live dashboard, and a
+# table of exactly what changed since the last report.
 
 LEVELS = {
     "success": ("🟢", "SUCCESS"),
@@ -494,6 +508,7 @@ def _job_error_report(ts, duration, reason):
     execution_id, log_file = _run_info()
     info = "".join(f"\n{label}: {value}" for label, value in (("🆔 Execution ID", execution_id), ("📄 Log file", log_file)) if value)
     text = ("🔴 KOSHVANI CRAWLER — ERROR\n\n"
+            f"Dashboard: {DASHBOARD_URL}\n\n"
             f"⏱ {ts}\n⏳ Duration: {duration}{info}\n\n"
             f"{reason}\n\n"
             f"{FOOTERS['error']}")
@@ -507,6 +522,7 @@ def render_email_text(m):
     emoji, word = LEVELS[m["level"]]
     c = m["counts"]
     lines = [f"{emoji} KOSHVANI CRAWLER — {word}", "",
+             f"Dashboard: {DASHBOARD_URL}", "",
              f"Execution: {m['ts']}", f"Duration: {m['duration']}"]
     if m["execution_id"]:
         lines.append(f"Execution ID: {m['execution_id']}")
@@ -531,51 +547,91 @@ def render_email_text(m):
     return "\n".join(lines).strip() + "\n"
 
 
+# Fixed, semantic colors for the stat tiles - always the same color per
+# category (not level-dependent), so a reader learns the palette once.
+_TILE_STYLE = {
+    "successful": ("#1a7f37", "#eaf7ec"),
+    "failed": ("#b3261e", "#fdecea"),
+    "unprocessed": ("#6b7280", "#f3f4f6"),
+    "recovered": ("#b45f06", "#fff4e5"),
+    "changes": ("#1d4ed8", "#eef2ff"),
+}
+
+
+def _stat_tiles_html(c, n_changes):
+    """A row of small KPI tiles (table-based layout, so it survives every
+    email client) - the figures a reader needs first, before any detail."""
+    e = html_escape
+    tiles = [
+        ("Successful", f"{c['successful']}/{c['total']}", "successful"),
+        ("Failed", str(c["failed"]), "failed"),
+        ("Unprocessed", str(c["unprocessed"]), "unprocessed"),
+        ("Recovered", str(c["recovered"]), "recovered"),
+        ("Data Changes", str(n_changes), "changes"),
+    ]
+    cells = "".join(
+        f'<td width="20%" style="background:{bg};border-radius:8px;padding:12px 4px;text-align:center">'
+        f'<div style="font-size:19px;font-weight:bold;color:{color};line-height:1.2">{e(value)}</div>'
+        f'<div style="font-size:10px;letter-spacing:.4px;color:#6b7280;text-transform:uppercase;margin-top:3px">{e(label)}</div></td>'
+        for label, value, kind in tiles for color, bg in [_TILE_STYLE[kind]])
+    return f'<table role="presentation" width="100%" cellspacing="6" cellpadding="0" style="margin:16px 0 4px"><tr>{cells}</tr></table>'
+
+
 def _changes_table_html(changes_by_scheme):
+    """A Scheme | Row | Field | Old -> New | Change table. Consecutive rows for
+    the same scheme (and the same row within it) leave the Scheme/Row cells
+    blank rather than repeat them - the same convention the scraper itself
+    uses for repeated district names - and alternate a faint tint per scheme
+    so one scheme's changes read as a group at a glance."""
     e = html_escape
     cell = "padding:7px 10px;border-bottom:1px solid #e5e7eb;vertical-align:top;font-size:13px"
-    head = "".join(
-        f'<th style="text-align:left;padding:8px 10px;background:#f3f4f6;font-size:12px;color:#374151;'
-        f'border-bottom:2px solid #d1d5db;white-space:nowrap">{h}</th>'
-        for h in ("Scheme", "Row", "Field", "Old → New", "Change"))
-    body = []
+    num_cell = cell + ";white-space:nowrap;text-align:right"
+    head_cell = ('text-align:left;padding:8px 10px;background:#f3f4f6;font-size:12px;color:#374151;'
+                 'border-bottom:2px solid #d1d5db;white-space:nowrap')
+    head = "".join(f'<th style="{head_cell}{";text-align:right" if h in ("Old → New", "Change") else ""}">{h}</th>'
+                   for h in ("Scheme", "Row", "Field", "Old → New", "Change"))
+    body, group_bg, parity, prev_name, prev_row = [], ("#ffffff", "#fafbfc"), 0, None, None
     for name, row_label, field, old, new, diff in _flatten_changes(changes_by_scheme):
+        if name != prev_name:
+            parity ^= 1
+            prev_row = None
+        bg = group_bg[parity]
+        show_name = name if name != prev_name else ""
+        show_row = row_label if (name != prev_name or row_label != prev_row) else ""
+        prev_name, prev_row = name, row_label
         change_color = "#6b7280" if diff is None else ("#1a7f37" if diff >= 0 else "#b3261e")
         body.append(
-            f'<tr>'
-            f'<td style="{cell}">{e(name)}</td>'
-            f'<td style="{cell}">{e(row_label)}</td>'
+            f'<tr style="background:{bg}">'
+            f'<td style="{cell}{";font-weight:bold" if show_name else ""}">{e(show_name)}</td>'
+            f'<td style="{cell};color:#57606a">{e(show_row)}</td>'
             f'<td style="{cell}">{e(field)}</td>'
-            f'<td style="{cell};white-space:nowrap">{e(fmt_val(old))} &rarr; {e(fmt_val(new))}</td>'
-            f'<td style="{cell};white-space:nowrap"><b style="color:{change_color}">{e(_change_cell(diff))}</b></td></tr>')
+            f'<td style="{num_cell}">{e(fmt_val(old))} &rarr; {e(fmt_val(new))}</td>'
+            f'<td style="{num_cell}"><b style="color:{change_color}">{e(_change_cell(diff))}</b></td></tr>')
     return (f'<div style="overflow-x:auto"><table role="presentation" cellspacing="0" cellpadding="0" '
-            f'style="width:100%;border-collapse:collapse;border:1px solid #e5e7eb"><thead><tr>{head}</tr></thead>'
-            f'<tbody>{"".join(body)}</tbody></table></div>')
+            f'style="width:100%;border-collapse:collapse;border:1px solid #e5e7eb;border-radius:6px;overflow:hidden">'
+            f'<thead><tr>{head}</tr></thead><tbody>{"".join(body)}</tbody></table></div>')
 
 
 def render_email_html(m):
-    """HTML alternative: the run's totals, then what changed since the last
-    report - not a scheme-by-scheme status listing. Inline styles only, no
-    images/links/scripts; every dynamic value is escaped."""
+    """HTML alternative: a dashboard-style summary (KPI tiles, then a link to
+    the live dashboard), then what changed since the last report - not a
+    scheme-by-scheme status listing. Inline styles only, no images or
+    external assets; every dynamic value is escaped. The one exception is the
+    dashboard link itself - a fixed constant, never user data."""
     e = html_escape
     emoji, word = LEVELS[m["level"]]
     accent = _LEVEL_COLORS[m["level"]]
     c = m["counts"]
     n_changes = _change_count(m["changes"])
 
-    def kv(label, value, bold=True):
-        return (f'<tr><td style="padding:3px 18px 3px 0;color:#57606a">{e(label)}</td>'
-                f'<td style="padding:3px 0;{"font-weight:bold" if bold else ""}">{value}</td></tr>')
+    def kv(label, value):
+        return (f'<tr><td style="padding:3px 18px 3px 0;color:#57606a;font-size:13px">{e(label)}</td>'
+                f'<td style="padding:3px 0;font-size:13px">{value}</td></tr>')
 
-    summary = "".join([
-        kv("Execution", e(m["ts"])), kv("Duration", e(m["duration"])),
-    ] + ([kv("Execution ID", e(m["execution_id"]))] if m["execution_id"] else [])
-      + ([kv("Log file", e(m["log_file"]))] if m["log_file"] else []) + [
-        kv("Schemes", f"{c['successful']}/{c['total']} successful"),
-        kv("Total / Successful", f"{c['total']} / {c['successful']}"),
-        kv("Failed", f"{c['failed']}"), kv("Unprocessed", f"{c['unprocessed']}"),
-        kv("Recovered by retry", f"{c['recovered']}"), kv("Data changes", e(str(n_changes or "None"))),
-    ] + ([kv("Fatal error", e(m["fatal_error"]))] if m["fatal_error"] else []))
+    meta = "".join([kv("Execution", e(m["ts"])), kv("Duration", e(m["duration"]))]
+        + ([kv("Execution ID", e(m["execution_id"]))] if m["execution_id"] else [])
+        + ([kv("Log file", e(m["log_file"]))] if m["log_file"] else [])
+        + ([kv("Fatal error", f'<b style="color:#b3261e">{e(m["fatal_error"])}</b>')] if m["fatal_error"] else []))
 
     def card(title, lines):
         detail = "<br>".join(e(l) for l in lines)
@@ -589,6 +645,7 @@ def render_email_html(m):
     if m["changes"]:
         sections.append(f'<h3 style="font-size:15px;margin:22px 0 6px">Data changes ({n_changes})</h3>'
                         + _changes_table_html(m["changes"]))
+    divider = '<div style="border-top:1px solid #e5e7eb;margin:18px 0 0"></div>' if sections else ""
 
     return ('<!DOCTYPE html><html><head><meta charset="utf-8">'
             '<meta name="viewport" content="width=device-width, initial-scale=1"></head>'
@@ -597,9 +654,10 @@ def render_email_html(m):
             'font-family:Arial,Helvetica,sans-serif;font-size:15px;color:#1f2328">'
             f'<div style="background:{accent};color:#ffffff;padding:16px 20px;font-size:18px;font-weight:bold;'
             f'border-radius:8px 8px 0 0">{e(emoji)} KOSHVANI CRAWLER — {e(word)}</div>'
-            f'<div style="padding:14px 20px 20px"><table role="presentation" cellspacing="0" cellpadding="0" '
-            f'style="margin-bottom:18px;font-size:14px">{summary}</table>'
-            f'{"".join(sections)}'
+            f'{_dashboard_button(accent)}'
+            f'<div style="padding:4px 20px 20px">{_stat_tiles_html(c, n_changes)}'
+            f'<table role="presentation" cellspacing="0" cellpadding="0" style="margin:14px 0 0;font-size:13px">{meta}</table>'
+            f'{divider}{"".join(sections)}'
             f'<p style="margin:20px 0 0;font-weight:bold;color:{accent}">{e(FOOTERS[m["level"]])}</p></div></div></body></html>')
 
 

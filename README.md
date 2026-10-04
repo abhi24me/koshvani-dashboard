@@ -250,6 +250,14 @@ final state) or `python gmail_alert.py error --stage git-pull|git-commit|git-pus
 for a job-level failure. Without those three variables no mail is sent; a mail
 problem can never fail the crawler or touch the data.
 
+Every e-mail opens with an "Open Dashboard" button straight to the live site
+(`DASHBOARD_URL` at the top of `gmail_alert.py`), then a row of KPI tiles
+(Successful / Failed / Unprocessed / Recovered / Data Changes) and the run's
+timing. It is not a scheme-by-scheme status report: the table that follows
+lists only what actually changed since the last report (Scheme, Row, Field,
+Old → New, Change), color-coded green/red - the detail the report is forwarded
+for, with nothing to wade through to find it.
+
 ## Execution logs
 
 Every run of `run_daily.sh` creates **its own log**, never reused and never
