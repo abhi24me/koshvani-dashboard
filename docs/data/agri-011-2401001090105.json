@@ -5,7 +5,7 @@
   "scheme_code": "2401001090105",
   "district": "G.B.NAGAR",
   "fin_year": "2026-2027",
-  "generated_at": "2026-10-05T00:37:39+00:00",
+  "generated_at": "2026-10-06T00:07:38+00:00",
   "status": "ok",
   "message": null,
   "prev_month": "September",
@@ -40,8 +40,8 @@
         "N",
         "V",
         "449600.00",
-        "385901.00",
-        "40775.00",
+        "426676.00",
+        "0.00",
         "426676.00",
         "94.90"
       ]
@@ -53,8 +53,8 @@
         "N",
         "V",
         "270000.00",
-        "0.00",
         "60150.00",
+        "0.00",
         "60150.00",
         "22.28"
       ]
@@ -66,8 +66,8 @@
         "N",
         "V",
         "154800.00",
-        "57600.00",
-        "53200.00",
+        "110800.00",
+        "0.00",
         "110800.00",
         "71.58"
       ]
@@ -75,8 +75,8 @@
   ],
   "totals": {
     "progressive_allotment": 874400.0,
-    "expenditure_upto_prev_month": 443501.0,
-    "current_month_expenditure": 154125.0,
+    "expenditure_upto_prev_month": 597626.0,
+    "current_month_expenditure": 0.0,
     "total_expenditure_upto_month": 597626.0,
     "pct_expenditure_of_allotment": 68.35
   }
