@@ -1,0 +1,532 @@
+
+2026-10-09 07:59:13 INFO  [run_daily] ========================================
+2026-10-09 07:59:13 INFO  [run_daily] KOSHVANI JOB STARTED
+2026-10-09 07:59:13 INFO  [run_daily] execution_id=20261009-075913-5ecb4d log=logs/daily-2026-10-09-075913.log
+2026-10-09 07:59:13 INFO  [run_daily] host: Linux 5.15.178-android13-8-g8805f47e70a8-ab36 | Python 3.14.6 | git version 2.55.0
+2026-10-09 07:59:13 INFO  [run_daily] repo: branch=main HEAD=f1abca1 dir=/data/data/com.termux/files/home/koshvani-dashboard
+2026-10-09 07:59:13 INFO  [run_daily] ========================================
+
+2026-10-09 07:59:14 INFO  [run_daily] [1/6] Checking Git status...
+?? logs/daily-2026-10-09-075913.log
+
+2026-10-09 07:59:14 INFO  [run_daily] [2/6] Pulling latest code from GitHub...
+2026-10-09 07:59:14 INFO  [run_daily] GIT pull --rebase: START
+From https://github.com/abhi24me/koshvani-dashboard
+ * branch            main       -> FETCH_HEAD
+Already up to date.
+2026-10-09 07:59:15 INFO  [run_daily] GIT pull --rebase: END exit_code=0 elapsed=1s
+2026-10-09 07:59:15 INFO  [run_daily] Git pull successful.
+
+2026-10-09 07:59:15 INFO  [run_daily] [3/6] Starting Koshvani scraper...
+2026-10-09 07:59:17.766 INFO  [MainThread] ==================================================
+2026-10-09 07:59:17.769 INFO  [MainThread] KOSHVANI CRAWLER START
+2026-10-09 07:59:17.770 INFO  [MainThread] Execution ID: 20261009-075913-5ecb4d
+2026-10-09 07:59:17.770 INFO  [MainThread] Python 3.14.6 | requests 2.34.2 | time zone offset +0530
+2026-10-09 07:59:17.773 INFO  [MainThread] Config: schemes=24 workers=4 max_attempts=3 retry_delays=5-15s/15-30s request_timeout=45s stagger=4+0-2s bounce_hold=60-120s cooldown_rounds=2x300s
+2026-10-09 07:59:17.776 INFO  [MainThread] STATUS RESET execution_id=20261009-075913-5ecb4d schemes=24 all set to status=0 [crawler_status.json 2366 bytes, 3 ms]
+2026-10-09 07:59:17.861 INFO  [MainThread] FILE WRITE index.json 14351 bytes 49 ms | overall=RUNNING successful=0 failed=0 unprocessed=24
+2026-10-09 07:59:17.885 INFO  [worker_0] [01/24 2401000010500] SCHEME START कृषि विभाग — जिला संगठन (Grant 011) (worker=worker_0)
+2026-10-09 07:59:17.886 INFO  [worker_0] [01/24 2401000010500] Attempt 1/3 START
+2026-10-09 07:59:17.895 INFO  [worker_1] [02/24 2401001020103] SCHEME START फूड एण्ड न्यूट्रिशन सिक्यूरिटी (कृषि उन्नति योजना) (के.60/रा.40-के.+ रा.) (Grant 011) (worker=worker_1)
+2026-10-09 07:59:17.896 INFO  [worker_1] [02/24 2401001020103] Start stagger: waiting 5.1s so workers do not hit the portal together
+2026-10-09 07:59:17.913 INFO  [worker_2] [03/24 2401001020129] SCHEME START मिशन फार आत्मनिर्भरता इन पल्सेस (के.60/रा.40-के.+रा.) (Grant 011) (worker=worker_2)
+2026-10-09 07:59:17.913 INFO  [worker_2] [03/24 2401001020129] Start stagger: waiting 10.1s so workers do not hit the portal together
+2026-10-09 07:59:17.919 INFO  [worker_3] [04/24 2401001030300] SCHEME START प्रयोगात्मक प्रक्षेत्र प्रदर्शन और बीज बर्द्धन प्रक्षेत्र (Grant 011) (worker=worker_3)
+2026-10-09 07:59:17.920 INFO  [worker_3] [04/24 2401001030300] Start stagger: waiting 14.6s so workers do not hit the portal together
+2026-10-09 07:59:17.938 INFO  [worker_0] [01/24 2401000010500] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-10-09 07:59:18.901 INFO  [worker_0] [01/24 2401000010500] HTTP GET main page (KoshvaniStatic.aspx) END status=200 bytes=32533 elapsed=0.96s
+2026-10-09 07:59:19.069 INFO  [worker_0] [01/24 2401000010500] HTTP GET grant list (ExpGrant.aspx) START
+2026-10-09 07:59:19.534 INFO  [worker_0] [01/24 2401000010500] HTTP GET grant list (ExpGrant.aspx) END status=200 bytes=112750 elapsed=0.46s
+2026-10-09 07:59:19.837 INFO  [worker_0] [01/24 2401000010500] HTTP GET scheme list (Extra_plnDept.aspx) START
+2026-10-09 07:59:23.014 INFO  [worker_1] [02/24 2401001020103] Attempt 1/3 START
+2026-10-09 07:59:23.052 INFO  [worker_1] [02/24 2401001020103] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-10-09 07:59:23.972 INFO  [worker_1] [02/24 2401001020103] HTTP GET main page (KoshvaniStatic.aspx) END status=200 bytes=32533 elapsed=0.92s
+2026-10-09 07:59:24.018 INFO  [worker_1] [02/24 2401001020103] HTTP GET grant list (ExpGrant.aspx) START
+2026-10-09 07:59:24.580 INFO  [worker_1] [02/24 2401001020103] HTTP GET grant list (ExpGrant.aspx) END status=200 bytes=112750 elapsed=0.56s
+2026-10-09 07:59:24.860 INFO  [worker_1] [02/24 2401001020103] HTTP GET scheme list (Extra_plnDept.aspx) START
+2026-10-09 07:59:27.979 INFO  [worker_2] [03/24 2401001020129] Attempt 1/3 START
+2026-10-09 07:59:28.004 INFO  [worker_2] [03/24 2401001020129] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-10-09 07:59:28.667 INFO  [worker_2] [03/24 2401001020129] HTTP GET main page (KoshvaniStatic.aspx) END status=200 bytes=32533 elapsed=0.66s
+2026-10-09 07:59:28.773 INFO  [worker_2] [03/24 2401001020129] HTTP GET grant list (ExpGrant.aspx) START
+2026-10-09 07:59:29.206 INFO  [worker_2] [03/24 2401001020129] HTTP GET grant list (ExpGrant.aspx) END status=200 bytes=112750 elapsed=0.43s
+2026-10-09 07:59:29.470 INFO  [worker_2] [03/24 2401001020129] HTTP GET scheme list (Extra_plnDept.aspx) START
+2026-10-09 07:59:30.535 INFO  [worker_0] [01/24 2401000010500] HTTP GET scheme list (Extra_plnDept.aspx) END status=200 bytes=727033 elapsed=10.70s redirects=1 final=ExpHead.aspx
+2026-10-09 07:59:32.085 INFO  [worker_1] [02/24 2401001020103] HTTP GET scheme list (Extra_plnDept.aspx) END status=200 bytes=727033 elapsed=7.22s redirects=1 final=ExpHead.aspx
+2026-10-09 07:59:32.488 INFO  [worker_3] [04/24 2401001030300] Attempt 1/3 START
+2026-10-09 07:59:32.537 INFO  [worker_3] [04/24 2401001030300] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-10-09 07:59:33.572 INFO  [worker_3] [04/24 2401001030300] HTTP GET main page (KoshvaniStatic.aspx) END status=200 bytes=32533 elapsed=1.02s
+2026-10-09 07:59:33.824 INFO  [worker_3] [04/24 2401001030300] HTTP GET grant list (ExpGrant.aspx) START
+2026-10-09 07:59:34.251 INFO  [worker_0] [01/24 2401000010500] HTTP GET scheme report (Extra_plnDept.aspx) START
+2026-10-09 07:59:34.351 INFO  [worker_3] [04/24 2401001030300] HTTP GET grant list (ExpGrant.aspx) END status=200 bytes=112750 elapsed=0.52s
+2026-10-09 07:59:35.379 INFO  [worker_3] [04/24 2401001030300] HTTP GET scheme list (Extra_plnDept.aspx) START
+2026-10-09 07:59:36.344 INFO  [worker_2] [03/24 2401001020129] HTTP GET scheme list (Extra_plnDept.aspx) END status=200 bytes=727033 elapsed=6.87s redirects=1 final=ExpHead.aspx
+2026-10-09 07:59:36.747 INFO  [worker_1] [02/24 2401001020103] HTTP GET scheme report (Extra_plnDept.aspx) START
+2026-10-09 07:59:38.753 INFO  [worker_2] [03/24 2401001020129] HTTP GET scheme report (Extra_plnDept.aspx) START
+2026-10-09 07:59:40.978 INFO  [worker_1] [02/24 2401001020103] HTTP GET scheme report (Extra_plnDept.aspx) END status=200 bytes=170573 elapsed=4.23s redirects=1 final=ExpTreas.aspx
+2026-10-09 07:59:41.504 INFO  [worker_1] [02/24 2401001020103] PARSE report table: columns=9 district_rows=2 fin_year=2026-2027 months={'prev_month': 'September', 'current_month': 'October'}
+2026-10-09 07:59:41.505 INFO  [worker_1] [02/24 2401001020103] VALIDATE ok status=ok rows=2
+2026-10-09 07:59:41.513 INFO  [worker_1] [02/24 2401001020103] FILE WRITE agri-011-2401001020103.json 1582 bytes 3 ms (status=ok, rows=2)
+2026-10-09 07:59:41.516 INFO  [worker_1] [02/24 2401001020103] STATUS UPDATE scheme=2401001020103 status=1 attempts=1 remark='' [crawler_status.json 2366 bytes, 2 ms]
+2026-10-09 07:59:41.516 INFO  [worker_1] [02/24 2401001020103] Attempt 1/3 succeeded in 18.50s
+2026-10-09 07:59:41.517 INFO  [worker_1] [02/24 2401001020103] SCHEME DONE status=1 attempts=1 elapsed=23.62s worker=worker_1
+2026-10-09 07:59:41.517 INFO  [worker_1] [05/24 2401001030500] SCHEME START संकर बीजों के उपयोग को बढ़ावा देने की योजना (Grant 011) (worker=worker_1)
+2026-10-09 07:59:41.517 INFO  [worker_1] [05/24 2401001030500] Attempt 1/3 START
+2026-10-09 07:59:41.528 INFO  [MainThread] FILE WRITE index.json 14351 bytes 3 ms | overall=RUNNING successful=1 failed=0 unprocessed=23
+2026-10-09 07:59:41.540 INFO  [worker_1] [05/24 2401001030500] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-10-09 07:59:42.668 INFO  [worker_2] [03/24 2401001020129] HTTP GET scheme report (Extra_plnDept.aspx) END status=200 bytes=161725 elapsed=3.91s redirects=1 final=ExpTreas.aspx
+2026-10-09 07:59:42.723 INFO  [worker_1] [05/24 2401001030500] HTTP GET main page (KoshvaniStatic.aspx) END status=200 bytes=32533 elapsed=1.18s
+2026-10-09 07:59:42.907 INFO  [worker_1] [05/24 2401001030500] HTTP GET grant list (ExpGrant.aspx) START
+2026-10-09 07:59:42.943 INFO  [worker_3] [04/24 2401001030300] HTTP GET scheme list (Extra_plnDept.aspx) END status=200 bytes=727033 elapsed=7.56s redirects=1 final=ExpHead.aspx
+2026-10-09 07:59:43.469 INFO  [worker_1] [05/24 2401001030500] HTTP GET grant list (ExpGrant.aspx) END status=200 bytes=112750 elapsed=0.56s
+2026-10-09 07:59:44.381 INFO  [worker_2] [03/24 2401001020129] PARSE report table: columns=9 district_rows=3 fin_year=2026-2027 months={'prev_month': 'September', 'current_month': 'October'}
+2026-10-09 07:59:44.393 INFO  [worker_2] [03/24 2401001020129] VALIDATE ok status=ok rows=3
+2026-10-09 07:59:44.532 INFO  [worker_2] [03/24 2401001020129] FILE WRITE agri-011-2401001020129.json 1816 bytes 117 ms (status=ok, rows=3)
+2026-10-09 07:59:44.711 INFO  [worker_2] [03/24 2401001020129] STATUS UPDATE scheme=2401001020129 status=1 attempts=1 remark='' [crawler_status.json 2366 bytes, 167 ms]
+2026-10-09 07:59:44.714 INFO  [worker_1] [05/24 2401001030500] HTTP GET scheme list (Extra_plnDept.aspx) START
+2026-10-09 07:59:44.723 INFO  [worker_2] [03/24 2401001020129] Attempt 1/3 succeeded in 16.74s
+2026-10-09 07:59:44.783 INFO  [worker_2] [03/24 2401001020129] SCHEME DONE status=1 attempts=1 elapsed=26.81s worker=worker_2
+2026-10-09 07:59:44.784 INFO  [worker_2] [06/24 2401001030600] SCHEME START उत्तर प्रदेश मिलेट्स पुनरोद्धार कार्यक्रम (Grant 011) (worker=worker_2)
+2026-10-09 07:59:44.785 INFO  [worker_2] [06/24 2401001030600] Start stagger: waiting 0.9s so workers do not hit the portal together
+2026-10-09 07:59:45.333 INFO  [MainThread] FILE WRITE index.json 14351 bytes 79 ms | overall=RUNNING successful=2 failed=0 unprocessed=22
+2026-10-09 07:59:46.135 INFO  [worker_2] [06/24 2401001030600] Attempt 1/3 START
+2026-10-09 07:59:46.181 INFO  [worker_2] [06/24 2401001030600] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-10-09 07:59:47.050 INFO  [worker_3] [04/24 2401001030300] HTTP GET scheme report (Extra_plnDept.aspx) START
+2026-10-09 07:59:47.060 INFO  [worker_2] [06/24 2401001030600] HTTP GET main page (KoshvaniStatic.aspx) END status=200 bytes=32533 elapsed=0.87s
+2026-10-09 07:59:47.111 INFO  [worker_2] [06/24 2401001030600] HTTP GET grant list (ExpGrant.aspx) START
+2026-10-09 07:59:47.468 INFO  [worker_2] [06/24 2401001030600] HTTP GET grant list (ExpGrant.aspx) END status=200 bytes=112750 elapsed=0.36s
+2026-10-09 07:59:47.708 INFO  [worker_2] [06/24 2401001030600] HTTP GET scheme list (Extra_plnDept.aspx) START
+2026-10-09 07:59:51.901 INFO  [worker_1] [05/24 2401001030500] HTTP GET scheme list (Extra_plnDept.aspx) END status=200 bytes=727033 elapsed=7.16s redirects=1 final=ExpHead.aspx
+2026-10-09 07:59:53.993 INFO  [worker_0] [01/24 2401000010500] HTTP GET scheme report (Extra_plnDept.aspx) END status=200 bytes=602618 elapsed=19.74s redirects=1 final=ExpTreas.aspx
+2026-10-09 07:59:54.251 INFO  [worker_1] [05/24 2401001030500] HTTP GET scheme report (Extra_plnDept.aspx) START
+2026-10-09 07:59:55.125 INFO  [worker_2] [06/24 2401001030600] HTTP GET scheme list (Extra_plnDept.aspx) END status=200 bytes=727033 elapsed=7.42s redirects=1 final=ExpHead.aspx
+2026-10-09 07:59:55.785 INFO  [worker_1] [05/24 2401001030500] HTTP GET scheme report (Extra_plnDept.aspx) END status=200 bytes=83678 elapsed=1.53s redirects=1 final=ExpTreas.aspx
+2026-10-09 07:59:56.678 INFO  [worker_1] [05/24 2401001030500] PARSE report table: columns=9 district_rows=1 fin_year=2026-2027 months={'prev_month': 'September', 'current_month': 'October'}
+2026-10-09 07:59:56.679 INFO  [worker_1] [05/24 2401001030500] VALIDATE ok status=ok rows=1
+2026-10-09 07:59:56.737 INFO  [worker_1] [05/24 2401001030500] FILE WRITE agri-011-2401001030500.json 1312 bytes 54 ms (status=ok, rows=1)
+2026-10-09 07:59:56.845 INFO  [worker_1] [05/24 2401001030500] STATUS UPDATE scheme=2401001030500 status=1 attempts=1 remark='' [crawler_status.json 2366 bytes, 107 ms]
+2026-10-09 07:59:56.856 INFO  [worker_1] [05/24 2401001030500] Attempt 1/3 succeeded in 15.34s
+2026-10-09 07:59:56.867 INFO  [worker_1] [05/24 2401001030500] SCHEME DONE status=1 attempts=1 elapsed=15.34s worker=worker_1
+2026-10-09 07:59:56.879 INFO  [worker_1] [07/24 2401001070300] SCHEME START पौध संरक्षण सेवा तथा कृषि रक्षा सेवा (Grant 011) (worker=worker_1)
+2026-10-09 07:59:56.885 INFO  [worker_1] [07/24 2401001070300] Attempt 1/3 START
+2026-10-09 07:59:56.953 INFO  [worker_1] [07/24 2401001070300] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-10-09 07:59:58.334 INFO  [worker_1] [07/24 2401001070300] HTTP GET main page (KoshvaniStatic.aspx) END status=200 bytes=32533 elapsed=1.36s
+2026-10-09 07:59:58.355 INFO  [worker_3] [04/24 2401001030300] HTTP GET scheme report (Extra_plnDept.aspx) END status=200 bytes=346925 elapsed=11.30s redirects=1 final=ExpTreas.aspx
+2026-10-09 07:59:58.902 INFO  [MainThread] FILE WRITE index.json 14351 bytes 254 ms | overall=RUNNING successful=3 failed=0 unprocessed=21
+2026-10-09 07:59:59.045 INFO  [worker_1] [07/24 2401001070300] HTTP GET grant list (ExpGrant.aspx) START
+2026-10-09 07:59:59.752 INFO  [worker_1] [07/24 2401001070300] HTTP GET grant list (ExpGrant.aspx) END status=200 bytes=112750 elapsed=0.70s
+2026-10-09 08:00:02.023 INFO  [worker_1] [07/24 2401001070300] HTTP GET scheme list (Extra_plnDept.aspx) START
+2026-10-09 08:00:05.420 INFO  [worker_0] [01/24 2401000010500] PARSE report table: columns=9 district_rows=17 fin_year=2026-2027 months={'prev_month': 'September', 'current_month': 'October'}
+2026-10-09 08:00:05.429 INFO  [worker_0] [01/24 2401000010500] VALIDATE ok status=ok rows=17
+2026-10-09 08:00:05.610 INFO  [worker_0] [01/24 2401000010500] FILE WRITE agri-011-2401000010500.json 4989 bytes 123 ms (status=ok, rows=17)
+2026-10-09 08:00:05.780 INFO  [worker_0] [01/24 2401000010500] STATUS UPDATE scheme=2401000010500 status=1 attempts=1 remark='' [crawler_status.json 2366 bytes, 141 ms]
+2026-10-09 08:00:05.797 INFO  [worker_0] [01/24 2401000010500] Attempt 1/3 succeeded in 47.91s
+2026-10-09 08:00:05.808 INFO  [worker_0] [01/24 2401000010500] SCHEME DONE status=1 attempts=1 elapsed=47.91s worker=worker_0
+2026-10-09 08:00:05.821 INFO  [worker_0] [08/24 2401001070400] SCHEME START विभिन्न परिस्थितिकी संसाधनों द्वारा कीट / रोग नियंत्रण (Grant 011) (worker=worker_0)
+2026-10-09 08:00:05.832 INFO  [worker_0] [08/24 2401001070400] Attempt 1/3 START
+2026-10-09 08:00:05.927 INFO  [worker_0] [08/24 2401001070400] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-10-09 08:00:06.717 INFO  [worker_2] [06/24 2401001030600] HTTP GET scheme report (Extra_plnDept.aspx) START
+2026-10-09 08:00:06.975 INFO  [worker_3] [04/24 2401001030300] PARSE report table: columns=9 district_rows=11 fin_year=2026-2027 months={'prev_month': 'September', 'current_month': 'October'}
+2026-10-09 08:00:06.976 INFO  [worker_3] [04/24 2401001030300] VALIDATE ok status=ok rows=11
+2026-10-09 08:00:06.985 INFO  [worker_3] [04/24 2401001030300] FILE WRITE agri-011-2401001030300.json 3485 bytes 3 ms (status=ok, rows=11)
+2026-10-09 08:00:06.990 INFO  [worker_3] [04/24 2401001030300] STATUS UPDATE scheme=2401001030300 status=1 attempts=1 remark='' [crawler_status.json 2366 bytes, 4 ms]
+2026-10-09 08:00:06.990 INFO  [worker_3] [04/24 2401001030300] Attempt 1/3 succeeded in 34.50s
+2026-10-09 08:00:06.990 INFO  [worker_3] [04/24 2401001030300] SCHEME DONE status=1 attempts=1 elapsed=49.07s worker=worker_3
+2026-10-09 08:00:06.991 INFO  [worker_3] [09/24 2401001090103] SCHEME START नेशनल मिशन ऑन एग्रीकल्चर एक्सटेंशन एण्ड टेक्नोलाजी (एन.एम.ए.ई.टी.) के अर्न्तगत सबमिशन ऑन एग्रीकल्चर एक्स्टेंशन (के.60/रा.40-के.+ रा.) (Grant 011) (worker=worker_3)
+2026-10-09 08:00:06.991 INFO  [worker_3] [09/24 2401001090103] Start stagger: waiting 2.9s so workers do not hit the portal together
+2026-10-09 08:00:06.994 INFO  [MainThread] FILE WRITE index.json 14351 bytes 7 ms | overall=RUNNING successful=4 failed=0 unprocessed=20
+2026-10-09 08:00:07.013 INFO  [MainThread] FILE WRITE index.json 14351 bytes 4 ms | overall=RUNNING successful=5 failed=0 unprocessed=19
+2026-10-09 08:00:07.030 INFO  [worker_0] [08/24 2401001070400] HTTP GET main page (KoshvaniStatic.aspx) END status=200 bytes=32533 elapsed=1.09s
+2026-10-09 08:00:07.083 INFO  [worker_0] [08/24 2401001070400] HTTP GET grant list (ExpGrant.aspx) START
+2026-10-09 08:00:07.716 INFO  [worker_0] [08/24 2401001070400] HTTP GET grant list (ExpGrant.aspx) END status=200 bytes=112750 elapsed=0.63s
+2026-10-09 08:00:07.970 INFO  [worker_0] [08/24 2401001070400] HTTP GET scheme list (Extra_plnDept.aspx) START
+2026-10-09 08:00:09.803 INFO  [worker_2] [06/24 2401001030600] HTTP GET scheme report (Extra_plnDept.aspx) END status=200 bytes=130887 elapsed=3.08s redirects=1 final=ExpTreas.aspx
+2026-10-09 08:00:09.885 INFO  [worker_1] [07/24 2401001070300] HTTP GET scheme list (Extra_plnDept.aspx) END status=200 bytes=727033 elapsed=7.85s redirects=1 final=ExpHead.aspx
+2026-10-09 08:00:09.910 INFO  [worker_3] [09/24 2401001090103] Attempt 1/3 START
+2026-10-09 08:00:09.960 INFO  [worker_3] [09/24 2401001090103] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-10-09 08:00:10.574 INFO  [worker_2] [06/24 2401001030600] PARSE report table: columns=9 district_rows=2 fin_year=2026-2027 months={'prev_month': 'September', 'current_month': 'October'}
+2026-10-09 08:00:10.581 INFO  [worker_2] [06/24 2401001030600] VALIDATE ok status=ok rows=2
+2026-10-09 08:00:10.659 INFO  [worker_2] [06/24 2401001030600] FILE WRITE agri-011-2401001030600.json 1630 bytes 56 ms (status=ok, rows=2)
+2026-10-09 08:00:10.749 INFO  [worker_2] [06/24 2401001030600] STATUS UPDATE scheme=2401001030600 status=1 attempts=1 remark='' [crawler_status.json 2366 bytes, 83 ms]
+2026-10-09 08:00:10.757 INFO  [worker_2] [06/24 2401001030600] Attempt 1/3 succeeded in 24.62s
+2026-10-09 08:00:10.765 INFO  [worker_2] [06/24 2401001030600] SCHEME DONE status=1 attempts=1 elapsed=25.97s worker=worker_2
+2026-10-09 08:00:10.772 INFO  [worker_2] [10/24 2401001090104] SCHEME START नेशनल मिशन ऑन एग्रीकल्चर एक्सटेंशन एण्ड टेक्नोलाजी (एन.एम.ए.ई.टी.) के अर्न्तगत सबमिशन आफ एग्रीकल्चर मेकेनाइजेशन (के.60/रा.40-के.+ रा.) (Grant 011) (worker=worker_2)
+2026-10-09 08:00:10.792 INFO  [worker_2] [10/24 2401001090104] Start stagger: waiting 4.6s so workers do not hit the portal together
+2026-10-09 08:00:11.072 INFO  [worker_3] [09/24 2401001090103] HTTP GET main page (KoshvaniStatic.aspx) END status=200 bytes=32533 elapsed=1.10s
+2026-10-09 08:00:11.629 INFO  [worker_3] [09/24 2401001090103] HTTP GET grant list (ExpGrant.aspx) START
+2026-10-09 08:00:12.007 INFO  [MainThread] FILE WRITE index.json 14351 bytes 125 ms | overall=RUNNING successful=6 failed=0 unprocessed=18
+2026-10-09 08:00:12.235 INFO  [worker_3] [09/24 2401001090103] HTTP GET grant list (ExpGrant.aspx) END status=200 bytes=112750 elapsed=0.60s
+2026-10-09 08:00:14.441 INFO  [worker_3] [09/24 2401001090103] HTTP GET scheme list (Extra_plnDept.aspx) START
+2026-10-09 08:00:14.937 INFO  [worker_1] [07/24 2401001070300] HTTP GET scheme report (Extra_plnDept.aspx) START
+2026-10-09 08:00:15.449 INFO  [worker_2] [10/24 2401001090104] Attempt 1/3 START
+2026-10-09 08:00:15.487 INFO  [worker_2] [10/24 2401001090104] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-10-09 08:00:16.373 INFO  [worker_2] [10/24 2401001090104] HTTP GET main page (KoshvaniStatic.aspx) END status=200 bytes=32533 elapsed=0.89s
+2026-10-09 08:00:16.428 INFO  [worker_2] [10/24 2401001090104] HTTP GET grant list (ExpGrant.aspx) START
+2026-10-09 08:00:16.784 INFO  [worker_0] [08/24 2401001070400] HTTP GET scheme list (Extra_plnDept.aspx) END status=200 bytes=727033 elapsed=8.81s redirects=1 final=ExpHead.aspx
+2026-10-09 08:00:16.977 INFO  [worker_2] [10/24 2401001090104] HTTP GET grant list (ExpGrant.aspx) END status=200 bytes=112750 elapsed=0.55s
+2026-10-09 08:00:17.794 INFO  [worker_2] [10/24 2401001090104] HTTP GET scheme list (Extra_plnDept.aspx) START
+2026-10-09 08:00:19.505 INFO  [worker_0] [08/24 2401001070400] HTTP GET scheme report (Extra_plnDept.aspx) START
+2026-10-09 08:00:22.021 INFO  [worker_3] [09/24 2401001090103] HTTP GET scheme list (Extra_plnDept.aspx) END status=200 bytes=727033 elapsed=7.58s redirects=1 final=ExpHead.aspx
+2026-10-09 08:00:24.103 INFO  [worker_3] [09/24 2401001090103] HTTP GET scheme report (Extra_plnDept.aspx) START
+2026-10-09 08:00:25.365 INFO  [worker_2] [10/24 2401001090104] HTTP GET scheme list (Extra_plnDept.aspx) END status=200 bytes=727033 elapsed=7.57s redirects=1 final=ExpHead.aspx
+2026-10-09 08:00:27.820 INFO  [worker_3] [09/24 2401001090103] HTTP GET scheme report (Extra_plnDept.aspx) END status=200 bytes=158546 elapsed=3.72s redirects=1 final=ExpTreas.aspx
+2026-10-09 08:00:28.095 INFO  [worker_2] [10/24 2401001090104] HTTP GET scheme report (Extra_plnDept.aspx) START
+2026-10-09 08:00:28.572 INFO  [worker_3] [09/24 2401001090103] PARSE report table: columns=9 district_rows=3 fin_year=2026-2027 months={'prev_month': 'September', 'current_month': 'October'}
+2026-10-09 08:00:28.573 INFO  [worker_3] [09/24 2401001090103] VALIDATE ok status=ok rows=3
+2026-10-09 08:00:28.587 INFO  [worker_3] [09/24 2401001090103] FILE WRITE agri-011-2401001090103.json 2059 bytes 8 ms (status=ok, rows=3)
+2026-10-09 08:00:28.590 INFO  [worker_3] [09/24 2401001090103] STATUS UPDATE scheme=2401001090103 status=1 attempts=1 remark='' [crawler_status.json 2366 bytes, 2 ms]
+2026-10-09 08:00:28.590 INFO  [worker_3] [09/24 2401001090103] Attempt 1/3 succeeded in 18.67s
+2026-10-09 08:00:28.590 INFO  [worker_3] [09/24 2401001090103] SCHEME DONE status=1 attempts=1 elapsed=21.60s worker=worker_3
+2026-10-09 08:00:28.591 INFO  [worker_3] [11/24 2401001090105] SCHEME START नेशनल मिशन ऑन एग्रीकल्चर एक्सटेंशन एण्ड टेक्नोलाजी (एन.एम.ए.ई.टी.) के अर्न्तगत नेशनल ई-गर्वनेन्स प्रोग्राम (के.60/रा.40-के.+ रा.) (Grant 011) (worker=worker_3)
+2026-10-09 08:00:28.591 INFO  [worker_3] [11/24 2401001090105] Attempt 1/3 START
+2026-10-09 08:00:28.616 INFO  [worker_3] [11/24 2401001090105] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-10-09 08:00:28.625 INFO  [MainThread] FILE WRITE index.json 14351 bytes 4 ms | overall=RUNNING successful=7 failed=0 unprocessed=17
+2026-10-09 08:00:29.364 INFO  [worker_3] [11/24 2401001090105] HTTP GET main page (KoshvaniStatic.aspx) END status=200 bytes=32533 elapsed=0.75s
+2026-10-09 08:00:29.420 INFO  [worker_3] [11/24 2401001090105] HTTP GET grant list (ExpGrant.aspx) START
+2026-10-09 08:00:29.738 INFO  [worker_2] [10/24 2401001090104] HTTP GET scheme report (Extra_plnDept.aspx) END status=200 bytes=87550 elapsed=1.64s redirects=1 final=ExpTreas.aspx
+2026-10-09 08:00:29.927 INFO  [worker_3] [11/24 2401001090105] HTTP GET grant list (ExpGrant.aspx) END status=200 bytes=112750 elapsed=0.51s
+2026-10-09 08:00:29.951 INFO  [worker_2] [10/24 2401001090104] PARSE report table: columns=9 district_rows=1 fin_year=2026-2027 months={'prev_month': 'September', 'current_month': 'October'}
+2026-10-09 08:00:29.958 INFO  [worker_2] [10/24 2401001090104] VALIDATE ok status=ok rows=1
+2026-10-09 08:00:30.030 INFO  [worker_2] [10/24 2401001090104] FILE WRITE agri-011-2401001090104.json 1536 bytes 56 ms (status=ok, rows=1)
+2026-10-09 08:00:30.082 INFO  [worker_2] [10/24 2401001090104] STATUS UPDATE scheme=2401001090104 status=1 attempts=1 remark='' [crawler_status.json 2366 bytes, 45 ms]
+2026-10-09 08:00:30.089 INFO  [worker_2] [10/24 2401001090104] Attempt 1/3 succeeded in 14.64s
+2026-10-09 08:00:30.095 INFO  [worker_2] [10/24 2401001090104] SCHEME DONE status=1 attempts=1 elapsed=19.32s worker=worker_2
+2026-10-09 08:00:30.102 INFO  [worker_2] [12/24 2401001090300] SCHEME START कृषि प्रसार प्रायोजना तथा प्रदर्शनियां (Grant 011) (worker=worker_2)
+2026-10-09 08:00:30.109 INFO  [worker_2] [12/24 2401001090300] Start stagger: waiting 3.8s so workers do not hit the portal together
+2026-10-09 08:00:30.234 INFO  [worker_3] [11/24 2401001090105] HTTP GET scheme list (Extra_plnDept.aspx) START
+2026-10-09 08:00:30.272 INFO  [MainThread] FILE WRITE index.json 14357 bytes 12 ms | overall=RUNNING successful=8 failed=0 unprocessed=16
+2026-10-09 08:00:33.871 INFO  [worker_2] [12/24 2401001090300] Attempt 1/3 START
+2026-10-09 08:00:33.905 INFO  [worker_2] [12/24 2401001090300] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-10-09 08:00:34.309 INFO  [worker_0] [08/24 2401001070400] HTTP GET scheme report (Extra_plnDept.aspx) END status=200 bytes=445678 elapsed=14.80s redirects=1 final=ExpTreas.aspx
+2026-10-09 08:00:34.769 INFO  [worker_2] [12/24 2401001090300] HTTP GET main page (KoshvaniStatic.aspx) END status=200 bytes=32533 elapsed=0.86s
+2026-10-09 08:00:34.924 INFO  [worker_2] [12/24 2401001090300] HTTP GET grant list (ExpGrant.aspx) START
+2026-10-09 08:00:35.319 INFO  [worker_2] [12/24 2401001090300] HTTP GET grant list (ExpGrant.aspx) END status=200 bytes=112750 elapsed=0.39s
+2026-10-09 08:00:37.068 INFO  [worker_2] [12/24 2401001090300] HTTP GET scheme list (Extra_plnDept.aspx) START
+2026-10-09 08:00:37.163 INFO  [worker_0] [08/24 2401001070400] PARSE report table: columns=9 district_rows=10 fin_year=2026-2027 months={'prev_month': 'September', 'current_month': 'October'}
+2026-10-09 08:00:37.165 INFO  [worker_0] [08/24 2401001070400] VALIDATE ok status=ok rows=10
+2026-10-09 08:00:37.179 INFO  [worker_0] [08/24 2401001070400] FILE WRITE agri-011-2401001070400.json 3613 bytes 8 ms (status=ok, rows=10)
+2026-10-09 08:00:37.181 INFO  [worker_0] [08/24 2401001070400] STATUS UPDATE scheme=2401001070400 status=1 attempts=1 remark='' [crawler_status.json 2366 bytes, 2 ms]
+2026-10-09 08:00:37.182 INFO  [worker_0] [08/24 2401001070400] Attempt 1/3 succeeded in 31.33s
+2026-10-09 08:00:37.182 INFO  [worker_0] [08/24 2401001070400] SCHEME DONE status=1 attempts=1 elapsed=31.36s worker=worker_0
+2026-10-09 08:00:37.183 INFO  [worker_0] [13/24 2401001090700] SCHEME START कृषि उत्पादन में वृद्धि के लिए कृषि प्रसार, कृषि निवेश तथा तकनीकी प्रबंधन (Grant 011) (worker=worker_0)
+2026-10-09 08:00:37.183 INFO  [worker_0] [13/24 2401001090700] Start stagger: waiting 2.3s so workers do not hit the portal together
+2026-10-09 08:00:37.203 INFO  [MainThread] FILE WRITE index.json 14357 bytes 6 ms | overall=RUNNING successful=9 failed=0 unprocessed=15
+2026-10-09 08:00:38.372 INFO  [worker_3] [11/24 2401001090105] HTTP GET scheme list (Extra_plnDept.aspx) END status=200 bytes=727033 elapsed=8.14s redirects=1 final=ExpHead.aspx
+2026-10-09 08:00:38.405 INFO  [worker_1] [07/24 2401001070300] HTTP GET scheme report (Extra_plnDept.aspx) END status=200 bytes=693224 elapsed=23.47s redirects=1 final=ExpTreas.aspx
+2026-10-09 08:00:39.452 INFO  [worker_0] [13/24 2401001090700] Attempt 1/3 START
+2026-10-09 08:00:39.498 INFO  [worker_0] [13/24 2401001090700] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-10-09 08:00:40.613 INFO  [worker_0] [13/24 2401001090700] HTTP GET main page (KoshvaniStatic.aspx) END status=200 bytes=32533 elapsed=1.10s
+2026-10-09 08:00:42.192 INFO  [worker_0] [13/24 2401001090700] HTTP GET grant list (ExpGrant.aspx) START
+2026-10-09 08:00:42.735 INFO  [worker_0] [13/24 2401001090700] HTTP GET grant list (ExpGrant.aspx) END status=200 bytes=112750 elapsed=0.53s
+2026-10-09 08:00:44.627 INFO  [worker_0] [13/24 2401001090700] HTTP GET scheme list (Extra_plnDept.aspx) START
+2026-10-09 08:00:47.686 INFO  [worker_3] [11/24 2401001090105] HTTP GET scheme report (Extra_plnDept.aspx) START
+2026-10-09 08:00:47.841 INFO  [worker_2] [12/24 2401001090300] HTTP GET scheme list (Extra_plnDept.aspx) END status=200 bytes=727033 elapsed=10.77s redirects=1 final=ExpHead.aspx
+2026-10-09 08:00:49.861 INFO  [worker_1] [07/24 2401001070300] PARSE report table: columns=9 district_rows=17 fin_year=2026-2027 months={'prev_month': 'September', 'current_month': 'October'}
+2026-10-09 08:00:49.868 INFO  [worker_1] [07/24 2401001070300] VALIDATE ok status=ok rows=17
+2026-10-09 08:00:49.953 INFO  [worker_1] [07/24 2401001070300] FILE WRITE agri-011-2401001070300.json 5067 bytes 61 ms (status=ok, rows=17)
+2026-10-09 08:00:50.042 INFO  [worker_1] [07/24 2401001070300] STATUS UPDATE scheme=2401001070300 status=1 attempts=1 remark='' [crawler_status.json 2366 bytes, 82 ms]
+2026-10-09 08:00:50.049 INFO  [worker_1] [07/24 2401001070300] Attempt 1/3 succeeded in 53.14s
+2026-10-09 08:00:50.056 INFO  [worker_1] [07/24 2401001070300] SCHEME DONE status=1 attempts=1 elapsed=53.17s worker=worker_1
+2026-10-09 08:00:50.064 INFO  [worker_1] [14/24 2401001090900] SCHEME START प्रशिक्षित कृषि उद्यमी स्वावलंबन योजना (Grant 011) (worker=worker_1)
+2026-10-09 08:00:50.078 INFO  [worker_1] [14/24 2401001090900] Attempt 1/3 START
+2026-10-09 08:00:50.144 INFO  [worker_1] [14/24 2401001090900] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-10-09 08:00:51.073 INFO  [worker_1] [14/24 2401001090900] HTTP GET main page (KoshvaniStatic.aspx) END status=200 bytes=32533 elapsed=0.93s
+2026-10-09 08:00:51.216 INFO  [MainThread] FILE WRITE index.json 14358 bytes 153 ms | overall=RUNNING successful=10 failed=0 unprocessed=14
+2026-10-09 08:00:51.614 INFO  [worker_3] [11/24 2401001090105] HTTP GET scheme report (Extra_plnDept.aspx) END status=200 bytes=174738 elapsed=3.93s redirects=1 final=ExpTreas.aspx
+2026-10-09 08:00:51.677 INFO  [worker_0] [13/24 2401001090700] HTTP GET scheme list (Extra_plnDept.aspx) END status=200 bytes=727033 elapsed=7.05s redirects=1 final=ExpHead.aspx
+2026-10-09 08:00:51.746 INFO  [worker_1] [14/24 2401001090900] HTTP GET grant list (ExpGrant.aspx) START
+2026-10-09 08:00:52.992 INFO  [worker_1] [14/24 2401001090900] HTTP GET grant list (ExpGrant.aspx) END status=200 bytes=112750 elapsed=1.17s
+2026-10-09 08:00:54.761 INFO  [worker_1] [14/24 2401001090900] HTTP GET scheme list (Extra_plnDept.aspx) START
+2026-10-09 08:00:55.441 INFO  [worker_2] [12/24 2401001090300] HTTP GET scheme report (Extra_plnDept.aspx) START
+2026-10-09 08:00:55.838 INFO  [worker_3] [11/24 2401001090105] PARSE report table: columns=9 district_rows=3 fin_year=2026-2027 months={'prev_month': 'September', 'current_month': 'October'}
+2026-10-09 08:00:55.850 INFO  [worker_3] [11/24 2401001090105] VALIDATE ok status=ok rows=3
+2026-10-09 08:00:55.940 INFO  [worker_3] [11/24 2401001090105] FILE WRITE agri-011-2401001090105.json 2148 bytes 67 ms (status=ok, rows=3)
+2026-10-09 08:00:56.032 INFO  [worker_3] [11/24 2401001090105] STATUS UPDATE scheme=2401001090105 status=1 attempts=1 remark='' [crawler_status.json 2366 bytes, 85 ms]
+2026-10-09 08:00:56.039 INFO  [worker_3] [11/24 2401001090105] Attempt 1/3 succeeded in 27.45s
+2026-10-09 08:00:56.046 INFO  [worker_3] [11/24 2401001090105] SCHEME DONE status=1 attempts=1 elapsed=27.45s worker=worker_3
+2026-10-09 08:00:56.054 INFO  [worker_3] [15/24 2401001130104] SCHEME START प्रमोशन ऑफ एग्रीमल्चर मैकेनाइजेशन फार इनसीटू मैनेजमेंट ऑफ क्राप रेजडयू (CRM) (के.60/रा.40-के.+ रा.) (Grant 011) (worker=worker_3)
+2026-10-09 08:00:56.063 INFO  [worker_3] [15/24 2401001130104] Attempt 1/3 START
+2026-10-09 08:00:56.157 INFO  [worker_3] [15/24 2401001130104] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-10-09 08:00:57.081 INFO  [MainThread] FILE WRITE index.json 14358 bytes 112 ms | overall=RUNNING successful=11 failed=0 unprocessed=13
+2026-10-09 08:00:57.310 INFO  [worker_3] [15/24 2401001130104] HTTP GET main page (KoshvaniStatic.aspx) END status=200 bytes=32533 elapsed=1.15s
+2026-10-09 08:00:57.753 INFO  [worker_3] [15/24 2401001130104] HTTP GET grant list (ExpGrant.aspx) START
+2026-10-09 08:00:58.014 INFO  [worker_0] [13/24 2401001090700] HTTP GET scheme report (Extra_plnDept.aspx) START
+2026-10-09 08:00:58.765 INFO  [worker_3] [15/24 2401001130104] HTTP GET grant list (ExpGrant.aspx) END status=200 bytes=112750 elapsed=1.00s
+2026-10-09 08:00:59.015 INFO  [worker_3] [15/24 2401001130104] HTTP GET scheme list (Extra_plnDept.aspx) START
+2026-10-09 08:01:02.139 INFO  [worker_1] [14/24 2401001090900] HTTP GET scheme list (Extra_plnDept.aspx) END status=200 bytes=727033 elapsed=7.36s redirects=1 final=ExpHead.aspx
+2026-10-09 08:01:04.219 INFO  [worker_1] [14/24 2401001090900] HTTP GET scheme report (Extra_plnDept.aspx) START
+2026-10-09 08:01:05.667 INFO  [worker_0] [13/24 2401001090700] HTTP GET scheme report (Extra_plnDept.aspx) END status=200 bytes=249915 elapsed=7.65s redirects=1 final=ExpTreas.aspx
+2026-10-09 08:01:07.244 INFO  [worker_1] [14/24 2401001090900] HTTP GET scheme report (Extra_plnDept.aspx) END status=200 bytes=118206 elapsed=3.02s redirects=1 final=ExpTreas.aspx
+2026-10-09 08:01:07.776 INFO  [worker_0] [13/24 2401001090700] PARSE report table: columns=9 district_rows=5 fin_year=2026-2027 months={'prev_month': 'September', 'current_month': 'October'}
+2026-10-09 08:01:07.777 INFO  [worker_0] [13/24 2401001090700] VALIDATE ok status=ok rows=5
+2026-10-09 08:01:07.849 INFO  [worker_0] [13/24 2401001090700] FILE WRITE agri-011-2401001090700.json 2382 bytes 54 ms (status=ok, rows=5)
+2026-10-09 08:01:07.957 INFO  [worker_0] [13/24 2401001090700] STATUS UPDATE scheme=2401001090700 status=1 attempts=1 remark='' [crawler_status.json 2366 bytes, 102 ms]
+2026-10-09 08:01:07.965 INFO  [worker_0] [13/24 2401001090700] Attempt 1/3 succeeded in 28.51s
+2026-10-09 08:01:07.972 INFO  [worker_0] [13/24 2401001090700] SCHEME DONE status=1 attempts=1 elapsed=30.78s worker=worker_0
+2026-10-09 08:01:07.980 INFO  [worker_0] [16/24 2401001140101] SCHEME START नेशनल फूड सिक्योरिटी मिशन (ओ0एस0 / टी0बी0ओ0) (के.60/रा.40-के.+ रा.) (Grant 011) (worker=worker_0)
+2026-10-09 08:01:07.994 INFO  [worker_0] [16/24 2401001140101] Attempt 1/3 START
+2026-10-09 08:01:08.061 INFO  [worker_0] [16/24 2401001140101] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-10-09 08:01:08.135 INFO  [worker_1] [14/24 2401001090900] PARSE report table: columns=9 district_rows=2 fin_year=2026-2027 months={'prev_month': 'September', 'current_month': 'October'}
+2026-10-09 08:01:08.136 INFO  [worker_1] [14/24 2401001090900] VALIDATE ok status=ok rows=2
+2026-10-09 08:01:08.155 INFO  [worker_1] [14/24 2401001090900] FILE WRITE agri-011-2401001090900.json 1509 bytes 11 ms (status=ok, rows=2)
+2026-10-09 08:01:08.159 INFO  [worker_1] [14/24 2401001090900] STATUS UPDATE scheme=2401001090900 status=1 attempts=1 remark='' [crawler_status.json 2366 bytes, 4 ms]
+2026-10-09 08:01:08.160 INFO  [worker_1] [14/24 2401001090900] Attempt 1/3 succeeded in 18.07s
+2026-10-09 08:01:08.160 INFO  [worker_1] [14/24 2401001090900] SCHEME DONE status=1 attempts=1 elapsed=18.10s worker=worker_1
+2026-10-09 08:01:08.160 INFO  [worker_1] [17/24 2401001140300] SCHEME START तिलहन बीज मिनीकिट वितरण योजना (Grant 011) (worker=worker_1)
+2026-10-09 08:01:08.161 INFO  [worker_1] [17/24 2401001140300] Start stagger: waiting 5.0s so workers do not hit the portal together
+2026-10-09 08:01:08.185 INFO  [MainThread] FILE WRITE index.json 14358 bytes 11 ms | overall=RUNNING successful=12 failed=0 unprocessed=12
+2026-10-09 08:01:08.201 INFO  [MainThread] FILE WRITE index.json 14358 bytes 3 ms | overall=RUNNING successful=13 failed=0 unprocessed=11
+2026-10-09 08:01:08.858 INFO  [worker_3] [15/24 2401001130104] HTTP GET scheme list (Extra_plnDept.aspx) END status=200 bytes=727033 elapsed=9.84s redirects=1 final=ExpHead.aspx
+2026-10-09 08:01:09.061 INFO  [worker_0] [16/24 2401001140101] HTTP GET main page (KoshvaniStatic.aspx) END status=200 bytes=32533 elapsed=0.99s
+2026-10-09 08:01:09.416 INFO  [worker_0] [16/24 2401001140101] HTTP GET grant list (ExpGrant.aspx) START
+2026-10-09 08:01:10.127 INFO  [worker_0] [16/24 2401001140101] HTTP GET grant list (ExpGrant.aspx) END status=200 bytes=112750 elapsed=0.68s
+2026-10-09 08:01:11.963 INFO  [worker_0] [16/24 2401001140101] HTTP GET scheme list (Extra_plnDept.aspx) START
+2026-10-09 08:01:12.560 INFO  [worker_3] [15/24 2401001130104] HTTP GET scheme report (Extra_plnDept.aspx) START
+2026-10-09 08:01:13.180 INFO  [worker_1] [17/24 2401001140300] Attempt 1/3 START
+2026-10-09 08:01:13.205 INFO  [worker_1] [17/24 2401001140300] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-10-09 08:01:13.855 INFO  [worker_2] [12/24 2401001090300] HTTP GET scheme report (Extra_plnDept.aspx) END status=200 bytes=579221 elapsed=18.41s redirects=1 final=ExpTreas.aspx
+2026-10-09 08:01:14.112 INFO  [worker_1] [17/24 2401001140300] HTTP GET main page (KoshvaniStatic.aspx) END status=200 bytes=32533 elapsed=0.91s
+2026-10-09 08:01:14.429 INFO  [worker_1] [17/24 2401001140300] HTTP GET grant list (ExpGrant.aspx) START
+2026-10-09 08:01:14.976 INFO  [worker_1] [17/24 2401001140300] HTTP GET grant list (ExpGrant.aspx) END status=200 bytes=112750 elapsed=0.54s
+2026-10-09 08:01:16.029 INFO  [worker_3] [15/24 2401001130104] HTTP GET scheme report (Extra_plnDept.aspx) END status=200 bytes=120814 elapsed=3.47s redirects=1 final=ExpTreas.aspx
+2026-10-09 08:01:16.779 INFO  [worker_1] [17/24 2401001140300] HTTP GET scheme list (Extra_plnDept.aspx) START
+2026-10-09 08:01:17.726 INFO  [worker_3] [15/24 2401001130104] PARSE report table: columns=9 district_rows=2 fin_year=2026-2027 months={'prev_month': 'September', 'current_month': 'October'}
+2026-10-09 08:01:17.733 INFO  [worker_3] [15/24 2401001130104] VALIDATE ok status=ok rows=2
+2026-10-09 08:01:17.807 INFO  [worker_3] [15/24 2401001130104] FILE WRITE agri-011-2401001130104.json 1641 bytes 51 ms (status=ok, rows=2)
+2026-10-09 08:01:17.896 INFO  [worker_3] [15/24 2401001130104] STATUS UPDATE scheme=2401001130104 status=1 attempts=1 remark='' [crawler_status.json 2366 bytes, 82 ms]
+2026-10-09 08:01:17.903 INFO  [worker_3] [15/24 2401001130104] Attempt 1/3 succeeded in 21.80s
+2026-10-09 08:01:17.911 INFO  [worker_3] [15/24 2401001130104] SCHEME DONE status=1 attempts=1 elapsed=21.85s worker=worker_3
+2026-10-09 08:01:17.919 INFO  [worker_3] [18/24 2401008000203] SCHEME START कृषि विकास योजनायें (के.60/रा.40-के.) (Grant 011) (worker=worker_3)
+2026-10-09 08:01:17.928 INFO  [worker_3] [18/24 2401008000203] Attempt 1/3 START
+2026-10-09 08:01:18.014 INFO  [worker_3] [18/24 2401008000203] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-10-09 08:01:18.458 INFO  [worker_2] [12/24 2401001090300] PARSE report table: columns=9 district_rows=15 fin_year=2026-2027 months={'prev_month': 'September', 'current_month': 'October'}
+2026-10-09 08:01:18.459 INFO  [worker_2] [12/24 2401001090300] VALIDATE ok status=ok rows=15
+2026-10-09 08:01:18.475 INFO  [worker_2] [12/24 2401001090300] FILE WRITE agri-011-2401001090300.json 4490 bytes 10 ms (status=ok, rows=15)
+2026-10-09 08:01:18.478 INFO  [worker_2] [12/24 2401001090300] STATUS UPDATE scheme=2401001090300 status=1 attempts=1 remark='' [crawler_status.json 2366 bytes, 3 ms]
+2026-10-09 08:01:18.479 INFO  [worker_2] [12/24 2401001090300] Attempt 1/3 succeeded in 44.61s
+2026-10-09 08:01:18.479 INFO  [worker_2] [12/24 2401001090300] SCHEME DONE status=1 attempts=1 elapsed=48.38s worker=worker_2
+2026-10-09 08:01:18.480 INFO  [worker_2] [19/24 2401008000400] SCHEME START कृषि क्षेत्र की क्षमता एवं कौशल विकास तथा उत्पादन वृद्धि की योजना (Grant 011) (worker=worker_2)
+2026-10-09 08:01:18.480 INFO  [worker_2] [19/24 2401008000400] Start stagger: waiting 4.7s so workers do not hit the portal together
+2026-10-09 08:01:18.501 INFO  [MainThread] FILE WRITE index.json 14358 bytes 10 ms | overall=RUNNING successful=14 failed=0 unprocessed=10
+2026-10-09 08:01:18.525 INFO  [MainThread] FILE WRITE index.json 14357 bytes 6 ms | overall=RUNNING successful=15 failed=0 unprocessed=9
+2026-10-09 08:01:18.808 INFO  [worker_3] [18/24 2401008000203] HTTP GET main page (KoshvaniStatic.aspx) END status=200 bytes=32533 elapsed=0.79s
+2026-10-09 08:01:18.877 INFO  [worker_3] [18/24 2401008000203] HTTP GET grant list (ExpGrant.aspx) START
+2026-10-09 08:01:19.300 INFO  [worker_0] [16/24 2401001140101] HTTP GET scheme list (Extra_plnDept.aspx) END status=200 bytes=727033 elapsed=7.33s redirects=1 final=ExpHead.aspx
+2026-10-09 08:01:20.897 INFO  [worker_3] [18/24 2401008000203] HTTP GET grant list (ExpGrant.aspx) END status=200 bytes=112750 elapsed=2.02s
+2026-10-09 08:01:23.090 INFO  [worker_3] [18/24 2401008000203] HTTP GET scheme list (Extra_plnDept.aspx) START
+2026-10-09 08:01:23.136 INFO  [worker_2] [19/24 2401008000400] Attempt 1/3 START
+2026-10-09 08:01:23.177 INFO  [worker_2] [19/24 2401008000400] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-10-09 08:01:24.198 INFO  [worker_1] [17/24 2401001140300] HTTP GET scheme list (Extra_plnDept.aspx) END status=200 bytes=727033 elapsed=7.41s redirects=1 final=ExpHead.aspx
+2026-10-09 08:01:24.338 INFO  [worker_2] [19/24 2401008000400] HTTP GET main page (KoshvaniStatic.aspx) END status=200 bytes=32533 elapsed=1.15s
+2026-10-09 08:01:24.767 INFO  [worker_2] [19/24 2401008000400] HTTP GET grant list (ExpGrant.aspx) START
+2026-10-09 08:01:25.329 INFO  [worker_0] [16/24 2401001140101] HTTP GET scheme report (Extra_plnDept.aspx) START
+2026-10-09 08:01:25.392 INFO  [worker_2] [19/24 2401008000400] HTTP GET grant list (ExpGrant.aspx) END status=200 bytes=112750 elapsed=0.61s
+2026-10-09 08:01:27.343 INFO  [worker_2] [19/24 2401008000400] HTTP GET scheme list (Extra_plnDept.aspx) START
+2026-10-09 08:01:28.411 INFO  [worker_0] [16/24 2401001140101] HTTP GET scheme report (Extra_plnDept.aspx) END status=200 bytes=126320 elapsed=3.07s redirects=1 final=ExpTreas.aspx
+2026-10-09 08:01:29.010 INFO  [worker_1] [17/24 2401001140300] HTTP GET scheme report (Extra_plnDept.aspx) START
+2026-10-09 08:01:29.347 INFO  [worker_0] [16/24 2401001140101] PARSE report table: columns=9 district_rows=2 fin_year=2026-2027 months={'prev_month': 'September', 'current_month': 'October'}
+2026-10-09 08:01:29.348 INFO  [worker_0] [16/24 2401001140101] VALIDATE ok status=ok rows=2
+2026-10-09 08:01:29.361 INFO  [worker_0] [16/24 2401001140101] FILE WRITE agri-011-2401001140101.json 1642 bytes 8 ms (status=ok, rows=2)
+2026-10-09 08:01:29.364 INFO  [worker_0] [16/24 2401001140101] STATUS UPDATE scheme=2401001140101 status=1 attempts=1 remark='' [crawler_status.json 2366 bytes, 2 ms]
+2026-10-09 08:01:29.365 INFO  [worker_0] [16/24 2401001140101] Attempt 1/3 succeeded in 21.36s
+2026-10-09 08:01:29.365 INFO  [worker_0] [16/24 2401001140101] SCHEME DONE status=1 attempts=1 elapsed=21.38s worker=worker_0
+2026-10-09 08:01:29.366 INFO  [worker_0] [20/24 2402001020109] SCHEME START नेशनल प्रोजेक्ट ऑन स्वायल हेल्थ फर्टिलिटी (के.60/रा.40-के.+ रा.) (Grant 011) (worker=worker_0)
+2026-10-09 08:01:29.366 INFO  [worker_0] [20/24 2402001020109] Attempt 1/3 START
+2026-10-09 08:01:29.377 INFO  [MainThread] FILE WRITE index.json 14357 bytes 3 ms | overall=RUNNING successful=16 failed=0 unprocessed=8
+2026-10-09 08:01:29.390 INFO  [worker_0] [20/24 2402001020109] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-10-09 08:01:30.369 INFO  [worker_3] [18/24 2401008000203] HTTP GET scheme list (Extra_plnDept.aspx) END status=200 bytes=727033 elapsed=7.27s redirects=1 final=ExpHead.aspx
+2026-10-09 08:01:30.490 INFO  [worker_0] [20/24 2402001020109] HTTP GET main page (KoshvaniStatic.aspx) END status=200 bytes=32533 elapsed=1.10s
+2026-10-09 08:01:30.559 INFO  [worker_1] [17/24 2401001140300] HTTP GET scheme report (Extra_plnDept.aspx) END status=200 bytes=91189 elapsed=1.55s redirects=1 final=ExpTreas.aspx
+2026-10-09 08:01:31.064 INFO  [worker_0] [20/24 2402001020109] HTTP GET grant list (ExpGrant.aspx) START
+2026-10-09 08:01:31.588 INFO  [worker_1] [17/24 2401001140300] PARSE report table: columns=9 district_rows=1 fin_year=2026-2027 months={'prev_month': 'September', 'current_month': 'October'}
+2026-10-09 08:01:31.601 INFO  [worker_1] [17/24 2401001140300] VALIDATE ok status=ok rows=1
+2026-10-09 08:01:31.678 INFO  [worker_0] [20/24 2402001020109] HTTP GET grant list (ExpGrant.aspx) END status=200 bytes=112750 elapsed=0.60s
+2026-10-09 08:01:31.703 INFO  [worker_1] [17/24 2401001140300] FILE WRITE agri-011-2401001140300.json 1379 bytes 79 ms (status=ok, rows=1)
+2026-10-09 08:01:32.412 INFO  [worker_1] [17/24 2401001140300] STATUS UPDATE scheme=2401001140300 status=1 attempts=1 remark='' [crawler_status.json 2366 bytes, 691 ms]
+2026-10-09 08:01:32.419 INFO  [worker_1] [17/24 2401001140300] Attempt 1/3 succeeded in 19.24s
+2026-10-09 08:01:32.432 INFO  [worker_1] [17/24 2401001140300] SCHEME DONE status=1 attempts=1 elapsed=24.26s worker=worker_1
+2026-10-09 08:01:32.441 INFO  [worker_1] [21/24 2402001020111] SCHEME START नेशनल मिशन ऑन नेचुरल फार्मिग (के.60/रा.40-के.+ रा.) (Grant 011) (worker=worker_1)
+2026-10-09 08:01:32.461 INFO  [worker_1] [21/24 2402001020111] Start stagger: waiting 1.0s so workers do not hit the portal together
+2026-10-09 08:01:33.489 INFO  [worker_1] [21/24 2402001020111] Attempt 1/3 START
+2026-10-09 08:01:33.568 INFO  [worker_1] [21/24 2402001020111] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-10-09 08:01:33.819 INFO  [MainThread] FILE WRITE index.json 14357 bytes 190 ms | overall=RUNNING successful=17 failed=0 unprocessed=7
+2026-10-09 08:01:34.136 INFO  [worker_0] [20/24 2402001020109] HTTP GET scheme list (Extra_plnDept.aspx) START
+2026-10-09 08:01:34.579 INFO  [worker_1] [21/24 2402001020111] HTTP GET main page (KoshvaniStatic.aspx) END status=200 bytes=32533 elapsed=1.00s
+2026-10-09 08:01:34.878 INFO  [worker_2] [19/24 2401008000400] HTTP GET scheme list (Extra_plnDept.aspx) END status=200 bytes=727033 elapsed=7.53s redirects=1 final=ExpHead.aspx
+2026-10-09 08:01:35.208 INFO  [worker_1] [21/24 2402001020111] HTTP GET grant list (ExpGrant.aspx) START
+2026-10-09 08:01:35.701 INFO  [worker_1] [21/24 2402001020111] HTTP GET grant list (ExpGrant.aspx) END status=200 bytes=112750 elapsed=0.48s
+2026-10-09 08:01:37.918 INFO  [worker_1] [21/24 2402001020111] HTTP GET scheme list (Extra_plnDept.aspx) START
+2026-10-09 08:01:38.838 INFO  [worker_3] [18/24 2401008000203] HTTP GET scheme report (Extra_plnDept.aspx) START
+2026-10-09 08:01:40.341 INFO  [worker_2] [19/24 2401008000400] HTTP GET scheme report (Extra_plnDept.aspx) START
+2026-10-09 08:01:41.768 INFO  [worker_0] [20/24 2402001020109] HTTP GET scheme list (Extra_plnDept.aspx) END status=200 bytes=727033 elapsed=7.63s redirects=1 final=ExpHead.aspx
+2026-10-09 08:01:43.404 INFO  [worker_3] [18/24 2401008000203] HTTP GET scheme report (Extra_plnDept.aspx) END status=200 bytes=164224 elapsed=4.56s redirects=1 final=ExpTreas.aspx
+2026-10-09 08:01:43.430 INFO  [worker_2] [19/24 2401008000400] HTTP GET scheme report (Extra_plnDept.aspx) END status=200 bytes=109471 elapsed=3.09s redirects=1 final=ExpTreas.aspx
+2026-10-09 08:01:45.563 INFO  [worker_1] [21/24 2402001020111] HTTP GET scheme list (Extra_plnDept.aspx) END status=200 bytes=727033 elapsed=7.64s redirects=1 final=ExpHead.aspx
+2026-10-09 08:01:45.830 INFO  [worker_2] [19/24 2401008000400] PARSE report table: columns=9 district_rows=2 fin_year=2026-2027 months={'prev_month': 'September', 'current_month': 'October'}
+2026-10-09 08:01:45.838 INFO  [worker_2] [19/24 2401008000400] VALIDATE ok status=ok rows=2
+2026-10-09 08:01:46.083 INFO  [worker_2] [19/24 2401008000400] FILE WRITE agri-011-2401008000400.json 1666 bytes 188 ms (status=ok, rows=2)
+2026-10-09 08:01:46.247 INFO  [worker_2] [19/24 2401008000400] STATUS UPDATE scheme=2401008000400 status=1 attempts=1 remark='' [crawler_status.json 2366 bytes, 163 ms]
+2026-10-09 08:01:46.275 INFO  [worker_2] [19/24 2401008000400] Attempt 1/3 succeeded in 23.13s
+2026-10-09 08:01:46.327 INFO  [worker_2] [19/24 2401008000400] SCHEME DONE status=1 attempts=1 elapsed=27.80s worker=worker_2
+2026-10-09 08:01:46.335 INFO  [worker_2] [22/24 4401001030300] SCHEME START प्रयोगात्मक प्रक्षेत्र प्रदर्शन और बीज वर्द्धन प्रक्षेत्र (जिला योजना) (Grant 011) (worker=worker_2)
+2026-10-09 08:01:46.348 INFO  [worker_2] [22/24 4401001030300] Attempt 1/3 START
+2026-10-09 08:01:46.447 INFO  [worker_2] [22/24 4401001030300] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-10-09 08:01:46.813 INFO  [worker_3] [18/24 2401008000203] PARSE report table: columns=9 district_rows=3 fin_year=2026-2027 months={'prev_month': 'September', 'current_month': 'October'}
+2026-10-09 08:01:46.820 INFO  [worker_3] [18/24 2401008000203] VALIDATE ok status=ok rows=3
+2026-10-09 08:01:46.892 INFO  [worker_3] [18/24 2401008000203] FILE WRITE agri-011-2401008000203.json 1810 bytes 47 ms (status=ok, rows=3)
+2026-10-09 08:01:46.969 INFO  [worker_3] [18/24 2401008000203] STATUS UPDATE scheme=2401008000203 status=1 attempts=1 remark='' [crawler_status.json 2366 bytes, 75 ms]
+2026-10-09 08:01:46.970 INFO  [worker_3] [18/24 2401008000203] Attempt 1/3 succeeded in 29.04s
+2026-10-09 08:01:46.971 INFO  [worker_3] [18/24 2401008000203] SCHEME DONE status=1 attempts=1 elapsed=29.05s worker=worker_3
+2026-10-09 08:01:46.972 INFO  [worker_3] [23/24 4401001030401] SCHEME START खाद्यान्न/दलहन/तिलहन/बीज की लागत और प्रासंगिक व्यय (Grant 011) (worker=worker_3)
+2026-10-09 08:01:47.013 INFO  [worker_3] [23/24 4401001030401] Start stagger: waiting 4.2s so workers do not hit the portal together
+2026-10-09 08:01:47.377 INFO  [worker_2] [22/24 4401001030300] HTTP GET main page (KoshvaniStatic.aspx) END status=200 bytes=32533 elapsed=0.91s
+2026-10-09 08:01:47.465 INFO  [MainThread] FILE WRITE index.json 14357 bytes 136 ms | overall=RUNNING successful=18 failed=0 unprocessed=6
+2026-10-09 08:01:48.035 INFO  [worker_2] [22/24 4401001030300] HTTP GET grant list (ExpGrant.aspx) START
+2026-10-09 08:01:48.477 INFO  [worker_2] [22/24 4401001030300] HTTP GET grant list (ExpGrant.aspx) END status=200 bytes=112750 elapsed=0.42s
+2026-10-09 08:01:48.750 INFO  [MainThread] FILE WRITE index.json 14357 bytes 138 ms | overall=RUNNING successful=19 failed=0 unprocessed=5
+2026-10-09 08:01:50.619 INFO  [worker_2] [22/24 4401001030300] HTTP GET scheme list (Extra_plnDept.aspx) START
+2026-10-09 08:01:50.951 INFO  [worker_0] [20/24 2402001020109] HTTP GET scheme report (Extra_plnDept.aspx) START
+2026-10-09 08:01:51.259 INFO  [worker_3] [23/24 4401001030401] Attempt 1/3 START
+2026-10-09 08:01:51.319 INFO  [worker_3] [23/24 4401001030401] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-10-09 08:01:52.166 INFO  [worker_3] [23/24 4401001030401] HTTP GET main page (KoshvaniStatic.aspx) END status=200 bytes=32533 elapsed=0.84s
+2026-10-09 08:01:52.419 INFO  [worker_1] [21/24 2402001020111] HTTP GET scheme report (Extra_plnDept.aspx) START
+2026-10-09 08:01:52.491 INFO  [worker_3] [23/24 4401001030401] HTTP GET grant list (ExpGrant.aspx) START
+2026-10-09 08:01:52.844 INFO  [worker_3] [23/24 4401001030401] HTTP GET grant list (ExpGrant.aspx) END status=200 bytes=112750 elapsed=0.35s
+2026-10-09 08:01:53.092 INFO  [worker_3] [23/24 4401001030401] HTTP GET scheme list (Extra_plnDept.aspx) START
+2026-10-09 08:01:53.664 INFO  [worker_0] [20/24 2402001020109] HTTP GET scheme report (Extra_plnDept.aspx) END status=200 bytes=104472 elapsed=2.71s redirects=1 final=ExpTreas.aspx
+2026-10-09 08:01:53.913 INFO  [worker_0] [20/24 2402001020109] PARSE report table: columns=9 district_rows=1 fin_year=2026-2027 months={'prev_month': 'September', 'current_month': 'October'}
+2026-10-09 08:01:53.915 INFO  [worker_0] [20/24 2402001020109] VALIDATE ok status=ok rows=1
+2026-10-09 08:01:53.922 INFO  [worker_0] [20/24 2402001020109] FILE WRITE agri-011-2402001020109.json 1353 bytes 3 ms (status=ok, rows=1)
+2026-10-09 08:01:53.925 INFO  [worker_0] [20/24 2402001020109] STATUS UPDATE scheme=2402001020109 status=1 attempts=1 remark='' [crawler_status.json 2366 bytes, 2 ms]
+2026-10-09 08:01:53.925 INFO  [worker_0] [20/24 2402001020109] Attempt 1/3 succeeded in 24.56s
+2026-10-09 08:01:53.925 INFO  [worker_0] [20/24 2402001020109] SCHEME DONE status=1 attempts=1 elapsed=24.56s worker=worker_0
+2026-10-09 08:01:53.926 INFO  [worker_0] [24/24 4401001030403] SCHEME START कपास और बिनोले के बीजों की लागत(प्रासंगिक व्यय सहित) (Grant 011) (worker=worker_0)
+2026-10-09 08:01:53.926 INFO  [worker_0] [24/24 4401001030403] Start stagger: waiting 1.8s so workers do not hit the portal together
+2026-10-09 08:01:53.951 INFO  [MainThread] FILE WRITE index.json 14357 bytes 7 ms | overall=RUNNING successful=20 failed=0 unprocessed=4
+2026-10-09 08:01:55.155 INFO  [worker_1] [21/24 2402001020111] HTTP GET scheme report (Extra_plnDept.aspx) END status=200 bytes=121134 elapsed=2.73s redirects=1 final=ExpTreas.aspx
+2026-10-09 08:01:55.518 INFO  [worker_1] [21/24 2402001020111] PARSE report table: columns=9 district_rows=2 fin_year=2026-2027 months={'prev_month': 'September', 'current_month': 'October'}
+2026-10-09 08:01:55.520 INFO  [worker_1] [21/24 2402001020111] VALIDATE ok status=ok rows=2
+2026-10-09 08:01:55.528 INFO  [worker_1] [21/24 2402001020111] FILE WRITE agri-011-2402001020111.json 1534 bytes 3 ms (status=ok, rows=2)
+2026-10-09 08:01:55.531 INFO  [worker_1] [21/24 2402001020111] STATUS UPDATE scheme=2402001020111 status=1 attempts=1 remark='' [crawler_status.json 2366 bytes, 2 ms]
+2026-10-09 08:01:55.531 INFO  [worker_1] [21/24 2402001020111] Attempt 1/3 succeeded in 22.04s
+2026-10-09 08:01:55.532 INFO  [worker_1] [21/24 2402001020111] SCHEME DONE status=1 attempts=1 elapsed=23.09s worker=worker_1
+2026-10-09 08:01:55.542 INFO  [MainThread] FILE WRITE index.json 14357 bytes 4 ms | overall=RUNNING successful=21 failed=0 unprocessed=3
+2026-10-09 08:01:55.769 INFO  [worker_0] [24/24 4401001030403] Attempt 1/3 START
+2026-10-09 08:01:55.794 INFO  [worker_0] [24/24 4401001030403] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-10-09 08:01:56.478 INFO  [worker_0] [24/24 4401001030403] HTTP GET main page (KoshvaniStatic.aspx) END status=200 bytes=32533 elapsed=0.68s
+2026-10-09 08:01:56.532 INFO  [worker_0] [24/24 4401001030403] HTTP GET grant list (ExpGrant.aspx) START
+2026-10-09 08:01:56.943 INFO  [worker_0] [24/24 4401001030403] HTTP GET grant list (ExpGrant.aspx) END status=200 bytes=112750 elapsed=0.41s
+2026-10-09 08:01:57.234 INFO  [worker_0] [24/24 4401001030403] HTTP GET scheme list (Extra_plnDept.aspx) START
+2026-10-09 08:01:57.702 INFO  [worker_2] [22/24 4401001030300] HTTP GET scheme list (Extra_plnDept.aspx) END status=200 bytes=727033 elapsed=7.08s redirects=1 final=ExpHead.aspx
+2026-10-09 08:02:00.851 INFO  [worker_3] [23/24 4401001030401] HTTP GET scheme list (Extra_plnDept.aspx) END status=200 bytes=727033 elapsed=7.76s redirects=1 final=ExpHead.aspx
+2026-10-09 08:02:04.027 INFO  [worker_2] [22/24 4401001030300] HTTP GET scheme report (Extra_plnDept.aspx) START
+2026-10-09 08:02:04.261 INFO  [worker_0] [24/24 4401001030403] HTTP GET scheme list (Extra_plnDept.aspx) END status=200 bytes=727033 elapsed=5.25s redirects=1 final=ExpHead.aspx
+2026-10-09 08:02:04.935 INFO  [worker_2] [22/24 4401001030300] HTTP GET scheme report (Extra_plnDept.aspx) END status=200 bytes=52046 elapsed=0.91s redirects=1 final=ExpTreas.aspx
+2026-10-09 08:02:05.890 INFO  [worker_2] [22/24 4401001030300] PARSE report table: columns=9 district_rows=1 fin_year=2026-2027 months={'prev_month': 'September', 'current_month': 'October'}
+2026-10-09 08:02:05.891 INFO  [worker_2] [22/24 4401001030300] VALIDATE ok status=ok rows=1
+2026-10-09 08:02:06.127 INFO  [worker_2] [22/24 4401001030300] FILE WRITE agri-011-4401001030300.json 1459 bytes 207 ms (status=ok, rows=1)
+2026-10-09 08:02:06.349 INFO  [worker_2] [22/24 4401001030300] STATUS UPDATE scheme=4401001030300 status=1 attempts=1 remark='' [crawler_status.json 2366 bytes, 194 ms]
+2026-10-09 08:02:06.367 INFO  [worker_2] [22/24 4401001030300] Attempt 1/3 succeeded in 18.22s
+2026-10-09 08:02:06.390 INFO  [worker_2] [22/24 4401001030300] SCHEME DONE status=1 attempts=1 elapsed=18.25s worker=worker_2
+2026-10-09 08:02:10.182 INFO  [MainThread] FILE WRITE index.json 14357 bytes 398 ms | overall=RUNNING successful=22 failed=0 unprocessed=2
+2026-10-09 08:02:15.545 INFO  [worker_3] [23/24 4401001030401] HTTP GET scheme report (Extra_plnDept.aspx) START
+2026-10-09 08:02:16.692 INFO  [worker_0] [24/24 4401001030403] HTTP GET scheme report (Extra_plnDept.aspx) START
+2026-10-09 08:02:17.657 INFO  [worker_3] [23/24 4401001030401] HTTP GET scheme report (Extra_plnDept.aspx) END status=200 bytes=87935 elapsed=1.91s redirects=1 final=ExpTreas.aspx
+2026-10-09 08:02:17.863 INFO  [worker_3] [23/24 4401001030401] PARSE report table: columns=9 district_rows=1 fin_year=2026-2027 months={'prev_month': 'September', 'current_month': 'October'}
+2026-10-09 08:02:17.864 INFO  [worker_3] [23/24 4401001030401] VALIDATE ok status=ok rows=1
+2026-10-09 08:02:17.876 INFO  [worker_3] [23/24 4401001030401] FILE WRITE agri-011-4401001030401.json 1381 bytes 3 ms (status=ok, rows=1)
+2026-10-09 08:02:17.878 INFO  [worker_3] [23/24 4401001030401] STATUS UPDATE scheme=4401001030401 status=1 attempts=1 remark='' [crawler_status.json 2366 bytes, 2 ms]
+2026-10-09 08:02:17.879 INFO  [worker_3] [23/24 4401001030401] Attempt 1/3 succeeded in 21.92s
+2026-10-09 08:02:17.879 INFO  [worker_3] [23/24 4401001030401] SCHEME DONE status=1 attempts=1 elapsed=26.22s worker=worker_3
+2026-10-09 08:02:17.893 INFO  [MainThread] FILE WRITE index.json 14357 bytes 4 ms | overall=RUNNING successful=23 failed=0 unprocessed=1
+2026-10-09 08:02:17.966 INFO  [worker_0] [24/24 4401001030403] HTTP GET scheme report (Extra_plnDept.aspx) END status=200 bytes=84981 elapsed=1.21s redirects=1 final=ExpTreas.aspx
+2026-10-09 08:02:18.152 INFO  [worker_0] [24/24 4401001030403] PARSE report table: columns=9 district_rows=1 fin_year=2026-2027 months={'prev_month': 'September', 'current_month': 'October'}
+2026-10-09 08:02:18.153 INFO  [worker_0] [24/24 4401001030403] VALIDATE ok status=ok rows=1
+2026-10-09 08:02:18.167 INFO  [worker_0] [24/24 4401001030403] FILE WRITE agri-011-4401001030403.json 1337 bytes 8 ms (status=ok, rows=1)
+2026-10-09 08:02:18.171 INFO  [worker_0] [24/24 4401001030403] STATUS UPDATE scheme=4401001030403 status=1 attempts=1 remark='' [crawler_status.json 2366 bytes, 3 ms]
+2026-10-09 08:02:18.171 INFO  [worker_0] [24/24 4401001030403] Attempt 1/3 succeeded in 17.71s
+2026-10-09 08:02:18.172 INFO  [worker_0] [24/24 4401001030403] SCHEME DONE status=1 attempts=1 elapsed=19.55s worker=worker_0
+2026-10-09 08:02:18.183 INFO  [MainThread] FILE WRITE index.json 14357 bytes 4 ms | overall=RUNNING successful=24 failed=0 unprocessed=0
+2026-10-09 08:02:18.191 INFO  [MainThread] STATUS FINAL overall=SUCCESS fatal=no [crawler_status.json 2389 bytes, 3 ms]
+2026-10-09 08:02:18.203 INFO  [MainThread] FILE WRITE index.json 14357 bytes 4 ms | overall=SUCCESS successful=24 failed=0 unprocessed=0
+2026-10-09 08:02:18.204 INFO  [MainThread] ==================================================
+2026-10-09 08:02:18.205 INFO  [MainThread] KOSHVANI CRAWLER SUMMARY
+2026-10-09 08:02:18.205 INFO  [MainThread] ==================================================
+2026-10-09 08:02:18.206 INFO  [MainThread] Execution ID: 20261009-075913-5ecb4d
+2026-10-09 08:02:18.206 INFO  [MainThread] Total schemes: 24
+2026-10-09 08:02:18.206 INFO  [MainThread] Successful: 24
+2026-10-09 08:02:18.206 INFO  [MainThread] Failed: 0
+2026-10-09 08:02:18.206 INFO  [MainThread] Unprocessed: 0
+2026-10-09 08:02:18.207 INFO  [MainThread] Recovered by retry: 0
+2026-10-09 08:02:18.207 INFO  [MainThread] Fatal crawler error: No
+2026-10-09 08:02:18.207 INFO  [MainThread] Execution status: SUCCESS
+2026-10-09 08:02:18.208 INFO  [MainThread] Wall time: 175.7s | workers: 4 | max attempts per scheme: 3
+2026-10-09 08:02:18.208 INFO  [MainThread] Scheme time: min 15.3s | avg 28.1s | max 53.2s
+2026-10-09 08:02:18.208 INFO  [MainThread] Slowest schemes: 2401001070300 53.2s (attempts 1, worker_1), 2401001030300 49.1s (attempts 1, worker_3), 2401001090300 48.4s (attempts 1, worker_2)
+2026-10-09 08:02:18.208 INFO  [MainThread] Worker utilisation: 96% | worker_0: 6 schemes 176s, worker_1: 6 schemes 158s, worker_2: 6 schemes 167s, worker_3: 6 schemes 175s
+2026-10-09 08:02:18.209 INFO  [MainThread] HTTP requests: 96 (ok 96, failed 0) | downloaded 25392 KB
+2026-10-09 08:02:18.209 INFO  [MainThread] Request latency: avg 3.86s | p95 11.30s | max 23.47s
+2026-10-09 08:02:18.209 INFO  [MainThread] Time spent waiting between retries: 0.0s (summed over workers)
+2026-10-09 08:02:18.210 INFO  [MainThread] Start stagger / bounce hold: 13 waits, 61.5s (summed over workers) | portal bounces seen: 0
+2026-10-09 08:02:18.210 INFO  [MainThread] ==================================================
+2026-10-09 08:02:44 INFO  [run_daily] SCRAPER END exit_code=0 elapsed=209s
+
+2026-10-09 08:02:44 INFO  [run_daily] Koshvani scraper completed.
+
+2026-10-09 08:02:44 INFO  [run_daily] [4/6] Checking for data changes...
+2026-10-09 08:02:55 INFO  [run_daily] Data changes detected:
+ M docs/data/agri-011-2401000010500.json
+ M docs/data/agri-011-2401001020103.json
+ M docs/data/agri-011-2401001020129.json
+ M docs/data/agri-011-2401001030300.json
+ M docs/data/agri-011-2401001030500.json
+ M docs/data/agri-011-2401001030600.json
+ M docs/data/agri-011-2401001070300.json
+ M docs/data/agri-011-2401001070400.json
+ M docs/data/agri-011-2401001090103.json
+ M docs/data/agri-011-2401001090104.json
+ M docs/data/agri-011-2401001090105.json
+ M docs/data/agri-011-2401001090300.json
+ M docs/data/agri-011-2401001090700.json
+ M docs/data/agri-011-2401001090900.json
+ M docs/data/agri-011-2401001130104.json
+ M docs/data/agri-011-2401001140101.json
+ M docs/data/agri-011-2401001140300.json
+ M docs/data/agri-011-2401008000203.json
+ M docs/data/agri-011-2401008000400.json
+ M docs/data/agri-011-2402001020109.json
+ M docs/data/agri-011-2402001020111.json
+ M docs/data/agri-011-4401001030300.json
+ M docs/data/agri-011-4401001030401.json
+ M docs/data/agri-011-4401001030403.json
+ M docs/data/crawler_status.json
+ M docs/data/index.json
+
+2026-10-09 08:02:55 INFO  [run_daily] [5/6] Committing updated Koshvani data...
+2026-10-09 08:02:55 INFO  [run_daily] GIT add data: START
+2026-10-09 08:02:55 INFO  [run_daily] GIT add data: END exit_code=0 elapsed=0s
+2026-10-09 08:02:55 INFO  [run_daily] GIT commit data: START
+[main bf322eb] Update Koshvani data
+ 26 files changed, 62 insertions(+), 62 deletions(-)
+2026-10-09 08:02:56 INFO  [run_daily] GIT commit data: END exit_code=0 elapsed=0s
+2026-10-09 08:03:01 INFO  [run_daily] Commit successful: bf322eb Update Koshvani data
+ 26 files changed, 62 insertions(+), 62 deletions(-)
+
+2026-10-09 08:03:01 INFO  [run_daily] Pushing to GitHub...
+2026-10-09 08:03:01 INFO  [run_daily] GIT push data: START
+To https://github.com/abhi24me/koshvani-dashboard.git
+   f1abca1..bf322eb  main -> main
+2026-10-09 08:03:13 INFO  [run_daily] GIT push data: END exit_code=0 elapsed=12s
+
+2026-10-09 08:03:13 INFO  [run_daily] GitHub push successful: HEAD=bf322eb origin/main=bf322eb
+
+2026-10-09 08:03:13 INFO  [run_daily] [6/6] Validating scheme results and sending the Gmail report...
+2026-10-09 08:03:19.522 INFO  [gmail_alert] Email notification sent successfully to 2 recipient(s).
+2026-10-09 08:03:19.644 INFO  [gmail_alert] Report e-mailed (success).
+2026-10-09 08:03:19 INFO  [run_daily] GMAIL report step finished (exit_code=0)
+
+2026-10-09 08:03:19 INFO  [run_daily] ========================================
+2026-10-09 08:03:19 INFO  [run_daily] KOSHVANI JOB COMPLETED
+2026-10-09 08:03:19 INFO  [run_daily] FINAL STATUS: SUCCESS
+2026-10-09 08:03:19 INFO  [run_daily] elapsed=246s
+2026-10-09 08:03:19 INFO  [run_daily] ========================================
+2026-10-09 08:03:20 INFO  [run_daily] LOG PUBLISH: workflow_exit_code=0 - this log is now being committed and pushed (that outcome is on screen only)
