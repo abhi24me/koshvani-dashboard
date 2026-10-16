@@ -1,0 +1,21 @@
+
+2026-10-16 19:27:31 INFO  [run_daily] ========================================
+2026-10-16 19:27:31 INFO  [run_daily] KOSHVANI JOB STARTED
+2026-10-16 19:27:31 INFO  [run_daily] execution_id=20261016-192731-63bd1c log=logs/daily-2026-10-16-192731.log
+2026-10-16 19:27:32 INFO  [run_daily] host: Linux 5.15.178-android13-8-g8805f47e70a8-ab36 | Python 3.14.6 | git version 2.55.0
+2026-10-16 19:27:32 INFO  [run_daily] repo: branch=main HEAD=65db001 dir=/data/data/com.termux/files/home/koshvani-dashboard
+2026-10-16 19:27:32 INFO  [run_daily] ========================================
+
+2026-10-16 19:27:32 INFO  [run_daily] [1/6] Checking Git status...
+?? logs/daily-2026-10-16-192731-2.log
+?? logs/daily-2026-10-16-192731.log
+
+2026-10-16 19:27:32 INFO  [run_daily] [2/6] Pulling latest code from GitHub...
+2026-10-16 19:27:32 INFO  [run_daily] GIT pull --rebase: START
+fatal: unable to access 'https://github.com/abhi24me/koshvani-dashboard.git/': Could not resolve host: github.com
+2026-10-16 19:27:43 INFO  [run_daily] GIT pull --rebase: END exit_code=1 elapsed=11s
+
+2026-10-16 19:27:43 WARN  [run_daily] ERROR: Git pull failed.
+2026-10-16 19:27:43 WARN  [run_daily] Please check Git status.
+2026-10-16 19:27:43 INFO  [run_daily] FINAL STATUS: ERROR (git pull failed)
+2026-10-16 19:27:43.893 WARN  [gmail_alert] Email notification failed: could not reach Gmail SMTP (gaierror).
