@@ -1,0 +1,23 @@
+
+2026-10-17 14:53:25 INFO  [run_daily] ========================================
+2026-10-17 14:53:25 INFO  [run_daily] KOSHVANI JOB STARTED
+2026-10-17 14:53:25 INFO  [run_daily] execution_id=20261017-145325-1d6627 log=logs/daily-2026-10-17-145325.log
+2026-10-17 14:53:25 INFO  [run_daily] host: Linux 5.15.178-android13-8-g8805f47e70a8-ab36 | Python 3.14.6 | git version 2.55.0
+2026-10-17 14:53:25 INFO  [run_daily] repo: branch=main HEAD=76c5643 dir=/data/data/com.termux/files/home/koshvani-dashboard
+2026-10-17 14:53:25 INFO  [run_daily] ========================================
+
+2026-10-17 14:53:25 INFO  [run_daily] [1/6] Checking Git status...
+ M logs/daily-2026-10-16-192731.log
+?? logs/daily-2026-10-17-145325.log
+
+2026-10-17 14:53:26 INFO  [run_daily] [2/6] Pulling latest code from GitHub...
+2026-10-17 14:53:26 INFO  [run_daily] GIT pull --rebase: START
+error: cannot pull with rebase: You have unstaged changes.
+error: Please commit or stash them.
+2026-10-17 14:53:26 INFO  [run_daily] GIT pull --rebase: END exit_code=128 elapsed=0s
+
+2026-10-17 14:53:26 WARN  [run_daily] ERROR: Git pull failed.
+2026-10-17 14:53:26 WARN  [run_daily] Please check Git status.
+2026-10-17 14:53:26 INFO  [run_daily] FINAL STATUS: ERROR (git pull failed)
+2026-10-17 14:53:40.871 INFO  [gmail_alert] Email notification sent successfully to 2 recipient(s).
+2026-10-17 14:53:41 INFO  [run_daily] LOG PUBLISH: workflow_exit_code=1 - this log is now being committed and pushed (that outcome is on screen only)
