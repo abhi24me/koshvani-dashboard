@@ -12,6 +12,7 @@ import subprocess
 import sys
 import tempfile
 import textwrap
+import time
 import unittest
 from pathlib import Path
 
@@ -291,6 +292,80 @@ class TestLeftoversAndFailures(RunDailyCase):
         salvaged = self.origin_git("show", f"main~{subjects.index('Save partial Koshvani data from an interrupted run')}:docs/data/a.json")
         self.assertEqual(salvaged, '{"v": "scraped-before-the-kill"}', "the killed run's data is preserved in history")
         self.assertEqual(git(self.repo, "status", "--porcelain").stdout.strip(), "", "and the working tree ends clean")
+
+    def test_a_stray_modified_published_log_is_discarded_not_recommitted(self):
+        """Exactly the 16 Oct incident: a tracked execution log left locally modified
+        (e.g. by two overlapping runs racing on the same tree) must not block every
+        future `git pull --rebase` forever. It is discarded - restored to the content
+        already safely committed - never recommitted as new content: that would skip
+        the sanitizer check publish_log always runs before anything is published."""
+        self.assertEqual(self.run_script("success"), 0, self.output)       # first run: establishes a tracked, published log
+        stray = self.repo / self.origin_logs()[0]
+        committed_content = stray.read_text(encoding="utf-8")
+        os.chmod(stray, stat.S_IWRITE | stat.S_IREAD)         # it was made read-only on publish; undo that to simulate the real tampering
+        stray.write_text(committed_content + "a line added locally after the fact\n", encoding="utf-8")
+        self.assertNotEqual(git(self.repo, "status", "--porcelain", "--", str(stray.relative_to(self.repo))).stdout.strip(), "")
+        self.assertEqual(self.run_script("success_nochange"), 0, self.output)
+        self.assertNotIn("Git pull failed", self.output)
+        self.assertIn("discarding the stray change", self.output)
+        self.assertNotIn("Save leftover", self.output, "the stray edit is discarded, never committed as if it were new data")
+        self.assertEqual(stray.read_text(encoding="utf-8"), committed_content, "restored to exactly what was already published")
+        self.assertEqual(git(self.repo, "status", "--porcelain").stdout.strip(), "")
+
+    def test_an_untracked_leftover_log_is_still_published_through_the_sanitizer_not_recommitted_raw(self):
+        """A stray UNTRACKED log (one that never finished publishing) is a different
+        case from a modified TRACKED one - it is real, not-yet-published output, so it
+        must still go out through publish_log's own scrub+check, at the end of the run,
+        never added directly at step [1/6] (which would skip that safety net)."""
+        (self.repo / "logs").mkdir()
+        dirty = self.repo / "logs" / "daily-2026-09-01-000000.log"
+        dirty.write_text("Cookie: ASP.NET_SessionId=FAKECOOKIE123456\n", encoding="utf-8")
+        self.assertEqual(self.run_script("success_nochange"), 0, self.output)
+        self.assertNotIn("Git pull failed", self.output)
+        self.assertNotIn("Save partial", self.output)
+        self.assertIn("logs/daily-2026-09-01-000000.log", self.origin_logs())
+        self.assertNotIn("FAKECOOKIE123456", self.origin_file("logs/daily-2026-09-01-000000.log"), "still scrubbed before publishing")
+
+    def test_two_overlapping_runs_the_second_exits_immediately(self):
+        """The root cause of the 16 Oct incident: two run_daily.sh invocations racing
+        on the same working tree. The lock must stop a second one cold, before it
+        ever touches git, rather than let both run and corrupt the tree between them."""
+        lock_dir = self.home / ".koshvani-dashboard.lock"
+        lock_dir.mkdir()
+        # A pid bash's own `kill -0` is sure to recognize as alive: bash's OWN view of
+        # its pid ($$), not Python's subprocess.pid - on Windows those are two different
+        # numbering spaces (a native Win32 pid vs. an MSYS one), so only the self-reported
+        # value is something another bash process can actually look up.
+        pid_file = self.home / "holder_pid.txt"
+        holder = subprocess.Popen(["bash", "-c", f"echo $$ > '{pid_file.as_posix()}'; sleep 30"])
+        self.addCleanup(holder.wait)
+        self.addCleanup(holder.kill)
+        for _ in range(50):
+            if pid_file.exists():
+                break
+            time.sleep(0.1)
+        (lock_dir / "pid").write_text(pid_file.read_text(encoding="utf-8").strip(), encoding="utf-8")
+        rc = self.run_script("success")
+        self.assertEqual(rc, 0, self.output)
+        self.assertIn("already running - exiting without touching the repository", self.output)
+        self.assertEqual(self.head(), git(self.repo, "rev-parse", "origin/main").stdout.strip(), "nothing was pulled, committed or pushed")
+        self.assertEqual(self.alert_calls(), [], "no report was sent - this invocation never ran the workflow at all")
+        self.assertTrue(lock_dir.exists(), "the lock belongs to the (still alive) other run; this invocation must not remove it")
+
+    def test_a_stale_lock_from_a_dead_process_is_taken_over(self):
+        lock_dir = self.home / ".koshvani-dashboard.lock"
+        lock_dir.mkdir()
+        dead_pid = subprocess.run(["bash", "-c", "echo $$"], capture_output=True, text=True).stdout.strip()   # exited already
+        (lock_dir / "pid").write_text(dead_pid, encoding="utf-8")
+        self.assertEqual(self.run_script("success"), 0, self.output)
+        self.assertIn("stale lock", self.output)
+        self.assertNotIn("already running", self.output)
+        self.assertEqual(len(self.alert_calls()), 1, "the run went ahead normally")
+
+    def test_the_lock_is_released_even_when_the_pull_fails(self):
+        git(self.repo, "remote", "set-url", "origin", (self.home / "does-not-exist.git").as_posix())
+        self.assertEqual(self.run_script("success"), 1)
+        self.assertFalse((self.home / ".koshvani-dashboard.lock").exists(), "the lock must not outlive its own run")
 
     def test_18_leftover_data_never_blocks_the_pull(self):
         (self.repo / "docs" / "data" / "a.json").write_text('{"v": "leftover"}', encoding="utf-8")

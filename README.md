@@ -268,6 +268,21 @@ run, no data changes, a failed pull - the finished log is committed
 every run lives in git. Logs a run could not push (no network) go out with the
 next run.
 
+**Only one execution at a time.** `acquire_lock` (a plain `mkdir`-based lock in
+`$HOME`, no extra package) refuses to let a second `run_daily.sh` touch the
+working tree while one is already running - a second, overlapping trigger (the
+scheduler firing twice, or a stuck previous run plus a fresh scheduled one)
+exits immediately instead of racing the first. A stale lock from a run that
+crashed or was killed is detected (its pid is no longer running) and taken
+over automatically. This exists because exactly that race, on 16 Oct 2026,
+left one run's own execution log locally modified after it had already been
+published - which then blocked every single `git pull --rebase` for the next
+six days, since nothing used to repair a dirty file outside `docs/data`. Step
+[1/6] now also recognizes that specific case (an already-published,
+chmod-read-only log found modified anyway) and discards the stray edit,
+restoring the log to what was already safely committed, rather than leave it
+jammed forever.
+
 A log records, with millisecond timestamps, the level and the worker thread:
 
 - the unique **execution id** (`YYYYMMDD-HHMMSS-xxxxxx`), also written to

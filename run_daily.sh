@@ -29,6 +29,36 @@ git_step() {
     return $rc
 }
 
+# acquire_lock: refuses to let two run_daily.sh executions touch the same git
+# working tree at once. A double-trigger (a stuck previous run plus a fresh
+# scheduled one, or the scheduler itself firing twice) is exactly how
+# logs/daily-2026-10-16-192731.log ended up uncommitted on the phone on 16 Oct,
+# which then blocked every single `git pull --rebase` for the next six days -
+# nothing else in this script could repair a dirty file outside docs/data, so
+# the crawler never ran again until that file was manually cleared. This lock
+# makes a second overlapping run exit immediately instead of racing the first.
+# A plain `mkdir` (atomic, no extra package - works unchanged on Termux) is the
+# lock; a stale lock from a run that crashed or was killed is detected by
+# checking whether its pid is still alive, and taken over.
+acquire_lock() {
+    local lock_dir="$HOME/.koshvani-dashboard.lock" holder
+    if ! mkdir "$lock_dir" 2>/dev/null; then
+        holder=$(cat "$lock_dir/pid" 2>/dev/null)
+        if [ -n "$holder" ] && kill -0 "$holder" 2>/dev/null; then
+            warn "another run_daily.sh (pid $holder) is already running - exiting without touching the repository"
+            exit 0
+        fi
+        warn "a stale lock from pid ${holder:-?} (no longer running) was left behind - taking it over"
+        rm -rf "$lock_dir"
+        mkdir "$lock_dir" || { warn "could not create the lock directory - exiting"; exit 1; }
+    fi
+    echo $$ > "$lock_dir/pid"
+    # $lock_dir is local to this function, so the trap command is expanded NOW,
+    # while it is still in scope, rather than left as a reference that would be
+    # empty by the time EXIT actually fires.
+    trap "rm -rf '$lock_dir'" EXIT
+}
+
 # ==========================================
 # The workflow (runs as the "inner" process)
 # ==========================================
@@ -77,6 +107,27 @@ if [ -n "$(git status --porcelain -- docs/data)" ]; then
     if [ $? -ne 0 ]; then
         warn "could not commit the leftover data - leaving it untouched."
     fi
+fi
+
+# An already-published execution log is made read-only right after it is
+# committed (see publish_log below) and is never meant to change again, so a
+# LOCALLY MODIFIED one is never legitimate new data to preserve - it was
+# already fully committed and pushed once. This is exactly what happened to
+# logs/daily-2026-10-16-192731.log on 16 Oct (two overlapping executions - see
+# acquire_lock above, which now stops that - raced on this same working tree
+# and left one of them with a stray local edit to an already-published log),
+# and it then blocked every single `git pull --rebase` for the next six days,
+# because nothing here used to resolve a dirty file outside docs/data. The fix
+# is simply to discard the stray edit and restore the log to the content that
+# was already safely committed - never to recommit whatever ended up on disk
+# locally (that would skip the sanitizer check publish_log always runs first).
+STALE_LOGS=()
+while IFS= read -r f; do
+    [ -n "$f" ] && STALE_LOGS+=("$f")
+done < <(git diff --name-only -- 'logs/daily-????-??-??-??????*.log' 'logs/daily-????-??-??.log')
+if [ ${#STALE_LOGS[@]} -gt 0 ]; then
+    warn "A previously published execution log was found locally modified - discarding the stray change(s): ${STALE_LOGS[*]}"
+    git_step "restore modified log(s)" git checkout -- "${STALE_LOGS[@]}"
 fi
 
 # ==========================================
@@ -304,6 +355,7 @@ publish_log() {
 }
 
 run_outer() {
+    acquire_lock
     REPO="$HOME/koshvani-dashboard"
     LOG_DIR="$REPO/logs"
     cd "$REPO" || exit 1
