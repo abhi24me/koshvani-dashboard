@@ -1,9 +1,9 @@
 {
-  "execution_id": "20261030-190344-05a8ac",
-  "started_at": "2026-10-30T13:33:47+00:00",
-  "updated_at": "2026-10-30T13:37:59+00:00",
-  "finished_at": "2026-10-30T13:37:59+00:00",
-  "overall_status": "SUCCESS",
+  "execution_id": "20261031-231230-5fbdce",
+  "started_at": "2026-10-31T17:42:34+00:00",
+  "updated_at": "2026-11-01T05:59:01+00:00",
+  "finished_at": "2026-11-01T05:59:01+00:00",
+  "overall_status": "WARNING",
   "fatal_error": "",
   "schemes": {
     "2401000010500": {
@@ -102,29 +102,29 @@
       "remark": ""
     },
     "2402001020109": {
-      "status": 1,
-      "attempts": 1,
-      "remark": ""
+      "status": -1,
+      "attempts": 9,
+      "remark": "ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79d3d58cd0>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))"
     },
     "2402001020111": {
-      "status": 1,
-      "attempts": 1,
-      "remark": ""
+      "status": -1,
+      "attempts": 9,
+      "remark": "ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79cf8eee90>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))"
     },
     "4401001030300": {
-      "status": 1,
-      "attempts": 1,
-      "remark": ""
+      "status": -1,
+      "attempts": 9,
+      "remark": "ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79cf8eec10>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))"
     },
     "4401001030401": {
-      "status": 1,
-      "attempts": 1,
-      "remark": ""
+      "status": -1,
+      "attempts": 9,
+      "remark": "ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79d3d5bd90>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))"
     },
     "4401001030403": {
-      "status": 1,
-      "attempts": 1,
-      "remark": ""
+      "status": -1,
+      "attempts": 9,
+      "remark": "ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79cf8ee210>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))"
     }
   }
 }
