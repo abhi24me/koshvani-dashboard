@@ -12,7 +12,7 @@
       "progressive_allotment": 9893000.0,
       "total_expenditure": 4471737.0,
       "pct_expenditure_of_allotment": 45.2,
-      "crawl_status": 1
+      "crawl_status": -1
     },
     {
       "id": "agri-011-2401001020103",
@@ -26,7 +26,7 @@
       "progressive_allotment": 623900.0,
       "total_expenditure": 410480.0,
       "pct_expenditure_of_allotment": 65.79,
-      "crawl_status": 1
+      "crawl_status": -1
     },
     {
       "id": "agri-011-2401001020129",
@@ -40,7 +40,7 @@
       "progressive_allotment": 249225.0,
       "total_expenditure": 12750.0,
       "pct_expenditure_of_allotment": 5.12,
-      "crawl_status": 1
+      "crawl_status": -1
     },
     {
       "id": "agri-011-2401001030300",
@@ -54,7 +54,7 @@
       "progressive_allotment": 3270000.0,
       "total_expenditure": 2954685.0,
       "pct_expenditure_of_allotment": 90.36,
-      "crawl_status": 1
+      "crawl_status": -1
     },
     {
       "id": "agri-011-2401001030500",
@@ -68,7 +68,7 @@
       "progressive_allotment": 226951.0,
       "total_expenditure": 30000.0,
       "pct_expenditure_of_allotment": 13.22,
-      "crawl_status": 1
+      "crawl_status": -1
     },
     {
       "id": "agri-011-2401001030600",
@@ -82,7 +82,7 @@
       "progressive_allotment": 560000.0,
       "total_expenditure": 560000.0,
       "pct_expenditure_of_allotment": 100.0,
-      "crawl_status": 1
+      "crawl_status": -1
     },
     {
       "id": "agri-011-2401001070300",
@@ -96,7 +96,7 @@
       "progressive_allotment": 10764820.0,
       "total_expenditure": 4836415.0,
       "pct_expenditure_of_allotment": 44.93,
-      "crawl_status": 1
+      "crawl_status": -1
     },
     {
       "id": "agri-011-2401001070400",
@@ -110,7 +110,7 @@
       "progressive_allotment": 1083000.0,
       "total_expenditure": 422166.0,
       "pct_expenditure_of_allotment": 38.98,
-      "crawl_status": 1
+      "crawl_status": -1
     },
     {
       "id": "agri-011-2401001090103",
@@ -124,7 +124,7 @@
       "progressive_allotment": 2761483.0,
       "total_expenditure": 2551257.0,
       "pct_expenditure_of_allotment": 92.39,
-      "crawl_status": 1
+      "crawl_status": -1
     },
     {
       "id": "agri-011-2401001090104",
@@ -138,7 +138,7 @@
       "progressive_allotment": 1525000.0,
       "total_expenditure": 968380.0,
       "pct_expenditure_of_allotment": 63.5,
-      "crawl_status": 1
+      "crawl_status": -1
     },
     {
       "id": "agri-011-2401001090105",
@@ -152,7 +152,7 @@
       "progressive_allotment": 874400.0,
       "total_expenditure": 597626.0,
       "pct_expenditure_of_allotment": 68.35,
-      "crawl_status": 1
+      "crawl_status": -1
     },
     {
       "id": "agri-011-2401001090300",
@@ -166,7 +166,7 @@
       "progressive_allotment": 31586372.0,
       "total_expenditure": 18345913.0,
       "pct_expenditure_of_allotment": 58.08,
-      "crawl_status": 1
+      "crawl_status": -1
     },
     {
       "id": "agri-011-2401001090700",
@@ -180,7 +180,7 @@
       "progressive_allotment": 655000.0,
       "total_expenditure": 644000.0,
       "pct_expenditure_of_allotment": 98.32,
-      "crawl_status": 1
+      "crawl_status": -1
     },
     {
       "id": "agri-011-2401001090900",
@@ -194,7 +194,7 @@
       "progressive_allotment": 235200.0,
       "total_expenditure": 14151.0,
       "pct_expenditure_of_allotment": 6.02,
-      "crawl_status": 1
+      "crawl_status": -1
     },
     {
       "id": "agri-011-2401001130104",
@@ -208,7 +208,7 @@
       "progressive_allotment": 8865900.0,
       "total_expenditure": 3494964.0,
       "pct_expenditure_of_allotment": 39.42,
-      "crawl_status": 1
+      "crawl_status": -1
     },
     {
       "id": "agri-011-2401001140101",
@@ -222,7 +222,7 @@
       "progressive_allotment": 241250.0,
       "total_expenditure": 200000.0,
       "pct_expenditure_of_allotment": 82.9,
-      "crawl_status": 1
+      "crawl_status": -1
     },
     {
       "id": "agri-011-2401001140300",
@@ -236,7 +236,7 @@
       "progressive_allotment": 26000.0,
       "total_expenditure": 26000.0,
       "pct_expenditure_of_allotment": 100.0,
-      "crawl_status": 1
+      "crawl_status": -1
     },
     {
       "id": "agri-011-2401008000203",
@@ -250,7 +250,7 @@
       "progressive_allotment": 2692374.0,
       "total_expenditure": 1005804.0,
       "pct_expenditure_of_allotment": 37.36,
-      "crawl_status": 1
+      "crawl_status": -1
     },
     {
       "id": "agri-011-2401008000400",
@@ -264,7 +264,7 @@
       "progressive_allotment": 390000.0,
       "total_expenditure": 338823.0,
       "pct_expenditure_of_allotment": 86.88,
-      "crawl_status": 1
+      "crawl_status": -1
     },
     {
       "id": "agri-011-2402001020109",
@@ -337,11 +337,11 @@
       "crawl_status": -1
     }
   ],
-  "generated_at": "2026-11-01T05:59:01+00:00",
-  "execution_id": "20261031-231230-5fbdce",
+  "generated_at": "2026-11-01T14:29:02+00:00",
+  "execution_id": "20261101-183629-64034a",
   "overall_status": "WARNING",
   "expected_scheme_count": 24,
-  "successful_scheme_count": 19,
-  "failed_scheme_count": 5,
+  "successful_scheme_count": 0,
+  "failed_scheme_count": 24,
   "unprocessed_scheme_count": 0
 }
