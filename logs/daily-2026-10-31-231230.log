@@ -1,0 +1,807 @@
+
+2026-10-31 23:12:30 INFO  [run_daily] ========================================
+2026-10-31 23:12:30 INFO  [run_daily] KOSHVANI JOB STARTED
+2026-10-31 23:12:30 INFO  [run_daily] execution_id=20261031-231230-5fbdce log=logs/daily-2026-10-31-231230.log
+2026-10-31 23:12:30 INFO  [run_daily] host: Linux 5.15.178-android13-8-g8805f47e70a8-ab36 | Python 3.14.6 | git version 2.55.0
+2026-10-31 23:12:30 INFO  [run_daily] repo: branch=main HEAD=93906ee dir=/data/data/com.termux/files/home/koshvani-dashboard
+2026-10-31 23:12:30 INFO  [run_daily] ========================================
+
+2026-10-31 23:12:30 INFO  [run_daily] [1/6] Checking Git status...
+?? logs/daily-2026-10-31-231230.log
+
+2026-10-31 23:12:31 INFO  [run_daily] [2/6] Pulling latest code from GitHub...
+2026-10-31 23:12:31 INFO  [run_daily] GIT pull --rebase: START
+From https://github.com/abhi24me/koshvani-dashboard
+ * branch            main       -> FETCH_HEAD
+Already up to date.
+2026-10-31 23:12:32 INFO  [run_daily] GIT pull --rebase: END exit_code=0 elapsed=1s
+2026-10-31 23:12:32 INFO  [run_daily] Git pull successful.
+
+2026-10-31 23:12:32 INFO  [run_daily] [3/6] Starting Koshvani scraper...
+2026-10-31 23:12:34.632 INFO  [MainThread] ==================================================
+2026-10-31 23:12:34.635 INFO  [MainThread] KOSHVANI CRAWLER START
+2026-10-31 23:12:34.636 INFO  [MainThread] Execution ID: 20261031-231230-5fbdce
+2026-10-31 23:12:34.636 INFO  [MainThread] Python 3.14.6 | requests 2.34.2 | time zone offset +0530
+2026-10-31 23:12:34.639 INFO  [MainThread] Config: schemes=24 workers=4 max_attempts=3 retry_delays=5-15s/15-30s request_timeout=45s stagger=4+0-2s bounce_hold=60-120s cooldown_rounds=2x300s
+2026-10-31 23:12:34.644 INFO  [MainThread] STATUS RESET execution_id=20261031-231230-5fbdce schemes=24 all set to status=0 [crawler_status.json 2366 bytes, 4 ms]
+2026-10-31 23:12:34.689 INFO  [MainThread] FILE WRITE index.json 14360 bytes 5 ms | overall=RUNNING successful=0 failed=0 unprocessed=24
+2026-10-31 23:12:34.691 INFO  [worker_0] [01/24 2401000010500] SCHEME START कृषि विभाग — जिला संगठन (Grant 011) (worker=worker_0)
+2026-10-31 23:12:34.692 INFO  [worker_0] [01/24 2401000010500] Attempt 1/3 START
+2026-10-31 23:12:34.696 INFO  [worker_1] [02/24 2401001020103] SCHEME START फूड एण्ड न्यूट्रिशन सिक्यूरिटी (कृषि उन्नति योजना) (के.60/रा.40-के.+ रा.) (Grant 011) (worker=worker_1)
+2026-10-31 23:12:34.697 INFO  [worker_1] [02/24 2401001020103] Start stagger: waiting 5.4s so workers do not hit the portal together
+2026-10-31 23:12:34.699 INFO  [worker_2] [03/24 2401001020129] SCHEME START मिशन फार आत्मनिर्भरता इन पल्सेस (के.60/रा.40-के.+रा.) (Grant 011) (worker=worker_2)
+2026-10-31 23:12:34.699 INFO  [worker_2] [03/24 2401001020129] Start stagger: waiting 11.0s so workers do not hit the portal together
+2026-10-31 23:12:34.704 INFO  [worker_3] [04/24 2401001030300] SCHEME START प्रयोगात्मक प्रक्षेत्र प्रदर्शन और बीज बर्द्धन प्रक्षेत्र (Grant 011) (worker=worker_3)
+2026-10-31 23:12:34.705 INFO  [worker_3] [04/24 2401001030300] Start stagger: waiting 16.9s so workers do not hit the portal together
+2026-10-31 23:12:34.726 INFO  [worker_0] [01/24 2401000010500] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-10-31 23:12:35.904 INFO  [worker_0] [01/24 2401000010500] HTTP GET main page (KoshvaniStatic.aspx) END status=200 bytes=32533 elapsed=1.18s
+2026-10-31 23:12:36.054 INFO  [worker_0] [01/24 2401000010500] HTTP GET grant list (ExpGrant.aspx) START
+2026-10-31 23:12:36.514 INFO  [worker_0] [01/24 2401000010500] HTTP GET grant list (ExpGrant.aspx) END status=200 bytes=112839 elapsed=0.46s
+2026-10-31 23:12:36.776 INFO  [worker_0] [01/24 2401000010500] HTTP GET scheme list (Extra_plnDept.aspx) START
+2026-10-31 23:12:40.124 INFO  [worker_1] [02/24 2401001020103] Attempt 1/3 START
+2026-10-31 23:12:40.150 INFO  [worker_1] [02/24 2401001020103] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-10-31 23:12:41.178 INFO  [worker_1] [02/24 2401001020103] HTTP GET main page (KoshvaniStatic.aspx) END status=200 bytes=32533 elapsed=1.02s
+2026-10-31 23:12:41.222 INFO  [worker_1] [02/24 2401001020103] HTTP GET grant list (ExpGrant.aspx) START
+2026-10-31 23:12:41.802 INFO  [worker_1] [02/24 2401001020103] HTTP GET grant list (ExpGrant.aspx) END status=200 bytes=112839 elapsed=0.58s
+2026-10-31 23:12:42.051 INFO  [worker_1] [02/24 2401001020103] HTTP GET scheme list (Extra_plnDept.aspx) START
+2026-10-31 23:12:43.891 INFO  [worker_0] [01/24 2401000010500] HTTP GET scheme list (Extra_plnDept.aspx) END status=200 bytes=728584 elapsed=7.11s redirects=1 final=ExpHead.aspx
+2026-10-31 23:12:45.718 INFO  [worker_2] [03/24 2401001020129] Attempt 1/3 START
+2026-10-31 23:12:45.768 INFO  [worker_2] [03/24 2401001020129] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-10-31 23:12:46.427 INFO  [worker_0] [01/24 2401000010500] HTTP GET scheme report (Extra_plnDept.aspx) START
+2026-10-31 23:12:46.812 INFO  [worker_2] [03/24 2401001020129] HTTP GET main page (KoshvaniStatic.aspx) END status=200 bytes=32533 elapsed=1.04s
+2026-10-31 23:12:46.862 INFO  [worker_2] [03/24 2401001020129] HTTP GET grant list (ExpGrant.aspx) START
+2026-10-31 23:12:47.387 INFO  [worker_2] [03/24 2401001020129] HTTP GET grant list (ExpGrant.aspx) END status=200 bytes=112839 elapsed=0.53s
+2026-10-31 23:12:47.647 INFO  [worker_2] [03/24 2401001020129] HTTP GET scheme list (Extra_plnDept.aspx) START
+2026-10-31 23:12:51.628 INFO  [worker_3] [04/24 2401001030300] Attempt 1/3 START
+2026-10-31 23:12:51.652 INFO  [worker_1] [02/24 2401001020103] HTTP GET scheme list (Extra_plnDept.aspx) END status=200 bytes=728584 elapsed=9.60s redirects=1 final=ExpHead.aspx
+2026-10-31 23:12:51.659 INFO  [worker_3] [04/24 2401001030300] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-10-31 23:12:52.890 INFO  [worker_3] [04/24 2401001030300] HTTP GET main page (KoshvaniStatic.aspx) END status=200 bytes=32533 elapsed=1.23s
+2026-10-31 23:12:53.172 INFO  [worker_3] [04/24 2401001030300] HTTP GET grant list (ExpGrant.aspx) START
+2026-10-31 23:12:53.733 INFO  [worker_3] [04/24 2401001030300] HTTP GET grant list (ExpGrant.aspx) END status=200 bytes=112839 elapsed=0.55s
+2026-10-31 23:12:54.555 INFO  [worker_3] [04/24 2401001030300] HTTP GET scheme list (Extra_plnDept.aspx) START
+2026-10-31 23:12:54.558 INFO  [worker_1] [02/24 2401001020103] HTTP GET scheme report (Extra_plnDept.aspx) START
+2026-10-31 23:12:54.815 INFO  [worker_2] [03/24 2401001020129] HTTP GET scheme list (Extra_plnDept.aspx) END status=200 bytes=728584 elapsed=7.17s redirects=1 final=ExpHead.aspx
+2026-10-31 23:12:56.903 INFO  [worker_2] [03/24 2401001020129] HTTP GET scheme report (Extra_plnDept.aspx) START
+2026-10-31 23:12:59.804 INFO  [worker_1] [02/24 2401001020103] HTTP GET scheme report (Extra_plnDept.aspx) END status=200 bytes=170989 elapsed=5.24s redirects=1 final=ExpTreas.aspx
+2026-10-31 23:13:00.318 INFO  [worker_1] [02/24 2401001020103] PARSE report table: columns=9 district_rows=2 fin_year=2026-2027 months={'prev_month': 'September', 'current_month': 'October'}
+2026-10-31 23:13:00.319 INFO  [worker_1] [02/24 2401001020103] VALIDATE ok status=ok rows=2
+2026-10-31 23:13:00.324 INFO  [worker_1] [02/24 2401001020103] FILE WRITE agri-011-2401001020103.json 1594 bytes 2 ms (status=ok, rows=2)
+2026-10-31 23:13:00.326 INFO  [worker_1] [02/24 2401001020103] STATUS UPDATE scheme=2401001020103 status=1 attempts=1 remark='' [crawler_status.json 2366 bytes, 2 ms]
+2026-10-31 23:13:00.327 INFO  [worker_1] [02/24 2401001020103] Attempt 1/3 succeeded in 20.20s
+2026-10-31 23:13:00.327 INFO  [worker_1] [02/24 2401001020103] SCHEME DONE status=1 attempts=1 elapsed=25.63s worker=worker_1
+2026-10-31 23:13:00.328 INFO  [worker_1] [05/24 2401001030500] SCHEME START संकर बीजों के उपयोग को बढ़ावा देने की योजना (Grant 011) (worker=worker_1)
+2026-10-31 23:13:00.329 INFO  [worker_1] [05/24 2401001030500] Attempt 1/3 START
+2026-10-31 23:13:00.339 INFO  [MainThread] FILE WRITE index.json 14360 bytes 3 ms | overall=RUNNING successful=1 failed=0 unprocessed=23
+2026-10-31 23:13:00.351 INFO  [worker_1] [05/24 2401001030500] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-10-31 23:13:01.141 INFO  [worker_2] [03/24 2401001020129] HTTP GET scheme report (Extra_plnDept.aspx) END status=200 bytes=161846 elapsed=4.24s redirects=1 final=ExpTreas.aspx
+2026-10-31 23:13:01.400 INFO  [worker_1] [05/24 2401001030500] HTTP GET main page (KoshvaniStatic.aspx) END status=200 bytes=32533 elapsed=1.05s
+2026-10-31 23:13:01.566 INFO  [worker_3] [04/24 2401001030300] HTTP GET scheme list (Extra_plnDept.aspx) END status=200 bytes=728584 elapsed=7.01s redirects=1 final=ExpHead.aspx
+2026-10-31 23:13:01.571 INFO  [worker_1] [05/24 2401001030500] HTTP GET grant list (ExpGrant.aspx) START
+2026-10-31 23:13:02.002 INFO  [worker_2] [03/24 2401001020129] PARSE report table: columns=9 district_rows=3 fin_year=2026-2027 months={'prev_month': 'September', 'current_month': 'October'}
+2026-10-31 23:13:02.009 INFO  [worker_2] [03/24 2401001020129] VALIDATE ok status=ok rows=3
+2026-10-31 23:13:02.048 INFO  [worker_1] [05/24 2401001030500] HTTP GET grant list (ExpGrant.aspx) END status=200 bytes=112839 elapsed=0.46s
+2026-10-31 23:13:02.049 INFO  [worker_2] [03/24 2401001020129] FILE WRITE agri-011-2401001020129.json 1816 bytes 25 ms (status=ok, rows=3)
+2026-10-31 23:13:02.126 INFO  [worker_2] [03/24 2401001020129] STATUS UPDATE scheme=2401001020129 status=1 attempts=1 remark='' [crawler_status.json 2366 bytes, 60 ms]
+2026-10-31 23:13:02.127 INFO  [worker_2] [03/24 2401001020129] Attempt 1/3 succeeded in 16.40s
+2026-10-31 23:13:02.129 INFO  [worker_2] [03/24 2401001020129] SCHEME DONE status=1 attempts=1 elapsed=27.43s worker=worker_2
+2026-10-31 23:13:02.130 INFO  [worker_2] [06/24 2401001030600] SCHEME START उत्तर प्रदेश मिलेट्स पुनरोद्धार कार्यक्रम (Grant 011) (worker=worker_2)
+2026-10-31 23:13:02.141 INFO  [worker_2] [06/24 2401001030600] Start stagger: waiting 4.0s so workers do not hit the portal together
+2026-10-31 23:13:02.974 INFO  [worker_1] [05/24 2401001030500] HTTP GET scheme list (Extra_plnDept.aspx) START
+2026-10-31 23:13:03.165 INFO  [MainThread] FILE WRITE index.json 14360 bytes 65 ms | overall=RUNNING successful=2 failed=0 unprocessed=22
+2026-10-31 23:13:05.087 INFO  [worker_3] [04/24 2401001030300] HTTP GET scheme report (Extra_plnDept.aspx) START
+2026-10-31 23:13:06.170 INFO  [worker_2] [06/24 2401001030600] Attempt 1/3 START
+2026-10-31 23:13:06.199 INFO  [worker_2] [06/24 2401001030600] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-10-31 23:13:07.264 INFO  [worker_2] [06/24 2401001030600] HTTP GET main page (KoshvaniStatic.aspx) END status=200 bytes=32533 elapsed=1.06s
+2026-10-31 23:13:07.308 INFO  [worker_2] [06/24 2401001030600] HTTP GET grant list (ExpGrant.aspx) START
+2026-10-31 23:13:07.909 INFO  [worker_2] [06/24 2401001030600] HTTP GET grant list (ExpGrant.aspx) END status=200 bytes=112839 elapsed=0.60s
+2026-10-31 23:13:08.142 INFO  [worker_2] [06/24 2401001030600] HTTP GET scheme list (Extra_plnDept.aspx) START
+2026-10-31 23:13:10.195 INFO  [worker_0] [01/24 2401000010500] HTTP GET scheme report (Extra_plnDept.aspx) END status=200 bytes=603337 elapsed=23.77s redirects=1 final=ExpTreas.aspx
+2026-10-31 23:13:10.256 INFO  [worker_1] [05/24 2401001030500] HTTP GET scheme list (Extra_plnDept.aspx) END status=200 bytes=728584 elapsed=7.27s redirects=1 final=ExpHead.aspx
+2026-10-31 23:13:15.117 INFO  [worker_1] [05/24 2401001030500] HTTP GET scheme report (Extra_plnDept.aspx) START
+2026-10-31 23:13:15.238 INFO  [worker_0] [01/24 2401000010500] PARSE report table: columns=9 district_rows=17 fin_year=2026-2027 months={'prev_month': 'September', 'current_month': 'October'}
+2026-10-31 23:13:15.240 INFO  [worker_0] [01/24 2401000010500] VALIDATE ok status=ok rows=17
+2026-10-31 23:13:15.254 INFO  [worker_2] [06/24 2401001030600] HTTP GET scheme list (Extra_plnDept.aspx) END status=200 bytes=728584 elapsed=7.11s redirects=1 final=ExpHead.aspx
+2026-10-31 23:13:15.312 INFO  [worker_0] [01/24 2401000010500] FILE WRITE agri-011-2401000010500.json 5009 bytes 62 ms (status=ok, rows=17)
+2026-10-31 23:13:15.379 INFO  [worker_0] [01/24 2401000010500] STATUS UPDATE scheme=2401000010500 status=1 attempts=1 remark='' [crawler_status.json 2366 bytes, 56 ms]
+2026-10-31 23:13:15.385 INFO  [worker_0] [01/24 2401000010500] Attempt 1/3 succeeded in 40.69s
+2026-10-31 23:13:15.391 INFO  [worker_0] [01/24 2401000010500] SCHEME DONE status=1 attempts=1 elapsed=40.69s worker=worker_0
+2026-10-31 23:13:15.398 INFO  [worker_0] [07/24 2401001070300] SCHEME START पौध संरक्षण सेवा तथा कृषि रक्षा सेवा (Grant 011) (worker=worker_0)
+2026-10-31 23:13:15.406 INFO  [worker_0] [07/24 2401001070300] Attempt 1/3 START
+2026-10-31 23:13:15.458 INFO  [worker_0] [07/24 2401001070300] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-10-31 23:13:16.630 INFO  [MainThread] FILE WRITE index.json 14360 bytes 65 ms | overall=RUNNING successful=3 failed=0 unprocessed=21
+2026-10-31 23:13:16.782 INFO  [worker_1] [05/24 2401001030500] HTTP GET scheme report (Extra_plnDept.aspx) END status=200 bytes=83737 elapsed=1.66s redirects=1 final=ExpTreas.aspx
+2026-10-31 23:13:17.098 INFO  [worker_0] [07/24 2401001070300] HTTP GET main page (KoshvaniStatic.aspx) END status=200 bytes=32533 elapsed=1.64s
+2026-10-31 23:13:17.429 INFO  [worker_0] [07/24 2401001070300] HTTP GET grant list (ExpGrant.aspx) START
+2026-10-31 23:13:17.559 INFO  [worker_1] [05/24 2401001030500] PARSE report table: columns=9 district_rows=1 fin_year=2026-2027 months={'prev_month': 'September', 'current_month': 'October'}
+2026-10-31 23:13:17.566 INFO  [worker_1] [05/24 2401001030500] VALIDATE ok status=ok rows=1
+2026-10-31 23:13:17.688 INFO  [worker_1] [05/24 2401001030500] FILE WRITE agri-011-2401001030500.json 1312 bytes 99 ms (status=ok, rows=1)
+2026-10-31 23:13:17.778 INFO  [worker_1] [05/24 2401001030500] STATUS UPDATE scheme=2401001030500 status=1 attempts=1 remark='' [crawler_status.json 2366 bytes, 79 ms]
+2026-10-31 23:13:17.785 INFO  [worker_1] [05/24 2401001030500] Attempt 1/3 succeeded in 17.46s
+2026-10-31 23:13:17.791 INFO  [worker_1] [05/24 2401001030500] SCHEME DONE status=1 attempts=1 elapsed=17.46s worker=worker_1
+2026-10-31 23:13:17.799 INFO  [worker_1] [08/24 2401001070400] SCHEME START विभिन्न परिस्थितिकी संसाधनों द्वारा कीट / रोग नियंत्रण (Grant 011) (worker=worker_1)
+2026-10-31 23:13:17.806 INFO  [worker_1] [08/24 2401001070400] Start stagger: waiting 3.5s so workers do not hit the portal together
+2026-10-31 23:13:18.058 INFO  [worker_0] [07/24 2401001070300] HTTP GET grant list (ExpGrant.aspx) END status=200 bytes=112839 elapsed=0.62s
+2026-10-31 23:13:18.280 INFO  [worker_3] [04/24 2401001030300] HTTP GET scheme report (Extra_plnDept.aspx) END status=200 bytes=349095 elapsed=13.19s redirects=1 final=ExpTreas.aspx
+2026-10-31 23:13:19.417 INFO  [worker_0] [07/24 2401001070300] HTTP GET scheme list (Extra_plnDept.aspx) START
+2026-10-31 23:13:19.939 INFO  [MainThread] FILE WRITE index.json 14360 bytes 750 ms | overall=RUNNING successful=4 failed=0 unprocessed=20
+2026-10-31 23:13:20.283 INFO  [worker_2] [06/24 2401001030600] HTTP GET scheme report (Extra_plnDept.aspx) START
+2026-10-31 23:13:21.169 INFO  [worker_3] [04/24 2401001030300] PARSE report table: columns=9 district_rows=11 fin_year=2026-2027 months={'prev_month': 'September', 'current_month': 'October'}
+2026-10-31 23:13:21.170 INFO  [worker_3] [04/24 2401001030300] VALIDATE ok status=ok rows=11
+2026-10-31 23:13:21.176 INFO  [worker_3] [04/24 2401001030300] FILE WRITE agri-011-2401001030300.json 3514 bytes 2 ms (status=ok, rows=11)
+2026-10-31 23:13:21.179 INFO  [worker_3] [04/24 2401001030300] STATUS UPDATE scheme=2401001030300 status=1 attempts=1 remark='' [crawler_status.json 2366 bytes, 2 ms]
+2026-10-31 23:13:21.179 INFO  [worker_3] [04/24 2401001030300] Attempt 1/3 succeeded in 29.55s
+2026-10-31 23:13:21.179 INFO  [worker_3] [04/24 2401001030300] SCHEME DONE status=1 attempts=1 elapsed=46.47s worker=worker_3
+2026-10-31 23:13:21.180 INFO  [worker_3] [09/24 2401001090103] SCHEME START नेशनल मिशन ऑन एग्रीकल्चर एक्सटेंशन एण्ड टेक्नोलाजी (एन.एम.ए.ई.टी.) के अर्न्तगत सबमिशन ऑन एग्रीकल्चर एक्स्टेंशन (के.60/रा.40-के.+ रा.) (Grant 011) (worker=worker_3)
+2026-10-31 23:13:21.180 INFO  [worker_3] [09/24 2401001090103] Start stagger: waiting 5.2s so workers do not hit the portal together
+2026-10-31 23:13:21.198 INFO  [MainThread] FILE WRITE index.json 14360 bytes 3 ms | overall=RUNNING successful=5 failed=0 unprocessed=19
+2026-10-31 23:13:21.278 INFO  [worker_1] [08/24 2401001070400] Attempt 1/3 START
+2026-10-31 23:13:21.311 INFO  [worker_1] [08/24 2401001070400] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-10-31 23:13:22.437 INFO  [worker_1] [08/24 2401001070400] HTTP GET main page (KoshvaniStatic.aspx) END status=200 bytes=32533 elapsed=1.13s
+2026-10-31 23:13:22.485 INFO  [worker_1] [08/24 2401001070400] HTTP GET grant list (ExpGrant.aspx) START
+2026-10-31 23:13:23.115 INFO  [worker_1] [08/24 2401001070400] HTTP GET grant list (ExpGrant.aspx) END status=200 bytes=112839 elapsed=0.63s
+2026-10-31 23:13:23.411 INFO  [worker_1] [08/24 2401001070400] HTTP GET scheme list (Extra_plnDept.aspx) START
+2026-10-31 23:13:23.604 INFO  [worker_2] [06/24 2401001030600] HTTP GET scheme report (Extra_plnDept.aspx) END status=200 bytes=131095 elapsed=3.31s redirects=1 final=ExpTreas.aspx
+2026-10-31 23:13:24.025 INFO  [worker_2] [06/24 2401001030600] PARSE report table: columns=9 district_rows=2 fin_year=2026-2027 months={'prev_month': 'September', 'current_month': 'October'}
+2026-10-31 23:13:24.026 INFO  [worker_2] [06/24 2401001030600] VALIDATE ok status=ok rows=2
+2026-10-31 23:13:24.036 INFO  [worker_2] [06/24 2401001030600] FILE WRITE agri-011-2401001030600.json 1630 bytes 6 ms (status=ok, rows=2)
+2026-10-31 23:13:24.043 INFO  [worker_2] [06/24 2401001030600] STATUS UPDATE scheme=2401001030600 status=1 attempts=1 remark='' [crawler_status.json 2366 bytes, 5 ms]
+2026-10-31 23:13:24.043 INFO  [worker_2] [06/24 2401001030600] Attempt 1/3 succeeded in 17.87s
+2026-10-31 23:13:24.043 INFO  [worker_2] [06/24 2401001030600] SCHEME DONE status=1 attempts=1 elapsed=21.91s worker=worker_2
+2026-10-31 23:13:24.044 INFO  [worker_2] [10/24 2401001090104] SCHEME START नेशनल मिशन ऑन एग्रीकल्चर एक्सटेंशन एण्ड टेक्नोलाजी (एन.एम.ए.ई.टी.) के अर्न्तगत सबमिशन आफ एग्रीकल्चर मेकेनाइजेशन (के.60/रा.40-के.+ रा.) (Grant 011) (worker=worker_2)
+2026-10-31 23:13:24.044 INFO  [worker_2] [10/24 2401001090104] Start stagger: waiting 6.7s so workers do not hit the portal together
+2026-10-31 23:13:24.060 INFO  [MainThread] FILE WRITE index.json 14360 bytes 6 ms | overall=RUNNING successful=6 failed=0 unprocessed=18
+2026-10-31 23:13:26.408 INFO  [worker_3] [09/24 2401001090103] Attempt 1/3 START
+2026-10-31 23:13:26.433 INFO  [worker_3] [09/24 2401001090103] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-10-31 23:13:27.509 INFO  [worker_3] [09/24 2401001090103] HTTP GET main page (KoshvaniStatic.aspx) END status=200 bytes=32533 elapsed=1.08s
+2026-10-31 23:13:27.560 INFO  [worker_3] [09/24 2401001090103] HTTP GET grant list (ExpGrant.aspx) START
+2026-10-31 23:13:28.233 INFO  [worker_3] [09/24 2401001090103] HTTP GET grant list (ExpGrant.aspx) END status=200 bytes=112839 elapsed=0.67s
+2026-10-31 23:13:28.366 INFO  [worker_0] [07/24 2401001070300] HTTP GET scheme list (Extra_plnDept.aspx) END status=200 bytes=728584 elapsed=8.93s redirects=1 final=ExpHead.aspx
+2026-10-31 23:13:28.749 INFO  [worker_3] [09/24 2401001090103] HTTP GET scheme list (Extra_plnDept.aspx) START
+2026-10-31 23:13:30.903 INFO  [worker_2] [10/24 2401001090104] Attempt 1/3 START
+2026-10-31 23:13:30.959 INFO  [worker_2] [10/24 2401001090104] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-10-31 23:13:31.195 INFO  [worker_1] [08/24 2401001070400] HTTP GET scheme list (Extra_plnDept.aspx) END status=200 bytes=728584 elapsed=7.78s redirects=1 final=ExpHead.aspx
+2026-10-31 23:13:32.224 INFO  [worker_2] [10/24 2401001090104] HTTP GET main page (KoshvaniStatic.aspx) END status=200 bytes=32533 elapsed=1.25s
+2026-10-31 23:13:32.713 INFO  [worker_2] [10/24 2401001090104] HTTP GET grant list (ExpGrant.aspx) START
+2026-10-31 23:13:33.338 INFO  [worker_2] [10/24 2401001090104] HTTP GET grant list (ExpGrant.aspx) END status=200 bytes=112839 elapsed=0.61s
+2026-10-31 23:13:33.472 INFO  [worker_0] [07/24 2401001070300] HTTP GET scheme report (Extra_plnDept.aspx) START
+2026-10-31 23:13:34.233 INFO  [worker_2] [10/24 2401001090104] HTTP GET scheme list (Extra_plnDept.aspx) START
+2026-10-31 23:13:35.679 INFO  [worker_1] [08/24 2401001070400] HTTP GET scheme report (Extra_plnDept.aspx) START
+2026-10-31 23:13:36.146 INFO  [worker_3] [09/24 2401001090103] HTTP GET scheme list (Extra_plnDept.aspx) END status=200 bytes=728584 elapsed=7.39s redirects=1 final=ExpHead.aspx
+2026-10-31 23:13:38.163 INFO  [worker_3] [09/24 2401001090103] HTTP GET scheme report (Extra_plnDept.aspx) START
+2026-10-31 23:13:41.586 INFO  [worker_2] [10/24 2401001090104] HTTP GET scheme list (Extra_plnDept.aspx) END status=200 bytes=728584 elapsed=7.35s redirects=1 final=ExpHead.aspx
+2026-10-31 23:13:42.680 INFO  [worker_3] [09/24 2401001090103] HTTP GET scheme report (Extra_plnDept.aspx) END status=200 bytes=158679 elapsed=4.52s redirects=1 final=ExpTreas.aspx
+2026-10-31 23:13:44.247 INFO  [worker_3] [09/24 2401001090103] PARSE report table: columns=9 district_rows=3 fin_year=2026-2027 months={'prev_month': 'September', 'current_month': 'October'}
+2026-10-31 23:13:44.254 INFO  [worker_3] [09/24 2401001090103] VALIDATE ok status=ok rows=3
+2026-10-31 23:13:44.329 INFO  [worker_3] [09/24 2401001090103] FILE WRITE agri-011-2401001090103.json 2059 bytes 51 ms (status=ok, rows=3)
+2026-10-31 23:13:44.442 INFO  [worker_3] [09/24 2401001090103] STATUS UPDATE scheme=2401001090103 status=1 attempts=1 remark='' [crawler_status.json 2366 bytes, 106 ms]
+2026-10-31 23:13:44.448 INFO  [worker_3] [09/24 2401001090103] Attempt 1/3 succeeded in 18.04s
+2026-10-31 23:13:44.453 INFO  [worker_3] [09/24 2401001090103] SCHEME DONE status=1 attempts=1 elapsed=23.27s worker=worker_3
+2026-10-31 23:13:44.459 INFO  [worker_3] [11/24 2401001090105] SCHEME START नेशनल मिशन ऑन एग्रीकल्चर एक्सटेंशन एण्ड टेक्नोलाजी (एन.एम.ए.ई.टी.) के अर्न्तगत नेशनल ई-गर्वनेन्स प्रोग्राम (के.60/रा.40-के.+ रा.) (Grant 011) (worker=worker_3)
+2026-10-31 23:13:44.465 INFO  [worker_3] [11/24 2401001090105] Attempt 1/3 START
+2026-10-31 23:13:44.517 INFO  [worker_3] [11/24 2401001090105] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-10-31 23:13:45.298 INFO  [worker_2] [10/24 2401001090104] HTTP GET scheme report (Extra_plnDept.aspx) START
+2026-10-31 23:13:45.308 INFO  [MainThread] FILE WRITE index.json 14360 bytes 37 ms | overall=RUNNING successful=7 failed=0 unprocessed=17
+2026-10-31 23:13:45.800 INFO  [worker_3] [11/24 2401001090105] HTTP GET main page (KoshvaniStatic.aspx) END status=200 bytes=32533 elapsed=1.28s
+2026-10-31 23:13:45.857 INFO  [worker_3] [11/24 2401001090105] HTTP GET grant list (ExpGrant.aspx) START
+2026-10-31 23:13:46.528 INFO  [worker_3] [11/24 2401001090105] HTTP GET grant list (ExpGrant.aspx) END status=200 bytes=112839 elapsed=0.67s
+2026-10-31 23:13:46.763 INFO  [worker_3] [11/24 2401001090105] HTTP GET scheme list (Extra_plnDept.aspx) START
+2026-10-31 23:13:48.208 INFO  [worker_2] [10/24 2401001090104] HTTP GET scheme report (Extra_plnDept.aspx) END status=200 bytes=120118 elapsed=2.91s redirects=1 final=ExpTreas.aspx
+2026-10-31 23:13:48.534 INFO  [worker_2] [10/24 2401001090104] PARSE report table: columns=9 district_rows=2 fin_year=2026-2027 months={'prev_month': 'September', 'current_month': 'October'}
+2026-10-31 23:13:48.535 INFO  [worker_2] [10/24 2401001090104] VALIDATE ok status=ok rows=2
+2026-10-31 23:13:48.542 INFO  [worker_2] [10/24 2401001090104] FILE WRITE agri-011-2401001090104.json 1734 bytes 2 ms (status=ok, rows=2)
+2026-10-31 23:13:48.544 INFO  [worker_2] [10/24 2401001090104] STATUS UPDATE scheme=2401001090104 status=1 attempts=1 remark='' [crawler_status.json 2366 bytes, 2 ms]
+2026-10-31 23:13:48.544 INFO  [worker_2] [10/24 2401001090104] Attempt 1/3 succeeded in 17.64s
+2026-10-31 23:13:48.545 INFO  [worker_2] [10/24 2401001090104] SCHEME DONE status=1 attempts=1 elapsed=24.50s worker=worker_2
+2026-10-31 23:13:48.545 INFO  [worker_2] [12/24 2401001090300] SCHEME START कृषि प्रसार प्रायोजना तथा प्रदर्शनियां (Grant 011) (worker=worker_2)
+2026-10-31 23:13:48.546 INFO  [worker_2] [12/24 2401001090300] Start stagger: waiting 1.8s so workers do not hit the portal together
+2026-10-31 23:13:48.565 INFO  [MainThread] FILE WRITE index.json 14360 bytes 3 ms | overall=RUNNING successful=8 failed=0 unprocessed=16
+2026-10-31 23:13:50.145 INFO  [worker_1] [08/24 2401001070400] HTTP GET scheme report (Extra_plnDept.aspx) END status=200 bytes=446338 elapsed=14.47s redirects=1 final=ExpTreas.aspx
+2026-10-31 23:13:50.362 INFO  [worker_2] [12/24 2401001090300] Attempt 1/3 START
+2026-10-31 23:13:50.401 INFO  [worker_2] [12/24 2401001090300] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-10-31 23:13:51.391 INFO  [worker_2] [12/24 2401001090300] HTTP GET main page (KoshvaniStatic.aspx) END status=200 bytes=32533 elapsed=0.98s
+2026-10-31 23:13:51.563 INFO  [worker_2] [12/24 2401001090300] HTTP GET grant list (ExpGrant.aspx) START
+2026-10-31 23:13:51.809 INFO  [worker_1] [08/24 2401001070400] PARSE report table: columns=9 district_rows=10 fin_year=2026-2027 months={'prev_month': 'September', 'current_month': 'October'}
+2026-10-31 23:13:51.810 INFO  [worker_1] [08/24 2401001070400] VALIDATE ok status=ok rows=10
+2026-10-31 23:13:51.827 INFO  [worker_1] [08/24 2401001070400] FILE WRITE agri-011-2401001070400.json 3645 bytes 12 ms (status=ok, rows=10)
+2026-10-31 23:13:51.829 INFO  [worker_1] [08/24 2401001070400] STATUS UPDATE scheme=2401001070400 status=1 attempts=1 remark='' [crawler_status.json 2366 bytes, 2 ms]
+2026-10-31 23:13:51.830 INFO  [worker_1] [08/24 2401001070400] Attempt 1/3 succeeded in 30.55s
+2026-10-31 23:13:51.830 INFO  [worker_1] [08/24 2401001070400] SCHEME DONE status=1 attempts=1 elapsed=34.03s worker=worker_1
+2026-10-31 23:13:51.830 INFO  [worker_1] [13/24 2401001090700] SCHEME START कृषि उत्पादन में वृद्धि के लिए कृषि प्रसार, कृषि निवेश तथा तकनीकी प्रबंधन (Grant 011) (worker=worker_1)
+2026-10-31 23:13:51.831 INFO  [worker_1] [13/24 2401001090700] Start stagger: waiting 3.9s so workers do not hit the portal together
+2026-10-31 23:13:51.844 INFO  [MainThread] FILE WRITE index.json 14360 bytes 5 ms | overall=RUNNING successful=9 failed=0 unprocessed=15
+2026-10-31 23:13:53.560 INFO  [worker_2] [12/24 2401001090300] HTTP GET grant list (ExpGrant.aspx) END status=200 bytes=112839 elapsed=1.99s
+2026-10-31 23:13:53.801 INFO  [worker_2] [12/24 2401001090300] HTTP GET scheme list (Extra_plnDept.aspx) START
+2026-10-31 23:13:55.204 INFO  [worker_3] [11/24 2401001090105] HTTP GET scheme list (Extra_plnDept.aspx) END status=200 bytes=728584 elapsed=8.44s redirects=1 final=ExpHead.aspx
+2026-10-31 23:13:55.739 INFO  [worker_1] [13/24 2401001090700] Attempt 1/3 START
+2026-10-31 23:13:55.778 INFO  [worker_1] [13/24 2401001090700] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-10-31 23:13:57.416 INFO  [worker_1] [13/24 2401001090700] HTTP GET main page (KoshvaniStatic.aspx) END status=200 bytes=32533 elapsed=1.63s
+2026-10-31 23:13:57.781 INFO  [worker_1] [13/24 2401001090700] HTTP GET grant list (ExpGrant.aspx) START
+2026-10-31 23:13:58.252 INFO  [worker_1] [13/24 2401001090700] HTTP GET grant list (ExpGrant.aspx) END status=200 bytes=112839 elapsed=0.47s
+2026-10-31 23:13:58.999 INFO  [worker_1] [13/24 2401001090700] HTTP GET scheme list (Extra_plnDept.aspx) START
+2026-10-31 23:13:59.039 INFO  [worker_0] [07/24 2401001070300] HTTP GET scheme report (Extra_plnDept.aspx) END status=200 bytes=693557 elapsed=25.56s redirects=1 final=ExpTreas.aspx
+2026-10-31 23:13:59.640 INFO  [worker_3] [11/24 2401001090105] HTTP GET scheme report (Extra_plnDept.aspx) START
+2026-10-31 23:14:02.185 INFO  [worker_0] [07/24 2401001070300] PARSE report table: columns=9 district_rows=17 fin_year=2026-2027 months={'prev_month': 'September', 'current_month': 'October'}
+2026-10-31 23:14:02.186 INFO  [worker_0] [07/24 2401001070300] VALIDATE ok status=ok rows=17
+2026-10-31 23:14:02.195 INFO  [worker_0] [07/24 2401001070300] FILE WRITE agri-011-2401001070300.json 5067 bytes 3 ms (status=ok, rows=17)
+2026-10-31 23:14:02.198 INFO  [worker_0] [07/24 2401001070300] STATUS UPDATE scheme=2401001070300 status=1 attempts=1 remark='' [crawler_status.json 2366 bytes, 2 ms]
+2026-10-31 23:14:02.198 INFO  [worker_0] [07/24 2401001070300] Attempt 1/3 succeeded in 46.78s
+2026-10-31 23:14:02.198 INFO  [worker_0] [07/24 2401001070300] SCHEME DONE status=1 attempts=1 elapsed=46.80s worker=worker_0
+2026-10-31 23:14:02.199 INFO  [worker_0] [14/24 2401001090900] SCHEME START प्रशिक्षित कृषि उद्यमी स्वावलंबन योजना (Grant 011) (worker=worker_0)
+2026-10-31 23:14:02.200 INFO  [worker_0] [14/24 2401001090900] Attempt 1/3 START
+2026-10-31 23:14:02.210 INFO  [MainThread] FILE WRITE index.json 14361 bytes 3 ms | overall=RUNNING successful=10 failed=0 unprocessed=14
+2026-10-31 23:14:02.224 INFO  [worker_0] [14/24 2401001090900] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-10-31 23:14:03.288 INFO  [worker_0] [14/24 2401001090900] HTTP GET main page (KoshvaniStatic.aspx) END status=200 bytes=32533 elapsed=1.06s
+2026-10-31 23:14:03.343 INFO  [worker_0] [14/24 2401001090900] HTTP GET grant list (ExpGrant.aspx) START
+2026-10-31 23:14:03.940 INFO  [worker_0] [14/24 2401001090900] HTTP GET grant list (ExpGrant.aspx) END status=200 bytes=112839 elapsed=0.60s
+2026-10-31 23:14:04.180 INFO  [worker_0] [14/24 2401001090900] HTTP GET scheme list (Extra_plnDept.aspx) START
+2026-10-31 23:14:04.965 INFO  [worker_3] [11/24 2401001090105] HTTP GET scheme report (Extra_plnDept.aspx) END status=200 bytes=174958 elapsed=5.32s redirects=1 final=ExpTreas.aspx
+2026-10-31 23:14:05.514 INFO  [worker_3] [11/24 2401001090105] PARSE report table: columns=9 district_rows=3 fin_year=2026-2027 months={'prev_month': 'September', 'current_month': 'October'}
+2026-10-31 23:14:05.515 INFO  [worker_3] [11/24 2401001090105] VALIDATE ok status=ok rows=3
+2026-10-31 23:14:05.530 INFO  [worker_3] [11/24 2401001090105] FILE WRITE agri-011-2401001090105.json 2148 bytes 9 ms (status=ok, rows=3)
+2026-10-31 23:14:05.535 INFO  [worker_3] [11/24 2401001090105] STATUS UPDATE scheme=2401001090105 status=1 attempts=1 remark='' [crawler_status.json 2366 bytes, 4 ms]
+2026-10-31 23:14:05.535 INFO  [worker_3] [11/24 2401001090105] Attempt 1/3 succeeded in 21.06s
+2026-10-31 23:14:05.536 INFO  [worker_3] [11/24 2401001090105] SCHEME DONE status=1 attempts=1 elapsed=21.08s worker=worker_3
+2026-10-31 23:14:05.536 INFO  [worker_3] [15/24 2401001130104] SCHEME START प्रमोशन ऑफ एग्रीमल्चर मैकेनाइजेशन फार इनसीटू मैनेजमेंट ऑफ क्राप रेजडयू (CRM) (के.60/रा.40-के.+ रा.) (Grant 011) (worker=worker_3)
+2026-10-31 23:14:05.537 INFO  [worker_3] [15/24 2401001130104] Start stagger: waiting 2.6s so workers do not hit the portal together
+2026-10-31 23:14:05.549 INFO  [MainThread] FILE WRITE index.json 14361 bytes 5 ms | overall=RUNNING successful=11 failed=0 unprocessed=13
+2026-10-31 23:14:05.596 INFO  [worker_2] [12/24 2401001090300] HTTP GET scheme list (Extra_plnDept.aspx) END status=200 bytes=728584 elapsed=11.79s redirects=1 final=ExpHead.aspx
+2026-10-31 23:14:06.021 INFO  [worker_1] [13/24 2401001090700] HTTP GET scheme list (Extra_plnDept.aspx) END status=200 bytes=728584 elapsed=7.02s redirects=1 final=ExpHead.aspx
+2026-10-31 23:14:08.450 INFO  [worker_3] [15/24 2401001130104] Attempt 1/3 START
+2026-10-31 23:14:08.517 INFO  [worker_3] [15/24 2401001130104] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-10-31 23:14:09.885 INFO  [worker_3] [15/24 2401001130104] HTTP GET main page (KoshvaniStatic.aspx) END status=200 bytes=32533 elapsed=1.36s
+2026-10-31 23:14:10.367 INFO  [worker_3] [15/24 2401001130104] HTTP GET grant list (ExpGrant.aspx) START
+2026-10-31 23:14:11.026 INFO  [worker_3] [15/24 2401001130104] HTTP GET grant list (ExpGrant.aspx) END status=200 bytes=112839 elapsed=0.65s
+2026-10-31 23:14:11.490 INFO  [worker_0] [14/24 2401001090900] HTTP GET scheme list (Extra_plnDept.aspx) END status=200 bytes=728584 elapsed=7.31s redirects=1 final=ExpHead.aspx
+2026-10-31 23:14:14.903 INFO  [worker_3] [15/24 2401001130104] HTTP GET scheme list (Extra_plnDept.aspx) START
+2026-10-31 23:14:18.331 INFO  [worker_2] [12/24 2401001090300] HTTP GET scheme report (Extra_plnDept.aspx) START
+2026-10-31 23:14:20.708 INFO  [worker_1] [13/24 2401001090700] HTTP GET scheme report (Extra_plnDept.aspx) START
+2026-10-31 23:14:21.625 INFO  [worker_0] [14/24 2401001090900] HTTP GET scheme report (Extra_plnDept.aspx) START
+2026-10-31 23:14:22.103 INFO  [worker_3] [15/24 2401001130104] HTTP GET scheme list (Extra_plnDept.aspx) END status=200 bytes=728584 elapsed=7.16s redirects=1 final=ExpHead.aspx
+2026-10-31 23:14:24.486 INFO  [worker_0] [14/24 2401001090900] HTTP GET scheme report (Extra_plnDept.aspx) END status=200 bytes=118411 elapsed=2.86s redirects=1 final=ExpTreas.aspx
+2026-10-31 23:14:25.183 INFO  [worker_3] [15/24 2401001130104] HTTP GET scheme report (Extra_plnDept.aspx) START
+2026-10-31 23:14:25.461 INFO  [worker_0] [14/24 2401001090900] PARSE report table: columns=9 district_rows=2 fin_year=2026-2027 months={'prev_month': 'September', 'current_month': 'October'}
+2026-10-31 23:14:25.463 INFO  [worker_0] [14/24 2401001090900] VALIDATE ok status=ok rows=2
+2026-10-31 23:14:25.476 INFO  [worker_0] [14/24 2401001090900] FILE WRITE agri-011-2401001090900.json 1509 bytes 8 ms (status=ok, rows=2)
+2026-10-31 23:14:25.480 INFO  [worker_0] [14/24 2401001090900] STATUS UPDATE scheme=2401001090900 status=1 attempts=1 remark='' [crawler_status.json 2366 bytes, 3 ms]
+2026-10-31 23:14:25.480 INFO  [worker_0] [14/24 2401001090900] Attempt 1/3 succeeded in 23.28s
+2026-10-31 23:14:25.481 INFO  [worker_0] [14/24 2401001090900] SCHEME DONE status=1 attempts=1 elapsed=23.28s worker=worker_0
+2026-10-31 23:14:25.481 INFO  [worker_0] [16/24 2401001140101] SCHEME START नेशनल फूड सिक्योरिटी मिशन (ओ0एस0 / टी0बी0ओ0) (के.60/रा.40-के.+ रा.) (Grant 011) (worker=worker_0)
+2026-10-31 23:14:25.482 INFO  [worker_0] [16/24 2401001140101] Attempt 1/3 START
+2026-10-31 23:14:25.493 INFO  [MainThread] FILE WRITE index.json 14361 bytes 3 ms | overall=RUNNING successful=12 failed=0 unprocessed=12
+2026-10-31 23:14:25.507 INFO  [worker_0] [16/24 2401001140101] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-10-31 23:14:26.617 INFO  [worker_0] [16/24 2401001140101] HTTP GET main page (KoshvaniStatic.aspx) END status=200 bytes=32533 elapsed=1.11s
+2026-10-31 23:14:26.672 INFO  [worker_0] [16/24 2401001140101] HTTP GET grant list (ExpGrant.aspx) START
+2026-10-31 23:14:27.305 INFO  [worker_0] [16/24 2401001140101] HTTP GET grant list (ExpGrant.aspx) END status=200 bytes=112839 elapsed=0.63s
+2026-10-31 23:14:27.544 INFO  [worker_0] [16/24 2401001140101] HTTP GET scheme list (Extra_plnDept.aspx) START
+2026-10-31 23:14:28.184 INFO  [worker_3] [15/24 2401001130104] HTTP GET scheme report (Extra_plnDept.aspx) END status=200 bytes=121508 elapsed=2.99s redirects=1 final=ExpTreas.aspx
+2026-10-31 23:14:28.558 INFO  [worker_3] [15/24 2401001130104] PARSE report table: columns=9 district_rows=2 fin_year=2026-2027 months={'prev_month': 'September', 'current_month': 'October'}
+2026-10-31 23:14:28.559 INFO  [worker_3] [15/24 2401001130104] VALIDATE ok status=ok rows=2
+2026-10-31 23:14:28.573 INFO  [worker_3] [15/24 2401001130104] FILE WRITE agri-011-2401001130104.json 1669 bytes 8 ms (status=ok, rows=2)
+2026-10-31 23:14:28.576 INFO  [worker_3] [15/24 2401001130104] STATUS UPDATE scheme=2401001130104 status=1 attempts=1 remark='' [crawler_status.json 2366 bytes, 3 ms]
+2026-10-31 23:14:28.576 INFO  [worker_3] [15/24 2401001130104] Attempt 1/3 succeeded in 20.11s
+2026-10-31 23:14:28.577 INFO  [worker_3] [15/24 2401001130104] SCHEME DONE status=1 attempts=1 elapsed=23.04s worker=worker_3
+2026-10-31 23:14:28.577 INFO  [worker_3] [17/24 2401001140300] SCHEME START तिलहन बीज मिनीकिट वितरण योजना (Grant 011) (worker=worker_3)
+2026-10-31 23:14:28.577 INFO  [worker_3] [17/24 2401001140300] Start stagger: waiting 1.2s so workers do not hit the portal together
+2026-10-31 23:14:28.588 INFO  [MainThread] FILE WRITE index.json 14361 bytes 3 ms | overall=RUNNING successful=13 failed=0 unprocessed=11
+2026-10-31 23:14:28.894 INFO  [worker_1] [13/24 2401001090700] HTTP GET scheme report (Extra_plnDept.aspx) END status=200 bytes=250105 elapsed=8.18s redirects=1 final=ExpTreas.aspx
+2026-10-31 23:14:29.708 INFO  [worker_1] [13/24 2401001090700] PARSE report table: columns=9 district_rows=5 fin_year=2026-2027 months={'prev_month': 'September', 'current_month': 'October'}
+2026-10-31 23:14:29.710 INFO  [worker_1] [13/24 2401001090700] VALIDATE ok status=ok rows=5
+2026-10-31 23:14:29.724 INFO  [worker_1] [13/24 2401001090700] FILE WRITE agri-011-2401001090700.json 2382 bytes 8 ms (status=ok, rows=5)
+2026-10-31 23:14:29.727 INFO  [worker_1] [13/24 2401001090700] STATUS UPDATE scheme=2401001090700 status=1 attempts=1 remark='' [crawler_status.json 2366 bytes, 2 ms]
+2026-10-31 23:14:29.728 INFO  [worker_1] [13/24 2401001090700] Attempt 1/3 succeeded in 33.98s
+2026-10-31 23:14:29.728 INFO  [worker_1] [13/24 2401001090700] SCHEME DONE status=1 attempts=1 elapsed=37.90s worker=worker_1
+2026-10-31 23:14:29.728 INFO  [worker_1] [18/24 2401008000203] SCHEME START कृषि विकास योजनायें (के.60/रा.40-के.) (Grant 011) (worker=worker_1)
+2026-10-31 23:14:29.729 INFO  [worker_1] [18/24 2401008000203] Start stagger: waiting 5.9s so workers do not hit the portal together
+2026-10-31 23:14:29.739 INFO  [MainThread] FILE WRITE index.json 14361 bytes 3 ms | overall=RUNNING successful=14 failed=0 unprocessed=10
+2026-10-31 23:14:29.800 INFO  [worker_3] [17/24 2401001140300] Attempt 1/3 START
+2026-10-31 23:14:29.825 INFO  [worker_3] [17/24 2401001140300] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-10-31 23:14:30.866 INFO  [worker_3] [17/24 2401001140300] HTTP GET main page (KoshvaniStatic.aspx) END status=200 bytes=32533 elapsed=1.04s
+2026-10-31 23:14:30.921 INFO  [worker_3] [17/24 2401001140300] HTTP GET grant list (ExpGrant.aspx) START
+2026-10-31 23:14:31.412 INFO  [worker_3] [17/24 2401001140300] HTTP GET grant list (ExpGrant.aspx) END status=200 bytes=112839 elapsed=0.49s
+2026-10-31 23:14:31.666 INFO  [worker_3] [17/24 2401001140300] HTTP GET scheme list (Extra_plnDept.aspx) START
+2026-10-31 23:14:34.608 INFO  [worker_0] [16/24 2401001140101] HTTP GET scheme list (Extra_plnDept.aspx) END status=200 bytes=728584 elapsed=7.06s redirects=1 final=ExpHead.aspx
+2026-10-31 23:14:35.631 INFO  [worker_1] [18/24 2401008000203] Attempt 1/3 START
+2026-10-31 23:14:35.670 INFO  [worker_1] [18/24 2401008000203] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-10-31 23:14:37.447 INFO  [worker_1] [18/24 2401008000203] HTTP GET main page (KoshvaniStatic.aspx) END status=200 bytes=32533 elapsed=1.77s
+2026-10-31 23:14:37.750 INFO  [worker_1] [18/24 2401008000203] HTTP GET grant list (ExpGrant.aspx) START
+2026-10-31 23:14:38.075 INFO  [worker_0] [16/24 2401001140101] HTTP GET scheme report (Extra_plnDept.aspx) START
+2026-10-31 23:14:38.252 INFO  [worker_1] [18/24 2401008000203] HTTP GET grant list (ExpGrant.aspx) END status=200 bytes=112839 elapsed=0.50s
+2026-10-31 23:14:38.531 INFO  [worker_1] [18/24 2401008000203] HTTP GET scheme list (Extra_plnDept.aspx) START
+2026-10-31 23:14:39.812 INFO  [worker_2] [12/24 2401001090300] HTTP GET scheme report (Extra_plnDept.aspx) END status=200 bytes=580273 elapsed=21.44s redirects=1 final=ExpTreas.aspx
+2026-10-31 23:14:40.013 INFO  [worker_3] [17/24 2401001140300] HTTP GET scheme list (Extra_plnDept.aspx) END status=200 bytes=728584 elapsed=8.35s redirects=1 final=ExpHead.aspx
+2026-10-31 23:14:41.219 INFO  [worker_0] [16/24 2401001140101] HTTP GET scheme report (Extra_plnDept.aspx) END status=200 bytes=126367 elapsed=3.14s redirects=1 final=ExpTreas.aspx
+2026-10-31 23:14:44.044 INFO  [worker_0] [16/24 2401001140101] PARSE report table: columns=9 district_rows=2 fin_year=2026-2027 months={'prev_month': 'September', 'current_month': 'October'}
+2026-10-31 23:14:44.057 INFO  [worker_0] [16/24 2401001140101] VALIDATE ok status=ok rows=2
+2026-10-31 23:14:44.219 INFO  [worker_0] [16/24 2401001140101] FILE WRITE agri-011-2401001140101.json 1642 bytes 120 ms (status=ok, rows=2)
+2026-10-31 23:14:44.343 INFO  [worker_0] [16/24 2401001140101] STATUS UPDATE scheme=2401001140101 status=1 attempts=1 remark='' [crawler_status.json 2366 bytes, 104 ms]
+2026-10-31 23:14:44.361 INFO  [worker_0] [16/24 2401001140101] Attempt 1/3 succeeded in 18.88s
+2026-10-31 23:14:44.373 INFO  [worker_0] [16/24 2401001140101] SCHEME DONE status=1 attempts=1 elapsed=18.88s worker=worker_0
+2026-10-31 23:14:44.386 INFO  [worker_0] [19/24 2401008000400] SCHEME START कृषि क्षेत्र की क्षमता एवं कौशल विकास तथा उत्पादन वृद्धि की योजना (Grant 011) (worker=worker_0)
+2026-10-31 23:14:44.398 INFO  [worker_0] [19/24 2401008000400] Attempt 1/3 START
+2026-10-31 23:14:44.463 INFO  [worker_0] [19/24 2401008000400] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-10-31 23:14:45.667 INFO  [worker_0] [19/24 2401008000400] HTTP GET main page (KoshvaniStatic.aspx) END status=200 bytes=32533 elapsed=1.19s
+2026-10-31 23:14:45.724 INFO  [worker_1] [18/24 2401008000203] HTTP GET scheme list (Extra_plnDept.aspx) END status=200 bytes=728584 elapsed=7.19s redirects=1 final=ExpHead.aspx
+2026-10-31 23:14:46.081 INFO  [MainThread] FILE WRITE index.json 14360 bytes 197 ms | overall=RUNNING successful=15 failed=0 unprocessed=9
+2026-10-31 23:14:46.424 INFO  [worker_0] [19/24 2401008000400] HTTP GET grant list (ExpGrant.aspx) START
+2026-10-31 23:14:47.107 INFO  [worker_0] [19/24 2401008000400] HTTP GET grant list (ExpGrant.aspx) END status=200 bytes=112839 elapsed=0.66s
+2026-10-31 23:14:51.155 INFO  [worker_0] [19/24 2401008000400] HTTP GET scheme list (Extra_plnDept.aspx) START
+2026-10-31 23:14:59.241 INFO  [worker_0] [19/24 2401008000400] HTTP GET scheme list (Extra_plnDept.aspx) END status=200 bytes=728584 elapsed=8.05s redirects=1 final=ExpHead.aspx
+2026-10-31 23:15:01.023 INFO  [worker_2] [12/24 2401001090300] PARSE report table: columns=9 district_rows=15 fin_year=2026-2027 months={'prev_month': 'September', 'current_month': 'October'}
+2026-10-31 23:15:01.073 INFO  [worker_2] [12/24 2401001090300] VALIDATE ok status=ok rows=15
+2026-10-31 23:15:01.436 INFO  [worker_2] [12/24 2401001090300] FILE WRITE agri-011-2401001090300.json 4490 bytes 283 ms (status=ok, rows=15)
+2026-10-31 23:15:01.663 INFO  [worker_2] [12/24 2401001090300] STATUS UPDATE scheme=2401001090300 status=1 attempts=1 remark='' [crawler_status.json 2366 bytes, 204 ms]
+2026-10-31 23:15:01.676 INFO  [worker_2] [12/24 2401001090300] Attempt 1/3 succeeded in 71.31s
+2026-10-31 23:15:01.724 INFO  [worker_2] [12/24 2401001090300] SCHEME DONE status=1 attempts=1 elapsed=73.13s worker=worker_2
+2026-10-31 23:15:01.736 INFO  [worker_2] [20/24 2402001020109] SCHEME START नेशनल प्रोजेक्ट ऑन स्वायल हेल्थ फर्टिलिटी (के.60/रा.40-के.+ रा.) (Grant 011) (worker=worker_2)
+2026-10-31 23:15:01.739 INFO  [worker_2] [20/24 2402001020109] Attempt 1/3 START
+2026-10-31 23:15:01.805 INFO  [worker_2] [20/24 2402001020109] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-10-31 23:15:02.916 INFO  [worker_2] [20/24 2402001020109] HTTP GET main page (KoshvaniStatic.aspx) END status=200 bytes=32533 elapsed=1.11s
+2026-10-31 23:15:03.674 INFO  [worker_2] [20/24 2402001020109] HTTP GET grant list (ExpGrant.aspx) START
+2026-10-31 23:15:03.895 INFO  [MainThread] FILE WRITE index.json 14360 bytes 157 ms | overall=RUNNING successful=16 failed=0 unprocessed=8
+2026-10-31 23:15:04.011 INFO  [worker_3] [17/24 2401001140300] HTTP GET scheme report (Extra_plnDept.aspx) START
+2026-10-31 23:15:05.831 INFO  [worker_2] [20/24 2402001020109] HTTP GET grant list (ExpGrant.aspx) END status=200 bytes=112839 elapsed=2.13s
+2026-10-31 23:15:06.183 INFO  [worker_3] [17/24 2401001140300] HTTP GET scheme report (Extra_plnDept.aspx) END status=200 bytes=91189 elapsed=2.16s redirects=1 final=ExpTreas.aspx
+2026-10-31 23:15:09.123 INFO  [worker_3] [17/24 2401001140300] PARSE report table: columns=9 district_rows=1 fin_year=2026-2027 months={'prev_month': 'September', 'current_month': 'October'}
+2026-10-31 23:15:09.131 INFO  [worker_3] [17/24 2401001140300] VALIDATE ok status=ok rows=1
+2026-10-31 23:15:09.338 INFO  [worker_3] [17/24 2401001140300] FILE WRITE agri-011-2401001140300.json 1379 bytes 112 ms (status=ok, rows=1)
+2026-10-31 23:15:09.462 INFO  [worker_2] [20/24 2402001020109] HTTP GET scheme list (Extra_plnDept.aspx) START
+2026-10-31 23:15:09.525 INFO  [worker_3] [17/24 2401001140300] STATUS UPDATE scheme=2401001140300 status=1 attempts=1 remark='' [crawler_status.json 2366 bytes, 168 ms]
+2026-10-31 23:15:09.555 INFO  [worker_3] [17/24 2401001140300] Attempt 1/3 succeeded in 39.75s
+2026-10-31 23:15:09.567 INFO  [worker_3] [17/24 2401001140300] SCHEME DONE status=1 attempts=1 elapsed=40.98s worker=worker_3
+2026-10-31 23:15:09.579 INFO  [worker_3] [21/24 2402001020111] SCHEME START नेशनल मिशन ऑन नेचुरल फार्मिग (के.60/रा.40-के.+ रा.) (Grant 011) (worker=worker_3)
+2026-10-31 23:15:09.593 INFO  [worker_3] [21/24 2402001020111] Attempt 1/3 START
+2026-10-31 23:15:09.645 INFO  [worker_3] [21/24 2402001020111] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-10-31 23:15:09.822 INFO  [worker_1] [18/24 2401008000203] HTTP GET scheme report (Extra_plnDept.aspx) START
+2026-10-31 23:15:10.635 INFO  [MainThread] FILE WRITE index.json 14360 bytes 93 ms | overall=RUNNING successful=17 failed=0 unprocessed=7
+2026-10-31 23:15:10.725 INFO  [worker_3] [21/24 2402001020111] HTTP GET main page (KoshvaniStatic.aspx) END status=200 bytes=32533 elapsed=1.06s
+2026-10-31 23:15:11.235 INFO  [worker_3] [21/24 2402001020111] HTTP GET grant list (ExpGrant.aspx) START
+2026-10-31 23:15:11.370 INFO  [worker_0] [19/24 2401008000400] HTTP GET scheme report (Extra_plnDept.aspx) START
+2026-10-31 23:15:11.737 INFO  [worker_3] [21/24 2402001020111] HTTP GET grant list (ExpGrant.aspx) END status=200 bytes=112839 elapsed=0.50s
+2026-10-31 23:15:11.973 INFO  [worker_3] [21/24 2402001020111] HTTP GET scheme list (Extra_plnDept.aspx) START
+2026-10-31 23:15:13.907 INFO  [worker_0] [19/24 2401008000400] HTTP GET scheme report (Extra_plnDept.aspx) END status=200 bytes=109603 elapsed=2.54s redirects=1 final=ExpTreas.aspx
+2026-10-31 23:15:14.189 INFO  [worker_0] [19/24 2401008000400] PARSE report table: columns=9 district_rows=2 fin_year=2026-2027 months={'prev_month': 'September', 'current_month': 'October'}
+2026-10-31 23:15:14.190 INFO  [worker_0] [19/24 2401008000400] VALIDATE ok status=ok rows=2
+2026-10-31 23:15:14.196 INFO  [worker_0] [19/24 2401008000400] FILE WRITE agri-011-2401008000400.json 1675 bytes 2 ms (status=ok, rows=2)
+2026-10-31 23:15:14.198 INFO  [worker_0] [19/24 2401008000400] STATUS UPDATE scheme=2401008000400 status=1 attempts=1 remark='' [crawler_status.json 2366 bytes, 2 ms]
+2026-10-31 23:15:14.199 INFO  [worker_0] [19/24 2401008000400] Attempt 1/3 succeeded in 29.79s
+2026-10-31 23:15:14.199 INFO  [worker_0] [19/24 2401008000400] SCHEME DONE status=1 attempts=1 elapsed=29.81s worker=worker_0
+2026-10-31 23:15:14.199 INFO  [worker_0] [22/24 4401001030300] SCHEME START प्रयोगात्मक प्रक्षेत्र प्रदर्शन और बीज वर्द्धन प्रक्षेत्र (जिला योजना) (Grant 011) (worker=worker_0)
+2026-10-31 23:15:14.200 INFO  [worker_0] [22/24 4401001030300] Start stagger: waiting 0.4s so workers do not hit the portal together
+2026-10-31 23:15:14.219 INFO  [MainThread] FILE WRITE index.json 14360 bytes 3 ms | overall=RUNNING successful=18 failed=0 unprocessed=6
+2026-10-31 23:15:14.617 INFO  [worker_1] [18/24 2401008000203] HTTP GET scheme report (Extra_plnDept.aspx) END status=200 bytes=164637 elapsed=4.79s redirects=1 final=ExpTreas.aspx
+2026-10-31 23:15:14.625 INFO  [worker_0] [22/24 4401001030300] Attempt 1/3 START
+2026-10-31 23:15:14.664 INFO  [worker_0] [22/24 4401001030300] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-10-31 23:15:15.103 INFO  [worker_1] [18/24 2401008000203] PARSE report table: columns=9 district_rows=3 fin_year=2026-2027 months={'prev_month': 'September', 'current_month': 'October'}
+2026-10-31 23:15:15.104 INFO  [worker_1] [18/24 2401008000203] VALIDATE ok status=ok rows=3
+2026-10-31 23:15:15.111 INFO  [worker_1] [18/24 2401008000203] FILE WRITE agri-011-2401008000203.json 1815 bytes 3 ms (status=ok, rows=3)
+2026-10-31 23:15:15.114 INFO  [worker_1] [18/24 2401008000203] STATUS UPDATE scheme=2401008000203 status=1 attempts=1 remark='' [crawler_status.json 2366 bytes, 2 ms]
+2026-10-31 23:15:15.114 INFO  [worker_1] [18/24 2401008000203] Attempt 1/3 succeeded in 39.48s
+2026-10-31 23:15:15.114 INFO  [worker_1] [18/24 2401008000203] SCHEME DONE status=1 attempts=1 elapsed=45.39s worker=worker_1
+2026-10-31 23:15:15.115 INFO  [worker_1] [23/24 4401001030401] SCHEME START खाद्यान्न/दलहन/तिलहन/बीज की लागत और प्रासंगिक व्यय (Grant 011) (worker=worker_1)
+2026-10-31 23:15:15.115 INFO  [worker_1] [23/24 4401001030401] Start stagger: waiting 4.4s so workers do not hit the portal together
+2026-10-31 23:15:15.125 INFO  [MainThread] FILE WRITE index.json 14360 bytes 2 ms | overall=RUNNING successful=19 failed=0 unprocessed=5
+2026-10-31 23:15:15.850 INFO  [worker_0] [22/24 4401001030300] HTTP GET main page (KoshvaniStatic.aspx) END status=200 bytes=32533 elapsed=1.18s
+2026-10-31 23:15:15.906 INFO  [worker_0] [22/24 4401001030300] HTTP GET grant list (ExpGrant.aspx) START
+2026-10-31 23:15:16.501 INFO  [worker_0] [22/24 4401001030300] HTTP GET grant list (ExpGrant.aspx) END status=200 bytes=112839 elapsed=0.59s
+2026-10-31 23:15:16.733 INFO  [worker_0] [22/24 4401001030300] HTTP GET scheme list (Extra_plnDept.aspx) START
+2026-10-31 23:15:19.443 INFO  [worker_3] [21/24 2402001020111] HTTP GET scheme list (Extra_plnDept.aspx) END status=200 bytes=728584 elapsed=7.47s redirects=1 final=ExpHead.aspx
+2026-10-31 23:15:19.556 INFO  [worker_1] [23/24 4401001030401] Attempt 1/3 START
+2026-10-31 23:15:19.612 INFO  [worker_1] [23/24 4401001030401] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-10-31 23:15:21.487 INFO  [worker_2] [20/24 2402001020109] HTTP GET scheme list (Extra_plnDept.aspx) END status=200 bytes=728584 elapsed=12.01s redirects=1 final=ExpHead.aspx
+2026-10-31 23:15:21.922 INFO  [worker_1] [23/24 4401001030401] HTTP GET main page (KoshvaniStatic.aspx) END status=200 bytes=32533 elapsed=2.30s
+2026-10-31 23:15:22.192 INFO  [worker_1] [23/24 4401001030401] HTTP GET grant list (ExpGrant.aspx) START
+2026-10-31 23:15:22.841 INFO  [worker_1] [23/24 4401001030401] HTTP GET grant list (ExpGrant.aspx) END status=200 bytes=112839 elapsed=0.64s
+2026-10-31 23:15:24.446 INFO  [worker_1] [23/24 4401001030401] HTTP GET scheme list (Extra_plnDept.aspx) START
+2026-10-31 23:15:24.575 INFO  [worker_0] [22/24 4401001030300] HTTP GET scheme list (Extra_plnDept.aspx) END status=200 bytes=728584 elapsed=7.84s redirects=1 final=ExpHead.aspx
+2026-10-31 23:15:28.068 INFO  [worker_3] [21/24 2402001020111] HTTP GET scheme report (Extra_plnDept.aspx) START
+2026-10-31 23:15:30.953 INFO  [worker_2] [20/24 2402001020109] HTTP GET scheme report (Extra_plnDept.aspx) START
+2026-10-31 23:15:31.719 INFO  [worker_0] [22/24 4401001030300] HTTP GET scheme report (Extra_plnDept.aspx) START
+2026-10-31 23:15:48.426 WARNING [worker_0] [22/24 4401001030300] HTTP GET scheme report (Extra_plnDept.aspx) FAILED after 16.71s kind=connection-reset: ConnectionError: ('Connection aborted.', ConnectionAbortedError(103, 'Software caused connection abort'))
+2026-10-31 23:15:48.427 WARNING [worker_0] [22/24 4401001030300] Attempt 1/3 failed after 33.80s kind=connection-reset: ConnectionError: ('Connection aborted.', ConnectionAbortedError(103, 'Software caused connection abort'))
+2026-10-31 23:15:48.431 WARNING [worker_1] [23/24 4401001030401] HTTP GET scheme list (Extra_plnDept.aspx) FAILED after 23.98s kind=chunkedencodingerror: ChunkedEncodingError: ("Connection broken: ConnectionAbortedError(103, 'Software caused connection abort')", ConnectionAbortedError(103, 'Software caused connection abort'))
+2026-10-31 23:15:48.434 WARNING [worker_1] [23/24 4401001030401] Attempt 1/3 failed after 28.88s kind=chunkedencodingerror: ChunkedEncodingError: ("Connection broken: ConnectionAbortedError(103, 'Software caused connection abort')", ConnectionAbortedError(103, 'Software caused connection abort'))
+2026-10-31 23:15:48.437 WARNING [worker_2] [20/24 2402001020109] HTTP GET scheme report (Extra_plnDept.aspx) FAILED after 17.48s kind=connection-reset: ConnectionError: ('Connection aborted.', ConnectionAbortedError(103, 'Software caused connection abort'))
+2026-10-31 23:15:48.433 WARNING [worker_3] [21/24 2402001020111] HTTP GET scheme report (Extra_plnDept.aspx) FAILED after 20.35s kind=connection-reset: ConnectionError: ('Connection aborted.', ConnectionAbortedError(103, 'Software caused connection abort'))
+2026-10-31 23:15:48.440 WARNING [worker_3] [21/24 2402001020111] Attempt 1/3 failed after 38.85s kind=connection-reset: ConnectionError: ('Connection aborted.', ConnectionAbortedError(103, 'Software caused connection abort'))
+2026-10-31 23:15:48.439 WARNING [worker_2] [20/24 2402001020109] Attempt 1/3 failed after 46.68s kind=connection-reset: ConnectionError: ('Connection aborted.', ConnectionAbortedError(103, 'Software caused connection abort'))
+2026-10-31 23:15:48.441 INFO  [worker_0] [22/24 4401001030300] STATUS UPDATE scheme=4401001030300 status=-1 attempts=1 remark="ConnectionError: ('Connection aborted.', ConnectionAbortedError(103, 'Software caused connection abort'))" [crawler_status.json 2472 bytes, 14 ms]
+2026-10-31 23:15:48.443 INFO  [worker_0] [22/24 4401001030300] Waiting 5.7 seconds before retry...
+2026-10-31 23:15:48.452 INFO  [worker_1] [23/24 4401001030401] STATUS UPDATE scheme=4401001030401 status=-1 attempts=1 remark='ChunkedEncodingError: ("Connection broken: ConnectionAbortedError(103, \'Software caused connection abort\')", ConnectionAbortedError(103, \'Software caused connection abort\'))' [crawler_status.json 2648 bytes, 9 ms]
+2026-10-31 23:15:48.460 INFO  [worker_1] [23/24 4401001030401] Waiting 7.2 seconds before retry...
+2026-10-31 23:15:48.470 INFO  [worker_3] [21/24 2402001020111] STATUS UPDATE scheme=2402001020111 status=-1 attempts=1 remark="ConnectionError: ('Connection aborted.', ConnectionAbortedError(103, 'Software caused connection abort'))" [crawler_status.json 2754 bytes, 11 ms]
+2026-10-31 23:15:48.471 INFO  [worker_3] [21/24 2402001020111] Waiting 8 seconds before retry...
+2026-10-31 23:15:48.479 INFO  [worker_2] [20/24 2402001020109] STATUS UPDATE scheme=2402001020109 status=-1 attempts=1 remark="ConnectionError: ('Connection aborted.', ConnectionAbortedError(103, 'Software caused connection abort'))" [crawler_status.json 2860 bytes, 7 ms]
+2026-10-31 23:15:48.480 INFO  [worker_2] [20/24 2402001020109] Waiting 9.9 seconds before retry...
+2026-10-31 23:15:54.144 INFO  [worker_0] [22/24 4401001030300] Attempt 2/3 START
+2026-10-31 23:15:54.168 INFO  [worker_0] [22/24 4401001030300] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-10-31 23:15:55.661 INFO  [worker_1] [23/24 4401001030401] Start stagger: waiting 2.7s so workers do not hit the portal together
+2026-10-31 23:15:56.738 INFO  [worker_3] [21/24 2402001020111] Start stagger: waiting 7.2s so workers do not hit the portal together
+2026-10-31 23:15:59.259 INFO  [worker_1] [23/24 4401001030401] Attempt 2/3 START
+2026-10-31 23:15:59.261 INFO  [worker_2] [20/24 2402001020109] Start stagger: waiting 10.5s so workers do not hit the portal together
+2026-10-31 23:15:59.293 INFO  [worker_1] [23/24 4401001030401] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-10-31 23:16:05.270 WARNING [worker_0] [22/24 4401001030300] HTTP GET main page (KoshvaniStatic.aspx) FAILED after 7.85s kind=connection-error: ConnectionError: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by NameResolutionError("HTTPSConnection(host='koshvani.up.nic.in', port=443): Failed to resolve 'koshvani.up.nic.in' ([Errno 7] No address associated with hostname)"…
+2026-10-31 23:16:05.272 WARNING [worker_0] [22/24 4401001030300] Attempt 2/3 failed after 7.87s kind=connection-error: ConnectionError: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by NameResolutionError("HTTPSConnection(host='koshvani.up.nic.in', port=443): Failed to resolve 'koshvani.up.nic.in' ([Errno 7] No address associated with hostname)"…
+2026-10-31 23:16:05.275 INFO  [worker_0] [22/24 4401001030300] STATUS UPDATE scheme=4401001030300 status=-1 attempts=2 remark='ConnectionError: HTTPSConnectionPool(host=\'koshvani.up.nic.in\', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by NameResolutionError("HTTPSConnection(host=\'koshvani.up.nic.in\', port=443): Failed to resolve \'koshvani.up.nic.in\' ([Errno 7] No address associated with hostname)"…' [crawler_status.json 3059 bytes, 3 ms]
+2026-10-31 23:16:05.277 INFO  [worker_0] [22/24 4401001030300] Waiting 23.9 seconds before retry...
+2026-10-31 23:16:07.161 INFO  [worker_3] [21/24 2402001020111] Attempt 2/3 START
+2026-10-31 23:16:07.200 INFO  [worker_3] [21/24 2402001020111] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-10-31 23:16:11.485 WARNING [worker_1] [23/24 4401001030401] HTTP GET main page (KoshvaniStatic.aspx) FAILED after 9.62s kind=connection-error: ConnectionError: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by NameResolutionError("HTTPSConnection(host='koshvani.up.nic.in', port=443): Failed to resolve 'koshvani.up.nic.in' ([Errno 7] No address associated with hostname)"…
+2026-10-31 23:16:11.486 WARNING [worker_1] [23/24 4401001030401] Attempt 2/3 failed after 9.66s kind=connection-error: ConnectionError: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by NameResolutionError("HTTPSConnection(host='koshvani.up.nic.in', port=443): Failed to resolve 'koshvani.up.nic.in' ([Errno 7] No address associated with hostname)"…
+2026-10-31 23:16:11.494 INFO  [worker_1] [23/24 4401001030401] STATUS UPDATE scheme=4401001030401 status=-1 attempts=2 remark='ConnectionError: HTTPSConnectionPool(host=\'koshvani.up.nic.in\', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by NameResolutionError("HTTPSConnection(host=\'koshvani.up.nic.in\', port=443): Failed to resolve \'koshvani.up.nic.in\' ([Errno 7] No address associated with hostname)"…' [crawler_status.json 3188 bytes, 7 ms]
+2026-10-31 23:16:11.495 INFO  [worker_1] [23/24 4401001030401] Waiting 15.1 seconds before retry...
+2026-10-31 23:16:12.376 INFO  [worker_2] [20/24 2402001020109] Attempt 2/3 START
+2026-10-31 23:16:12.410 INFO  [worker_2] [20/24 2402001020109] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-10-31 23:16:13.225 WARNING [worker_3] [21/24 2402001020111] HTTP GET main page (KoshvaniStatic.aspx) FAILED after 6.02s kind=connection-error: ConnectionError: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by NameResolutionError("HTTPSConnection(host='koshvani.up.nic.in', port=443): Failed to resolve 'koshvani.up.nic.in' ([Errno 7] No address associated with hostname)"…
+2026-10-31 23:16:13.226 WARNING [worker_3] [21/24 2402001020111] Attempt 2/3 failed after 6.06s kind=connection-error: ConnectionError: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by NameResolutionError("HTTPSConnection(host='koshvani.up.nic.in', port=443): Failed to resolve 'koshvani.up.nic.in' ([Errno 7] No address associated with hostname)"…
+2026-10-31 23:16:13.234 INFO  [worker_3] [21/24 2402001020111] STATUS UPDATE scheme=2402001020111 status=-1 attempts=2 remark='ConnectionError: HTTPSConnectionPool(host=\'koshvani.up.nic.in\', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by NameResolutionError("HTTPSConnection(host=\'koshvani.up.nic.in\', port=443): Failed to resolve \'koshvani.up.nic.in\' ([Errno 7] No address associated with hostname)"…' [crawler_status.json 3387 bytes, 7 ms]
+2026-10-31 23:16:13.235 INFO  [worker_3] [21/24 2402001020111] Waiting 15.9 seconds before retry...
+2026-10-31 23:16:18.426 WARNING [worker_2] [20/24 2402001020109] HTTP GET main page (KoshvaniStatic.aspx) FAILED after 6.02s kind=connection-error: ConnectionError: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by NameResolutionError("HTTPSConnection(host='koshvani.up.nic.in', port=443): Failed to resolve 'koshvani.up.nic.in' ([Errno 7] No address associated with hostname)"…
+2026-10-31 23:16:18.428 WARNING [worker_2] [20/24 2402001020109] Attempt 2/3 failed after 6.05s kind=connection-error: ConnectionError: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by NameResolutionError("HTTPSConnection(host='koshvani.up.nic.in', port=443): Failed to resolve 'koshvani.up.nic.in' ([Errno 7] No address associated with hostname)"…
+2026-10-31 23:16:18.436 INFO  [worker_2] [20/24 2402001020109] STATUS UPDATE scheme=2402001020109 status=-1 attempts=2 remark='ConnectionError: HTTPSConnectionPool(host=\'koshvani.up.nic.in\', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by NameResolutionError("HTTPSConnection(host=\'koshvani.up.nic.in\', port=443): Failed to resolve \'koshvani.up.nic.in\' ([Errno 7] No address associated with hostname)"…' [crawler_status.json 3586 bytes, 7 ms]
+2026-10-31 23:16:18.437 INFO  [worker_2] [20/24 2402001020109] Waiting 16.9 seconds before retry...
+2026-10-31 23:16:26.596 INFO  [worker_1] [23/24 4401001030401] Attempt 3/3 START
+2026-10-31 23:16:26.620 INFO  [worker_1] [23/24 4401001030401] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-10-31 23:16:29.136 INFO  [worker_3] [21/24 2402001020111] Start stagger: waiting 1.7s so workers do not hit the portal together
+2026-10-31 23:16:29.178 INFO  [worker_0] [22/24 4401001030300] Start stagger: waiting 6.6s so workers do not hit the portal together
+2026-10-31 23:16:29.635 WARNING [worker_1] [23/24 4401001030401] HTTP GET main page (KoshvaniStatic.aspx) FAILED after 3.01s kind=connection-error: ConnectionError: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by NameResolutionError("HTTPSConnection(host='koshvani.up.nic.in', port=443): Failed to resolve 'koshvani.up.nic.in' ([Errno 7] No address associated with hostname)"…
+2026-10-31 23:16:29.636 WARNING [worker_1] [23/24 4401001030401] Attempt 3/3 failed after 3.04s kind=connection-error: ConnectionError: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by NameResolutionError("HTTPSConnection(host='koshvani.up.nic.in', port=443): Failed to resolve 'koshvani.up.nic.in' ([Errno 7] No address associated with hostname)"…
+2026-10-31 23:16:29.644 INFO  [worker_1] [23/24 4401001030401] STATUS UPDATE scheme=4401001030401 status=-1 attempts=3 remark='ConnectionError: HTTPSConnectionPool(host=\'koshvani.up.nic.in\', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by NameResolutionError("HTTPSConnection(host=\'koshvani.up.nic.in\', port=443): Failed to resolve \'koshvani.up.nic.in\' ([Errno 7] No address associated with hostname)"…' [crawler_status.json 3586 bytes, 7 ms]
+2026-10-31 23:16:29.645 WARNING [worker_1] [23/24 4401001030401] KEEPING last good data for agri-011-4401001030401 (from 2026-10-30T13:37:56+00:00); the failure is only recorded in crawler_status.json
+2026-10-31 23:16:29.646 INFO  [worker_1] [23/24 4401001030401] FINAL STATUS: FAILED after 3 attempts
+2026-10-31 23:16:29.646 WARNING [worker_1] [23/24 4401001030401] SCHEME DONE status=-1 attempts=3 elapsed=71.28s worker=worker_1
+2026-10-31 23:16:29.647 INFO  [worker_1] [24/24 4401001030403] SCHEME START कपास और बिनोले के बीजों की लागत(प्रासंगिक व्यय सहित) (Grant 011) (worker=worker_1)
+2026-10-31 23:16:29.647 INFO  [worker_1] [24/24 4401001030403] Start stagger: waiting 10.8s so workers do not hit the portal together
+2026-10-31 23:16:29.658 INFO  [MainThread] FILE WRITE index.json 14364 bytes 3 ms | overall=RUNNING successful=19 failed=4 unprocessed=1
+2026-10-31 23:16:30.846 INFO  [worker_3] [21/24 2402001020111] Attempt 3/3 START
+2026-10-31 23:16:30.869 INFO  [worker_3] [21/24 2402001020111] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-10-31 23:18:52.183 INFO  [worker_2] [20/24 2402001020109] Start stagger: waiting 10.7s so workers do not hit the portal together
+2026-10-31 23:18:52.648 INFO  [worker_0] [22/24 4401001030300] Attempt 3/3 START
+2026-10-31 23:18:52.672 INFO  [worker_0] [22/24 4401001030300] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-10-31 23:21:53.891 INFO  [worker_1] [24/24 4401001030403] Attempt 1/3 START
+2026-10-31 23:21:53.917 INFO  [worker_1] [24/24 4401001030403] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-10-31 23:26:30.009 INFO  [worker_2] [20/24 2402001020109] Attempt 3/3 START
+2026-10-31 23:26:30.032 INFO  [worker_2] [20/24 2402001020109] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-11-01 00:45:53.599 WARNING [worker_3] [21/24 2402001020111] HTTP GET main page (KoshvaniStatic.aspx) FAILED after 102.14s kind=timeout: ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79d3d5bd90>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))
+2026-11-01 00:45:53.604 WARNING [worker_3] [21/24 2402001020111] Attempt 3/3 failed after 102.17s kind=timeout: ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79d3d5bd90>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))
+2026-11-01 00:45:53.689 INFO  [worker_3] [21/24 2402001020111] STATUS UPDATE scheme=2402001020111 status=-1 attempts=3 remark="ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79d3d5bd90>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))" [crawler_status.json 3578 bytes, 82 ms]
+2026-11-01 00:45:53.693 WARNING [worker_3] [21/24 2402001020111] KEEPING last good data for agri-011-2402001020111 (from 2026-10-30T13:37:42+00:00); the failure is only recorded in crawler_status.json
+2026-11-01 00:45:53.694 INFO  [worker_3] [21/24 2402001020111] FINAL STATUS: FAILED after 3 attempts
+2026-11-01 00:45:53.695 WARNING [worker_3] [21/24 2402001020111] SCHEME DONE status=-1 attempts=3 elapsed=180.27s worker=worker_3
+2026-11-01 00:45:53.707 INFO  [MainThread] FILE WRITE index.json 14364 bytes 4 ms | overall=RUNNING successful=19 failed=4 unprocessed=1
+2026-11-01 00:46:49.932 WARNING [worker_0] [22/24 4401001030300] HTTP GET main page (KoshvaniStatic.aspx) FAILED after 100.99s kind=timeout: ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79d3d5aad0>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))
+2026-11-01 00:46:49.934 WARNING [worker_0] [22/24 4401001030300] Attempt 3/3 failed after 101.07s kind=timeout: ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79d3d5aad0>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))
+2026-11-01 00:46:50.012 INFO  [worker_0] [22/24 4401001030300] STATUS UPDATE scheme=4401001030300 status=-1 attempts=3 remark="ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79d3d5aad0>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))" [crawler_status.json 3570 bytes, 78 ms]
+2026-11-01 00:46:50.013 WARNING [worker_0] [22/24 4401001030300] KEEPING last good data for agri-011-4401001030300 (from 2026-10-30T13:37:51+00:00); the failure is only recorded in crawler_status.json
+2026-11-01 00:46:50.014 INFO  [worker_0] [22/24 4401001030300] FINAL STATUS: FAILED after 3 attempts
+2026-11-01 00:46:50.014 WARNING [worker_0] [22/24 4401001030300] SCHEME DONE status=-1 attempts=3 elapsed=179.50s worker=worker_0
+2026-11-01 00:46:50.026 INFO  [MainThread] FILE WRITE index.json 14364 bytes 4 ms | overall=RUNNING successful=19 failed=4 unprocessed=1
+2026-11-01 00:46:53.846 WARNING [worker_1] [24/24 4401001030403] HTTP GET main page (KoshvaniStatic.aspx) FAILED after 100.30s kind=timeout: ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79d3d58cd0>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))
+2026-11-01 00:46:53.852 WARNING [worker_1] [24/24 4401001030403] Attempt 1/3 failed after 100.33s kind=timeout: ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79d3d58cd0>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))
+2026-11-01 00:46:53.937 INFO  [worker_1] [24/24 4401001030403] STATUS UPDATE scheme=4401001030403 status=-1 attempts=1 remark="ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79d3d58cd0>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))" [crawler_status.json 3867 bytes, 82 ms]
+2026-11-01 00:46:53.940 INFO  [worker_1] [24/24 4401001030403] Waiting 12.9 seconds before retry...
+2026-11-01 00:57:15.483 WARNING [worker_2] [20/24 2402001020109] HTTP GET main page (KoshvaniStatic.aspx) FAILED after 100.51s kind=timeout: ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79d3d5a0d0>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))
+2026-11-01 00:57:15.485 WARNING [worker_2] [20/24 2402001020109] Attempt 3/3 failed after 100.53s kind=timeout: ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79d3d5a0d0>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))
+2026-11-01 00:57:15.498 INFO  [worker_2] [20/24 2402001020109] STATUS UPDATE scheme=2402001020109 status=-1 attempts=3 remark="ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79d3d5a0d0>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))" [crawler_status.json 3859 bytes, 9 ms]
+2026-11-01 00:57:15.500 WARNING [worker_2] [20/24 2402001020109] KEEPING last good data for agri-011-2402001020109 (from 2026-10-30T13:37:36+00:00); the failure is only recorded in crawler_status.json
+2026-11-01 00:57:15.501 INFO  [worker_2] [20/24 2402001020109] FINAL STATUS: FAILED after 3 attempts
+2026-11-01 00:57:15.502 WARNING [worker_2] [20/24 2402001020109] SCHEME DONE status=-1 attempts=3 elapsed=201.55s worker=worker_2
+2026-11-01 00:57:15.518 INFO  [MainThread] FILE WRITE index.json 14365 bytes 4 ms | overall=RUNNING successful=19 failed=5 unprocessed=0
+2026-11-01 00:58:29.151 INFO  [worker_1] [24/24 4401001030403] Attempt 2/3 START
+2026-11-01 00:58:29.188 INFO  [worker_1] [24/24 4401001030403] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-11-01 01:11:14.345 WARNING [worker_1] [24/24 4401001030403] HTTP GET main page (KoshvaniStatic.aspx) FAILED after 96.98s kind=timeout: ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79d3d5bc50>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))
+2026-11-01 01:11:14.350 WARNING [worker_1] [24/24 4401001030403] Attempt 2/3 failed after 97.03s kind=timeout: ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79d3d5bc50>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))
+2026-11-01 01:11:14.437 INFO  [worker_1] [24/24 4401001030403] STATUS UPDATE scheme=4401001030403 status=-1 attempts=2 remark="ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79d3d5bc50>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))" [crawler_status.json 3859 bytes, 84 ms]
+2026-11-01 01:11:14.440 INFO  [worker_1] [24/24 4401001030403] Waiting 25.1 seconds before retry...
+2026-11-01 01:14:42.003 INFO  [worker_1] [24/24 4401001030403] Attempt 3/3 START
+2026-11-01 01:14:42.044 INFO  [worker_1] [24/24 4401001030403] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-11-01 01:22:45.517 WARNING [worker_1] [24/24 4401001030403] HTTP GET main page (KoshvaniStatic.aspx) FAILED after 94.31s kind=timeout: ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79d3d5ad50>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))
+2026-11-01 01:22:45.522 WARNING [worker_1] [24/24 4401001030403] Attempt 3/3 failed after 94.35s kind=timeout: ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79d3d5ad50>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))
+2026-11-01 01:22:45.535 INFO  [worker_1] [24/24 4401001030403] STATUS UPDATE scheme=4401001030403 status=-1 attempts=3 remark="ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79d3d5ad50>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))" [crawler_status.json 3859 bytes, 10 ms]
+2026-11-01 01:22:45.539 WARNING [worker_1] [24/24 4401001030403] KEEPING last good data for agri-011-4401001030403 (from 2026-10-30T13:37:58+00:00); the failure is only recorded in crawler_status.json
+2026-11-01 01:22:45.540 INFO  [worker_1] [24/24 4401001030403] FINAL STATUS: FAILED after 3 attempts
+2026-11-01 01:22:45.541 WARNING [worker_1] [24/24 4401001030403] SCHEME DONE status=-1 attempts=3 elapsed=340.73s worker=worker_1
+2026-11-01 01:22:45.556 INFO  [MainThread] FILE WRITE index.json 14365 bytes 4 ms | overall=RUNNING successful=19 failed=5 unprocessed=0
+2026-11-01 01:22:45.557 WARNING [MainThread] COOL-DOWN round 1/2: 5 scheme(s) still failed; waiting 300s for the portal to settle
+2026-11-01 01:53:11.503 INFO  [worker_0] [21/24 2402001020111] SCHEME START [cool-down round 1/2] नेशनल मिशन ऑन नेचुरल फार्मिग (के.60/रा.40-के.+ रा.) (Grant 011) (worker=worker_0)
+2026-11-01 01:53:11.505 INFO  [worker_0] [21/24 2402001020111] Attempt 1/3 START
+2026-11-01 01:53:11.504 INFO  [worker_2] [22/24 4401001030300] SCHEME START [cool-down round 1/2] प्रयोगात्मक प्रक्षेत्र प्रदर्शन और बीज वर्द्धन प्रक्षेत्र (जिला योजना) (Grant 011) (worker=worker_2)
+2026-11-01 01:53:11.505 INFO  [worker_1] [23/24 4401001030401] SCHEME START [cool-down round 1/2] खाद्यान्न/दलहन/तिलहन/बीज की लागत और प्रासंगिक व्यय (Grant 011) (worker=worker_1)
+2026-11-01 01:53:11.504 INFO  [worker_3] [20/24 2402001020109] SCHEME START [cool-down round 1/2] नेशनल प्रोजेक्ट ऑन स्वायल हेल्थ फर्टिलिटी (के.60/रा.40-के.+ रा.) (Grant 011) (worker=worker_3)
+2026-11-01 01:53:11.506 INFO  [worker_2] [22/24 4401001030300] Start stagger: waiting 4.2s so workers do not hit the portal together
+2026-11-01 01:53:11.508 INFO  [worker_1] [23/24 4401001030401] Start stagger: waiting 10.0s so workers do not hit the portal together
+2026-11-01 01:53:11.510 INFO  [worker_3] [20/24 2402001020109] Start stagger: waiting 15.9s so workers do not hit the portal together
+2026-11-01 01:53:11.531 INFO  [worker_0] [21/24 2402001020111] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-11-01 01:53:49.789 INFO  [worker_2] [22/24 4401001030300] Attempt 1/3 START
+2026-11-01 01:53:49.818 INFO  [worker_2] [22/24 4401001030300] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-11-01 01:54:18.228 INFO  [worker_1] [23/24 4401001030401] Attempt 1/3 START
+2026-11-01 01:54:18.267 INFO  [worker_1] [23/24 4401001030401] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-11-01 01:54:35.079 INFO  [worker_3] [20/24 2402001020109] Attempt 1/3 START
+2026-11-01 01:54:35.116 INFO  [worker_3] [20/24 2402001020109] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-11-01 01:59:22.304 WARNING [worker_0] [21/24 2402001020111] HTTP GET main page (KoshvaniStatic.aspx) FAILED after 94.00s kind=timeout: ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79d3d59a90>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))
+2026-11-01 01:59:22.309 WARNING [worker_0] [21/24 2402001020111] Attempt 1/3 failed after 94.03s kind=timeout: ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79d3d59a90>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))
+2026-11-01 01:59:22.393 INFO  [worker_0] [21/24 2402001020111] STATUS UPDATE scheme=2402001020111 status=-1 attempts=4 remark="ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79d3d59a90>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))" [crawler_status.json 3859 bytes, 81 ms]
+2026-11-01 01:59:22.396 INFO  [worker_0] [21/24 2402001020111] Waiting 12.6 seconds before retry...
+2026-11-01 02:00:00.554 WARNING [worker_2] [22/24 4401001030300] HTTP GET main page (KoshvaniStatic.aspx) FAILED after 93.92s kind=timeout: ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79d3d59590>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))
+2026-11-01 02:00:00.557 WARNING [worker_2] [22/24 4401001030300] Attempt 1/3 failed after 93.95s kind=timeout: ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79d3d59590>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))
+2026-11-01 02:00:00.564 INFO  [worker_2] [22/24 4401001030300] STATUS UPDATE scheme=4401001030300 status=-1 attempts=4 remark="ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79d3d59590>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))" [crawler_status.json 3859 bytes, 4 ms]
+2026-11-01 02:00:00.566 INFO  [worker_2] [22/24 4401001030300] Waiting 9.5 seconds before retry...
+2026-11-01 02:00:06.977 WARNING [worker_1] [23/24 4401001030401] HTTP GET main page (KoshvaniStatic.aspx) FAILED after 94.51s kind=timeout: ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79d3d59810>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))
+2026-11-01 02:00:06.982 WARNING [worker_1] [23/24 4401001030401] Attempt 1/3 failed after 94.56s kind=timeout: ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79d3d59810>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))
+2026-11-01 02:00:06.994 INFO  [worker_1] [23/24 4401001030401] STATUS UPDATE scheme=4401001030401 status=-1 attempts=4 remark="ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79d3d59810>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))" [crawler_status.json 3851 bytes, 10 ms]
+2026-11-01 02:00:06.997 INFO  [worker_1] [23/24 4401001030401] Waiting 11.3 seconds before retry...
+2026-11-01 02:00:19.219 INFO  [worker_0] [21/24 2402001020111] Attempt 2/3 START
+2026-11-01 02:00:19.258 INFO  [worker_0] [21/24 2402001020111] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-11-01 02:00:20.154 INFO  [worker_2] [22/24 4401001030300] Start stagger: waiting 3.8s so workers do not hit the portal together
+2026-11-01 02:00:22.228 WARNING [worker_3] [20/24 2402001020109] HTTP GET main page (KoshvaniStatic.aspx) FAILED after 93.76s kind=timeout: ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79d3d5b610>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))
+2026-11-01 02:00:22.234 WARNING [worker_3] [20/24 2402001020109] Attempt 1/3 failed after 93.80s kind=timeout: ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79d3d5b610>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))
+2026-11-01 02:00:22.319 INFO  [worker_3] [20/24 2402001020109] STATUS UPDATE scheme=2402001020109 status=-1 attempts=4 remark="ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79d3d5b610>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))" [crawler_status.json 3851 bytes, 82 ms]
+2026-11-01 02:00:22.322 INFO  [worker_3] [20/24 2402001020109] Waiting 9.2 seconds before retry...
+2026-11-01 02:00:23.978 INFO  [worker_2] [22/24 4401001030300] Attempt 2/3 START
+2026-11-01 02:00:24.010 INFO  [worker_2] [22/24 4401001030300] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-11-01 02:00:28.385 INFO  [worker_1] [23/24 4401001030401] Attempt 2/3 START
+2026-11-01 02:00:28.423 INFO  [worker_1] [23/24 4401001030401] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-11-01 02:00:37.773 INFO  [worker_3] [20/24 2402001020109] Start stagger: waiting 1.7s so workers do not hit the portal together
+2026-11-01 02:00:39.479 INFO  [worker_3] [20/24 2402001020109] Attempt 2/3 START
+2026-11-01 02:00:39.519 INFO  [worker_3] [20/24 2402001020109] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-11-01 02:07:46.094 WARNING [worker_0] [21/24 2402001020111] HTTP GET main page (KoshvaniStatic.aspx) FAILED after 93.48s kind=timeout: ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79d3d5b110>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))
+2026-11-01 02:07:46.102 WARNING [worker_0] [21/24 2402001020111] Attempt 2/3 failed after 93.53s kind=timeout: ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79d3d5b110>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))
+2026-11-01 02:07:46.186 INFO  [worker_0] [21/24 2402001020111] STATUS UPDATE scheme=2402001020111 status=-1 attempts=5 remark="ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79d3d5b110>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))" [crawler_status.json 3851 bytes, 80 ms]
+2026-11-01 02:07:46.188 INFO  [worker_0] [21/24 2402001020111] Waiting 17.3 seconds before retry...
+2026-11-01 02:08:27.697 WARNING [worker_2] [22/24 4401001030300] HTTP GET main page (KoshvaniStatic.aspx) FAILED after 93.70s kind=timeout: ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79d3d5a490>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))
+2026-11-01 02:08:27.702 WARNING [worker_2] [22/24 4401001030300] Attempt 2/3 failed after 93.74s kind=timeout: ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79d3d5a490>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))
+2026-11-01 02:08:27.715 INFO  [worker_2] [22/24 4401001030300] STATUS UPDATE scheme=4401001030300 status=-1 attempts=5 remark="ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79d3d5a490>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))" [crawler_status.json 3851 bytes, 10 ms]
+2026-11-01 02:08:27.719 INFO  [worker_2] [22/24 4401001030300] Waiting 25.6 seconds before retry...
+2026-11-01 02:08:54.949 WARNING [worker_1] [23/24 4401001030401] HTTP GET main page (KoshvaniStatic.aspx) FAILED after 93.92s kind=timeout: ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79cf8ed1d0>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))
+2026-11-01 02:08:54.955 WARNING [worker_1] [23/24 4401001030401] Attempt 2/3 failed after 93.96s kind=timeout: ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79cf8ed1d0>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))
+2026-11-01 02:08:54.968 INFO  [worker_1] [23/24 4401001030401] STATUS UPDATE scheme=4401001030401 status=-1 attempts=5 remark="ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79cf8ed1d0>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))" [crawler_status.json 3851 bytes, 10 ms]
+2026-11-01 02:08:54.971 INFO  [worker_1] [23/24 4401001030401] Waiting 27 seconds before retry...
+2026-11-01 02:09:21.993 WARNING [worker_3] [20/24 2402001020109] HTTP GET main page (KoshvaniStatic.aspx) FAILED after 94.13s kind=timeout: ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79cf8ef110>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))
+2026-11-01 02:09:21.998 WARNING [worker_3] [20/24 2402001020109] Attempt 2/3 failed after 94.18s kind=timeout: ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79cf8ef110>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))
+2026-11-01 02:09:22.084 INFO  [worker_3] [20/24 2402001020109] STATUS UPDATE scheme=2402001020109 status=-1 attempts=5 remark="ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79cf8ef110>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))" [crawler_status.json 3851 bytes, 81 ms]
+2026-11-01 02:09:22.086 INFO  [worker_3] [20/24 2402001020109] Waiting 26.2 seconds before retry...
+2026-11-01 02:09:24.722 INFO  [worker_0] [21/24 2402001020111] Attempt 3/3 START
+2026-11-01 02:09:24.758 INFO  [worker_0] [21/24 2402001020111] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-11-01 02:11:53.440 INFO  [worker_2] [22/24 4401001030300] Attempt 3/3 START
+2026-11-01 02:11:53.476 INFO  [worker_2] [22/24 4401001030300] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-11-01 02:13:54.136 INFO  [worker_1] [23/24 4401001030401] Attempt 3/3 START
+2026-11-01 02:13:54.169 INFO  [worker_1] [23/24 4401001030401] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-11-01 02:14:15.842 INFO  [worker_3] [20/24 2402001020109] Start stagger: waiting 1.6s so workers do not hit the portal together
+2026-11-01 02:14:17.425 INFO  [worker_3] [20/24 2402001020109] Attempt 3/3 START
+2026-11-01 02:14:17.465 INFO  [worker_3] [20/24 2402001020109] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-11-01 02:24:36.518 WARNING [worker_0] [21/24 2402001020111] HTTP GET main page (KoshvaniStatic.aspx) FAILED after 94.87s kind=timeout: ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79cf8ed6d0>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))
+2026-11-01 02:24:36.523 WARNING [worker_0] [21/24 2402001020111] Attempt 3/3 failed after 94.91s kind=timeout: ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79cf8ed6d0>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))
+2026-11-01 02:24:36.609 INFO  [worker_0] [21/24 2402001020111] STATUS UPDATE scheme=2402001020111 status=-1 attempts=6 remark="ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79cf8ed6d0>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))" [crawler_status.json 3851 bytes, 83 ms]
+2026-11-01 02:24:36.613 WARNING [worker_0] [21/24 2402001020111] KEEPING last good data for agri-011-2402001020111 (from 2026-10-30T13:37:42+00:00); the failure is only recorded in crawler_status.json
+2026-11-01 02:24:36.615 INFO  [worker_0] [21/24 2402001020111] FINAL STATUS: FAILED after 6 attempts
+2026-11-01 02:24:36.615 WARNING [worker_0] [21/24 2402001020111] SCHEME DONE status=-1 attempts=6 elapsed=312.64s worker=worker_0
+2026-11-01 02:24:36.616 INFO  [worker_0] [24/24 4401001030403] SCHEME START [cool-down round 1/2] कपास और बिनोले के बीजों की लागत(प्रासंगिक व्यय सहित) (Grant 011) (worker=worker_0)
+2026-11-01 02:24:36.618 INFO  [worker_0] [24/24 4401001030403] Attempt 1/3 START
+2026-11-01 02:24:36.634 INFO  [MainThread] FILE WRITE index.json 14365 bytes 4 ms | overall=RUNNING successful=19 failed=5 unprocessed=0
+2026-11-01 02:24:36.653 INFO  [worker_0] [24/24 4401001030403] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-11-01 02:25:10.122 WARNING [worker_2] [22/24 4401001030300] HTTP GET main page (KoshvaniStatic.aspx) FAILED after 95.37s kind=timeout: ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79cf8ed810>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))
+2026-11-01 02:25:10.127 WARNING [worker_2] [22/24 4401001030300] Attempt 3/3 failed after 95.41s kind=timeout: ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79cf8ed810>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))
+2026-11-01 02:25:10.141 INFO  [worker_2] [22/24 4401001030300] STATUS UPDATE scheme=4401001030300 status=-1 attempts=6 remark="ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79cf8ed810>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))" [crawler_status.json 3851 bytes, 11 ms]
+2026-11-01 02:25:10.145 WARNING [worker_2] [22/24 4401001030300] KEEPING last good data for agri-011-4401001030300 (from 2026-10-30T13:37:51+00:00); the failure is only recorded in crawler_status.json
+2026-11-01 02:25:10.146 INFO  [worker_2] [22/24 4401001030300] FINAL STATUS: FAILED after 6 attempts
+2026-11-01 02:25:10.147 WARNING [worker_2] [22/24 4401001030300] SCHEME DONE status=-1 attempts=6 elapsed=326.27s worker=worker_2
+2026-11-01 02:25:10.165 INFO  [MainThread] FILE WRITE index.json 14365 bytes 7 ms | overall=RUNNING successful=19 failed=5 unprocessed=0
+2026-11-01 02:25:14.824 WARNING [worker_1] [23/24 4401001030401] HTTP GET main page (KoshvaniStatic.aspx) FAILED after 94.04s kind=timeout: ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79cf8eda90>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))
+2026-11-01 02:25:14.829 WARNING [worker_1] [23/24 4401001030401] Attempt 3/3 failed after 94.08s kind=timeout: ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79cf8eda90>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))
+2026-11-01 02:25:14.843 INFO  [worker_1] [23/24 4401001030401] STATUS UPDATE scheme=4401001030401 status=-1 attempts=6 remark="ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79cf8eda90>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))" [crawler_status.json 3851 bytes, 10 ms]
+2026-11-01 02:25:14.846 WARNING [worker_1] [23/24 4401001030401] KEEPING last good data for agri-011-4401001030401 (from 2026-10-30T13:37:56+00:00); the failure is only recorded in crawler_status.json
+2026-11-01 02:25:14.848 INFO  [worker_1] [23/24 4401001030401] FINAL STATUS: FAILED after 6 attempts
+2026-11-01 02:25:14.849 WARNING [worker_1] [23/24 4401001030401] SCHEME DONE status=-1 attempts=6 elapsed=330.97s worker=worker_1
+2026-11-01 02:25:14.863 INFO  [MainThread] FILE WRITE index.json 14365 bytes 4 ms | overall=RUNNING successful=19 failed=5 unprocessed=0
+2026-11-01 02:25:26.821 WARNING [worker_3] [20/24 2402001020109] HTTP GET main page (KoshvaniStatic.aspx) FAILED after 94.03s kind=timeout: ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79cf8eefd0>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))
+2026-11-01 02:25:26.826 WARNING [worker_3] [20/24 2402001020109] Attempt 3/3 failed after 94.08s kind=timeout: ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79cf8eefd0>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))
+2026-11-01 02:25:26.911 INFO  [worker_3] [20/24 2402001020109] STATUS UPDATE scheme=2402001020109 status=-1 attempts=6 remark="ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79cf8eefd0>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))" [crawler_status.json 3851 bytes, 81 ms]
+2026-11-01 02:25:26.914 WARNING [worker_3] [20/24 2402001020109] KEEPING last good data for agri-011-2402001020109 (from 2026-10-30T13:37:36+00:00); the failure is only recorded in crawler_status.json
+2026-11-01 02:25:26.916 INFO  [worker_3] [20/24 2402001020109] FINAL STATUS: FAILED after 6 attempts
+2026-11-01 02:25:26.917 WARNING [worker_3] [20/24 2402001020109] SCHEME DONE status=-1 attempts=6 elapsed=336.96s worker=worker_3
+2026-11-01 02:25:26.931 INFO  [MainThread] FILE WRITE index.json 14365 bytes 4 ms | overall=RUNNING successful=19 failed=5 unprocessed=0
+2026-11-01 02:32:09.362 WARNING [worker_0] [24/24 4401001030403] HTTP GET main page (KoshvaniStatic.aspx) FAILED after 93.99s kind=timeout: ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79cf8ec7d0>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))
+2026-11-01 02:32:09.367 WARNING [worker_0] [24/24 4401001030403] Attempt 1/3 failed after 94.03s kind=timeout: ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79cf8ec7d0>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))
+2026-11-01 02:32:09.381 INFO  [worker_0] [24/24 4401001030403] STATUS UPDATE scheme=4401001030403 status=-1 attempts=4 remark="ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79cf8ec7d0>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))" [crawler_status.json 3851 bytes, 11 ms]
+2026-11-01 02:32:09.384 INFO  [worker_0] [24/24 4401001030403] Waiting 6.5 seconds before retry...
+2026-11-01 02:33:08.019 INFO  [worker_0] [24/24 4401001030403] Attempt 2/3 START
+2026-11-01 02:33:08.059 INFO  [worker_0] [24/24 4401001030403] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-11-01 02:45:09.604 WARNING [worker_0] [24/24 4401001030403] HTTP GET main page (KoshvaniStatic.aspx) FAILED after 94.13s kind=timeout: ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79cf8eed50>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))
+2026-11-01 02:45:09.612 WARNING [worker_0] [24/24 4401001030403] Attempt 2/3 failed after 94.18s kind=timeout: ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79cf8eed50>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))
+2026-11-01 02:45:09.625 INFO  [worker_0] [24/24 4401001030403] STATUS UPDATE scheme=4401001030403 status=-1 attempts=5 remark="ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79cf8eed50>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))" [crawler_status.json 3851 bytes, 10 ms]
+2026-11-01 02:45:09.627 INFO  [worker_0] [24/24 4401001030403] Waiting 21.1 seconds before retry...
+2026-11-01 02:46:55.984 INFO  [worker_0] [24/24 4401001030403] Attempt 3/3 START
+2026-11-01 02:46:56.018 INFO  [worker_0] [24/24 4401001030403] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-11-01 03:09:34.168 WARNING [worker_0] [24/24 4401001030403] HTTP GET main page (KoshvaniStatic.aspx) FAILED after 95.72s kind=timeout: ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79cf8eec10>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))
+2026-11-01 03:09:34.173 WARNING [worker_0] [24/24 4401001030403] Attempt 3/3 failed after 95.76s kind=timeout: ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79cf8eec10>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))
+2026-11-01 03:09:34.187 INFO  [worker_0] [24/24 4401001030403] STATUS UPDATE scheme=4401001030403 status=-1 attempts=6 remark="ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79cf8eec10>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))" [crawler_status.json 3851 bytes, 11 ms]
+2026-11-01 03:09:34.190 WARNING [worker_0] [24/24 4401001030403] KEEPING last good data for agri-011-4401001030403 (from 2026-10-30T13:37:58+00:00); the failure is only recorded in crawler_status.json
+2026-11-01 03:09:34.191 INFO  [worker_0] [24/24 4401001030403] FINAL STATUS: FAILED after 6 attempts
+2026-11-01 03:09:34.191 WARNING [worker_0] [24/24 4401001030403] SCHEME DONE status=-1 attempts=6 elapsed=311.63s worker=worker_0
+2026-11-01 03:09:34.272 INFO  [MainThread] FILE WRITE index.json 14365 bytes 70 ms | overall=RUNNING successful=19 failed=5 unprocessed=0
+2026-11-01 03:09:34.272 WARNING [MainThread] COOL-DOWN round 2/2: 5 scheme(s) still failed; waiting 300s for the portal to settle
+2026-11-01 03:55:51.517 INFO  [worker_2] [20/24 2402001020109] SCHEME START [cool-down round 2/2] नेशनल प्रोजेक्ट ऑन स्वायल हेल्थ फर्टिलिटी (के.60/रा.40-के.+ रा.) (Grant 011) (worker=worker_2)
+2026-11-01 03:55:51.519 INFO  [worker_2] [20/24 2402001020109] Attempt 1/3 START
+2026-11-01 03:55:51.519 INFO  [worker_3] [22/24 4401001030300] SCHEME START [cool-down round 2/2] प्रयोगात्मक प्रक्षेत्र प्रदर्शन और बीज वर्द्धन प्रक्षेत्र (जिला योजना) (Grant 011) (worker=worker_3)
+2026-11-01 03:55:51.519 INFO  [worker_0] [23/24 4401001030401] SCHEME START [cool-down round 2/2] खाद्यान्न/दलहन/तिलहन/बीज की लागत और प्रासंगिक व्यय (Grant 011) (worker=worker_0)
+2026-11-01 03:55:51.519 INFO  [worker_1] [21/24 2402001020111] SCHEME START [cool-down round 2/2] नेशनल मिशन ऑन नेचुरल फार्मिग (के.60/रा.40-के.+ रा.) (Grant 011) (worker=worker_1)
+2026-11-01 03:55:51.522 INFO  [worker_3] [22/24 4401001030300] Start stagger: waiting 4.3s so workers do not hit the portal together
+2026-11-01 03:55:51.523 INFO  [worker_0] [23/24 4401001030401] Start stagger: waiting 8.8s so workers do not hit the portal together
+2026-11-01 03:55:51.524 INFO  [worker_1] [21/24 2402001020111] Start stagger: waiting 14.6s so workers do not hit the portal together
+2026-11-01 03:55:51.559 INFO  [worker_2] [20/24 2402001020109] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-11-01 03:56:57.176 INFO  [worker_3] [22/24 4401001030300] Attempt 1/3 START
+2026-11-01 03:56:57.209 INFO  [worker_3] [22/24 4401001030300] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-11-01 03:57:57.806 INFO  [worker_0] [23/24 4401001030401] Attempt 1/3 START
+2026-11-01 03:57:57.839 INFO  [worker_0] [23/24 4401001030401] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-11-01 03:58:26.200 INFO  [worker_1] [21/24 2402001020111] Attempt 1/3 START
+2026-11-01 03:58:26.238 INFO  [worker_1] [21/24 2402001020111] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-11-01 04:06:45.497 WARNING [worker_2] [20/24 2402001020109] HTTP GET main page (KoshvaniStatic.aspx) FAILED after 94.71s kind=timeout: ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79d3d59f90>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))
+2026-11-01 04:06:45.503 WARNING [worker_2] [20/24 2402001020109] Attempt 1/3 failed after 94.76s kind=timeout: ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79d3d59f90>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))
+2026-11-01 04:06:45.587 INFO  [worker_2] [20/24 2402001020109] STATUS UPDATE scheme=2402001020109 status=-1 attempts=7 remark="ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79d3d59f90>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))" [crawler_status.json 3851 bytes, 81 ms]
+2026-11-01 04:06:45.590 INFO  [worker_2] [20/24 2402001020109] Waiting 6.4 seconds before retry...
+2026-11-01 04:07:00.995 WARNING [worker_3] [22/24 4401001030300] HTTP GET main page (KoshvaniStatic.aspx) FAILED after 94.64s kind=timeout: ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79d3d5b110>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))
+2026-11-01 04:07:01.001 WARNING [worker_3] [22/24 4401001030300] Attempt 1/3 failed after 94.68s kind=timeout: ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79d3d5b110>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))
+2026-11-01 04:07:01.014 INFO  [worker_3] [22/24 4401001030300] STATUS UPDATE scheme=4401001030300 status=-1 attempts=7 remark="ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79d3d5b110>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))" [crawler_status.json 3851 bytes, 10 ms]
+2026-11-01 04:07:01.016 INFO  [worker_3] [22/24 4401001030300] Waiting 8.6 seconds before retry...
+2026-11-01 04:08:06.843 INFO  [worker_2] [20/24 2402001020109] Attempt 2/3 START
+2026-11-01 04:08:06.879 INFO  [worker_2] [20/24 2402001020109] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-11-01 04:08:12.942 WARNING [worker_0] [23/24 4401001030401] HTTP GET main page (KoshvaniStatic.aspx) FAILED after 95.03s kind=timeout: ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79d3d5b610>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))
+2026-11-01 04:08:12.946 WARNING [worker_0] [23/24 4401001030401] Attempt 1/3 failed after 95.07s kind=timeout: ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79d3d5b610>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))
+2026-11-01 04:08:13.030 INFO  [worker_0] [23/24 4401001030401] STATUS UPDATE scheme=4401001030401 status=-1 attempts=7 remark="ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79d3d5b610>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))" [crawler_status.json 3851 bytes, 81 ms]
+2026-11-01 04:08:13.033 INFO  [worker_0] [23/24 4401001030401] Waiting 13.2 seconds before retry...
+2026-11-01 04:08:27.975 INFO  [worker_3] [22/24 4401001030300] Attempt 2/3 START
+2026-11-01 04:08:28.009 INFO  [worker_3] [22/24 4401001030300] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-11-01 04:08:30.002 WARNING [worker_1] [21/24 2402001020111] HTTP GET main page (KoshvaniStatic.aspx) FAILED after 95.01s kind=timeout: ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79d3d58f50>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))
+2026-11-01 04:08:30.007 WARNING [worker_1] [21/24 2402001020111] Attempt 1/3 failed after 95.06s kind=timeout: ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79d3d58f50>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))
+2026-11-01 04:08:30.093 INFO  [worker_1] [21/24 2402001020111] STATUS UPDATE scheme=2402001020111 status=-1 attempts=7 remark="ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79d3d58f50>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))" [crawler_status.json 3851 bytes, 82 ms]
+2026-11-01 04:08:30.095 INFO  [worker_1] [21/24 2402001020111] Waiting 11.5 seconds before retry...
+2026-11-01 04:08:42.898 INFO  [worker_0] [23/24 4401001030401] Attempt 2/3 START
+2026-11-01 04:08:42.937 INFO  [worker_0] [23/24 4401001030401] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-11-01 04:08:58.233 INFO  [worker_1] [21/24 2402001020111] Start stagger: waiting 0.9s so workers do not hit the portal together
+2026-11-01 04:08:59.147 INFO  [worker_1] [21/24 2402001020111] Attempt 2/3 START
+2026-11-01 04:08:59.186 INFO  [worker_1] [21/24 2402001020111] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-11-01 04:28:18.096 WARNING [worker_2] [20/24 2402001020109] HTTP GET main page (KoshvaniStatic.aspx) FAILED after 94.11s kind=timeout: ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79d3d59590>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))
+2026-11-01 04:28:18.101 WARNING [worker_2] [20/24 2402001020109] Attempt 2/3 failed after 94.16s kind=timeout: ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79d3d59590>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))
+2026-11-01 04:28:18.188 INFO  [worker_2] [20/24 2402001020109] STATUS UPDATE scheme=2402001020109 status=-1 attempts=8 remark="ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79d3d59590>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))" [crawler_status.json 3851 bytes, 83 ms]
+2026-11-01 04:28:18.190 INFO  [worker_2] [20/24 2402001020109] Waiting 23.9 seconds before retry...
+2026-11-01 04:35:29.788 WARNING [worker_3] [22/24 4401001030300] HTTP GET main page (KoshvaniStatic.aspx) FAILED after 94.34s kind=timeout: ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79d3d59a90>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))
+2026-11-01 04:35:29.793 WARNING [worker_3] [22/24 4401001030300] Attempt 2/3 failed after 94.38s kind=timeout: ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79d3d59a90>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))
+2026-11-01 04:35:29.878 INFO  [worker_3] [22/24 4401001030300] STATUS UPDATE scheme=4401001030300 status=-1 attempts=8 remark="ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79d3d59a90>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))" [crawler_status.json 3851 bytes, 82 ms]
+2026-11-01 04:35:29.881 INFO  [worker_3] [22/24 4401001030300] Waiting 28.9 seconds before retry...
+2026-11-01 04:39:08.363 WARNING [worker_0] [23/24 4401001030401] HTTP GET main page (KoshvaniStatic.aspx) FAILED after 94.80s kind=timeout: ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79d3d5ad50>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))
+2026-11-01 04:39:08.369 WARNING [worker_0] [23/24 4401001030401] Attempt 2/3 failed after 94.85s kind=timeout: ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79d3d5ad50>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))
+2026-11-01 04:39:08.455 INFO  [worker_0] [23/24 4401001030401] STATUS UPDATE scheme=4401001030401 status=-1 attempts=8 remark="ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79d3d5ad50>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))" [crawler_status.json 3851 bytes, 82 ms]
+2026-11-01 04:39:08.457 INFO  [worker_0] [23/24 4401001030401] Waiting 18.6 seconds before retry...
+2026-11-01 04:49:18.633 WARNING [worker_1] [21/24 2402001020111] HTTP GET main page (KoshvaniStatic.aspx) FAILED after 95.45s kind=timeout: ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79d3d5a710>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))
+2026-11-01 04:49:18.639 WARNING [worker_1] [21/24 2402001020111] Attempt 2/3 failed after 95.50s kind=timeout: ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79d3d5a710>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))
+2026-11-01 04:49:18.652 INFO  [worker_1] [21/24 2402001020111] STATUS UPDATE scheme=2402001020111 status=-1 attempts=8 remark="ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79d3d5a710>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))" [crawler_status.json 3851 bytes, 10 ms]
+2026-11-01 04:49:18.654 INFO  [worker_1] [21/24 2402001020111] Waiting 19.1 seconds before retry...
+2026-11-01 04:51:53.840 INFO  [worker_2] [20/24 2402001020109] Attempt 3/3 START
+2026-11-01 04:51:53.875 INFO  [worker_2] [20/24 2402001020109] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-11-01 05:00:01.674 INFO  [worker_0] [23/24 4401001030401] Attempt 3/3 START
+2026-11-01 05:00:01.713 INFO  [worker_0] [23/24 4401001030401] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-11-01 05:00:01.956 INFO  [worker_3] [22/24 4401001030300] Start stagger: waiting 5.0s so workers do not hit the portal together
+2026-11-01 05:09:29.541 INFO  [worker_3] [22/24 4401001030300] Attempt 3/3 START
+2026-11-01 05:09:29.580 INFO  [worker_3] [22/24 4401001030300] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-11-01 05:09:30.345 INFO  [worker_1] [21/24 2402001020111] Start stagger: waiting 4.8s so workers do not hit the portal together
+2026-11-01 05:15:48.849 INFO  [worker_1] [21/24 2402001020111] Attempt 3/3 START
+2026-11-01 05:15:48.884 INFO  [worker_1] [21/24 2402001020111] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-11-01 05:28:03.911 WARNING [worker_2] [20/24 2402001020109] HTTP GET main page (KoshvaniStatic.aspx) FAILED after 93.84s kind=timeout: ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79d3d58cd0>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))
+2026-11-01 05:28:03.917 WARNING [worker_2] [20/24 2402001020109] Attempt 3/3 failed after 93.88s kind=timeout: ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79d3d58cd0>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))
+2026-11-01 05:28:04.001 INFO  [worker_2] [20/24 2402001020109] STATUS UPDATE scheme=2402001020109 status=-1 attempts=9 remark="ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79d3d58cd0>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))" [crawler_status.json 3851 bytes, 81 ms]
+2026-11-01 05:28:04.004 WARNING [worker_2] [20/24 2402001020109] KEEPING last good data for agri-011-2402001020109 (from 2026-10-30T13:37:36+00:00); the failure is only recorded in crawler_status.json
+2026-11-01 05:28:04.006 INFO  [worker_2] [20/24 2402001020109] FINAL STATUS: FAILED after 9 attempts
+2026-11-01 05:28:04.007 WARNING [worker_2] [20/24 2402001020109] SCHEME DONE status=-1 attempts=9 elapsed=313.55s worker=worker_2
+2026-11-01 05:28:04.008 INFO  [worker_2] [24/24 4401001030403] SCHEME START [cool-down round 2/2] कपास और बिनोले के बीजों की लागत(प्रासंगिक व्यय सहित) (Grant 011) (worker=worker_2)
+2026-11-01 05:28:04.010 INFO  [worker_2] [24/24 4401001030403] Attempt 1/3 START
+2026-11-01 05:28:04.025 INFO  [MainThread] FILE WRITE index.json 14365 bytes 6 ms | overall=RUNNING successful=19 failed=5 unprocessed=0
+2026-11-01 05:28:04.047 INFO  [worker_2] [24/24 4401001030403] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-11-01 05:39:18.627 WARNING [worker_0] [23/24 4401001030401] HTTP GET main page (KoshvaniStatic.aspx) FAILED after 94.21s kind=timeout: ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79d3d5bd90>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))
+2026-11-01 05:39:18.632 WARNING [worker_0] [23/24 4401001030401] Attempt 3/3 failed after 94.25s kind=timeout: ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79d3d5bd90>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))
+2026-11-01 05:39:18.646 INFO  [worker_0] [23/24 4401001030401] STATUS UPDATE scheme=4401001030401 status=-1 attempts=9 remark="ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79d3d5bd90>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))" [crawler_status.json 3851 bytes, 10 ms]
+2026-11-01 05:39:18.649 WARNING [worker_0] [23/24 4401001030401] KEEPING last good data for agri-011-4401001030401 (from 2026-10-30T13:37:56+00:00); the failure is only recorded in crawler_status.json
+2026-11-01 05:39:18.651 INFO  [worker_0] [23/24 4401001030401] FINAL STATUS: FAILED after 9 attempts
+2026-11-01 05:39:18.652 WARNING [worker_0] [23/24 4401001030401] SCHEME DONE status=-1 attempts=9 elapsed=324.95s worker=worker_0
+2026-11-01 05:39:18.665 INFO  [MainThread] FILE WRITE index.json 14365 bytes 3 ms | overall=RUNNING successful=19 failed=5 unprocessed=0
+2026-11-01 05:47:41.785 WARNING [worker_3] [22/24 4401001030300] HTTP GET main page (KoshvaniStatic.aspx) FAILED after 94.07s kind=timeout: ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79cf8eec10>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))
+2026-11-01 05:47:41.787 WARNING [worker_3] [22/24 4401001030300] Attempt 3/3 failed after 94.11s kind=timeout: ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79cf8eec10>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))
+2026-11-01 05:47:41.798 INFO  [worker_3] [22/24 4401001030300] STATUS UPDATE scheme=4401001030300 status=-1 attempts=9 remark="ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79cf8eec10>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))" [crawler_status.json 3851 bytes, 9 ms]
+2026-11-01 05:47:41.800 WARNING [worker_3] [22/24 4401001030300] KEEPING last good data for agri-011-4401001030300 (from 2026-10-30T13:37:51+00:00); the failure is only recorded in crawler_status.json
+2026-11-01 05:47:41.801 INFO  [worker_3] [22/24 4401001030300] FINAL STATUS: FAILED after 9 attempts
+2026-11-01 05:47:41.802 WARNING [worker_3] [22/24 4401001030300] SCHEME DONE status=-1 attempts=9 elapsed=330.06s worker=worker_3
+2026-11-01 05:47:41.813 INFO  [MainThread] FILE WRITE index.json 14365 bytes 4 ms | overall=RUNNING successful=19 failed=5 unprocessed=0
+2026-11-01 05:58:46.631 WARNING [worker_1] [21/24 2402001020111] HTTP GET main page (KoshvaniStatic.aspx) FAILED after 97.73s kind=timeout: ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79cf8eee90>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))
+2026-11-01 05:58:46.638 WARNING [worker_1] [21/24 2402001020111] Attempt 3/3 failed after 97.77s kind=timeout: ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79cf8eee90>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))
+2026-11-01 05:58:46.647 INFO  [worker_1] [21/24 2402001020111] STATUS UPDATE scheme=2402001020111 status=-1 attempts=9 remark="ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79cf8eee90>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))" [crawler_status.json 3851 bytes, 6 ms]
+2026-11-01 05:58:46.650 WARNING [worker_1] [21/24 2402001020111] KEEPING last good data for agri-011-2402001020111 (from 2026-10-30T13:37:42+00:00); the failure is only recorded in crawler_status.json
+2026-11-01 05:58:46.651 INFO  [worker_1] [21/24 2402001020111] FINAL STATUS: FAILED after 9 attempts
+2026-11-01 05:58:46.652 WARNING [worker_1] [21/24 2402001020111] SCHEME DONE status=-1 attempts=9 elapsed=339.36s worker=worker_1
+2026-11-01 05:58:46.665 INFO  [MainThread] FILE WRITE index.json 14365 bytes 4 ms | overall=RUNNING successful=19 failed=5 unprocessed=0
+2026-11-01 07:43:02.424 WARNING [worker_2] [24/24 4401001030403] HTTP GET main page (KoshvaniStatic.aspx) FAILED after 101.34s kind=timeout: ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79cf8ec690>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))
+2026-11-01 07:43:02.430 WARNING [worker_2] [24/24 4401001030403] Attempt 1/3 failed after 101.39s kind=timeout: ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79cf8ec690>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))
+2026-11-01 07:43:02.443 INFO  [worker_2] [24/24 4401001030403] STATUS UPDATE scheme=4401001030403 status=-1 attempts=7 remark="ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79cf8ec690>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))" [crawler_status.json 3851 bytes, 10 ms]
+2026-11-01 07:43:02.446 INFO  [worker_2] [24/24 4401001030403] Waiting 13.4 seconds before retry...
+2026-11-01 08:02:04.044 INFO  [worker_2] [24/24 4401001030403] Attempt 2/3 START
+2026-11-01 08:02:04.084 INFO  [worker_2] [24/24 4401001030403] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-11-01 10:42:57.212 WARNING [worker_2] [24/24 4401001030403] HTTP GET main page (KoshvaniStatic.aspx) FAILED after 104.82s kind=timeout: ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79cf8ee710>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))
+2026-11-01 10:42:57.218 WARNING [worker_2] [24/24 4401001030403] Attempt 2/3 failed after 104.87s kind=timeout: ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79cf8ee710>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))
+2026-11-01 10:42:57.232 INFO  [worker_2] [24/24 4401001030403] STATUS UPDATE scheme=4401001030403 status=-1 attempts=8 remark="ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79cf8ee710>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))" [crawler_status.json 3851 bytes, 10 ms]
+2026-11-01 10:42:57.234 INFO  [worker_2] [24/24 4401001030403] Waiting 25.1 seconds before retry...
+2026-11-01 11:10:56.351 INFO  [worker_2] [24/24 4401001030403] Attempt 3/3 START
+2026-11-01 11:10:56.384 INFO  [worker_2] [24/24 4401001030403] HTTP GET main page (KoshvaniStatic.aspx) START
+2026-11-01 11:29:01.015 WARNING [worker_2] [24/24 4401001030403] HTTP GET main page (KoshvaniStatic.aspx) FAILED after 91.96s kind=timeout: ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79cf8ee210>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))
+2026-11-01 11:29:01.021 WARNING [worker_2] [24/24 4401001030403] Attempt 3/3 failed after 92.00s kind=timeout: ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79cf8ee210>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))
+2026-11-01 11:29:01.108 INFO  [worker_2] [24/24 4401001030403] STATUS UPDATE scheme=4401001030403 status=-1 attempts=9 remark="ConnectTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Max retries exceeded with url: KoshvaniStatic.aspx (Caused by ConnectTimeoutError(<HTTPSConnection(host='koshvani.up.nic.in', port=443) at 0x79cf8ee210>, 'Connection to koshvani.up.nic.in timed out. (connect timeout=45)'))" [crawler_status.json 3851 bytes, 83 ms]
+2026-11-01 11:29:01.111 WARNING [worker_2] [24/24 4401001030403] KEEPING last good data for agri-011-4401001030403 (from 2026-10-30T13:37:58+00:00); the failure is only recorded in crawler_status.json
+2026-11-01 11:29:01.113 INFO  [worker_2] [24/24 4401001030403] FINAL STATUS: FAILED after 9 attempts
+2026-11-01 11:29:01.114 WARNING [worker_2] [24/24 4401001030403] SCHEME DONE status=-1 attempts=9 elapsed=336.88s worker=worker_2
+2026-11-01 11:29:01.131 INFO  [MainThread] FILE WRITE index.json 14365 bytes 8 ms | overall=RUNNING successful=19 failed=5 unprocessed=0
+2026-11-01 11:29:01.137 INFO  [MainThread] STATUS FINAL overall=WARNING fatal=no [crawler_status.json 3874 bytes, 3 ms]
+2026-11-01 11:29:01.152 INFO  [MainThread] FILE WRITE index.json 14365 bytes 4 ms | overall=WARNING successful=19 failed=5 unprocessed=0
+2026-11-01 11:29:01.153 INFO  [MainThread] ==================================================
+2026-11-01 11:29:01.154 INFO  [MainThread] KOSHVANI CRAWLER SUMMARY
+2026-11-01 11:29:01.154 INFO  [MainThread] ==================================================
+2026-11-01 11:29:01.154 INFO  [MainThread] Execution ID: 20261031-231230-5fbdce
+2026-11-01 11:29:01.154 INFO  [MainThread] Total schemes: 24
+2026-11-01 11:29:01.155 INFO  [MainThread] Successful: 19
+2026-11-01 11:29:01.155 INFO  [MainThread] Failed: 5
+2026-11-01 11:29:01.155 INFO  [MainThread] Unprocessed: 0
+2026-11-01 11:29:01.155 INFO  [MainThread] Recovered by retry: 0
+2026-11-01 11:29:01.156 INFO  [MainThread] Fatal crawler error: No
+2026-11-01 11:29:01.156 INFO  [MainThread] Execution status: WARNING
+2026-11-01 11:29:01.157 INFO  [MainThread] Wall time: 2447.3s | workers: 4 | max attempts per scheme: 3
+2026-11-01 11:29:01.157 INFO  [MainThread] Scheme time: min 17.5s | avg 142.9s | max 340.7s
+2026-11-01 11:29:01.157 INFO  [MainThread] Slowest schemes: 4401001030403 340.7s (attempts 3, worker_1), 2402001020111 339.4s (attempts 9, worker_1), 2402001020109 337.0s (attempts 6, worker_3)
+2026-11-01 11:29:01.158 INFO  [MainThread] Worker utilisation: 50% | worker_0: 9 schemes 1288s, worker_1: 9 schemes 1243s, worker_2: 8 schemes 1325s, worker_3: 8 schemes 1002s
+2026-11-01 11:29:01.158 INFO  [MainThread] HTTP requests: 132 (ok 87, failed 45) | downloaded 23465 KB
+2026-11-01 11:29:01.158 INFO  [MainThread] Request latency: avg 29.77s | p95 97.73s | max 104.82s
+2026-11-01 11:29:01.159 INFO  [MainThread] Attempt failures by kind: chunkedencodingerror=1, connection-error=5, connection-reset=3, timeout=36
+2026-11-01 11:29:01.159 INFO  [MainThread] Time spent waiting between retries: 475.6s (summed over workers)
+2026-11-01 11:29:01.159 INFO  [MainThread] Start stagger / bounce hold: 33 waits, 199.6s (summed over workers) | portal bounces seen: 0
+2026-11-01 11:29:01.159 INFO  [MainThread] ==================================================
+2026-11-01 11:29:02 INFO  [run_daily] SCRAPER END exit_code=0 elapsed=44190s
+
+2026-11-01 11:29:02 INFO  [run_daily] Koshvani scraper completed.
+
+2026-11-01 11:29:02 INFO  [run_daily] [4/6] Checking for data changes...
+2026-11-01 11:29:02 INFO  [run_daily] Data changes detected:
+ M docs/data/agri-011-2401000010500.json
+ M docs/data/agri-011-2401001020103.json
+ M docs/data/agri-011-2401001020129.json
+ M docs/data/agri-011-2401001030300.json
+ M docs/data/agri-011-2401001030500.json
+ M docs/data/agri-011-2401001030600.json
+ M docs/data/agri-011-2401001070300.json
+ M docs/data/agri-011-2401001070400.json
+ M docs/data/agri-011-2401001090103.json
+ M docs/data/agri-011-2401001090104.json
+ M docs/data/agri-011-2401001090105.json
+ M docs/data/agri-011-2401001090300.json
+ M docs/data/agri-011-2401001090700.json
+ M docs/data/agri-011-2401001090900.json
+ M docs/data/agri-011-2401001130104.json
+ M docs/data/agri-011-2401001140101.json
+ M docs/data/agri-011-2401001140300.json
+ M docs/data/agri-011-2401008000203.json
+ M docs/data/agri-011-2401008000400.json
+ M docs/data/crawler_status.json
+ M docs/data/index.json
+
+2026-11-01 11:29:02 INFO  [run_daily] [5/6] Committing updated Koshvani data...
+2026-11-01 11:29:02 INFO  [run_daily] GIT add data: START
+2026-11-01 11:29:02 INFO  [run_daily] GIT add data: END exit_code=0 elapsed=0s
+2026-11-01 11:29:02 INFO  [run_daily] GIT commit data: START
+[main 6c7846a] Update Koshvani data
+ 21 files changed, 68 insertions(+), 68 deletions(-)
+2026-11-01 11:29:02 INFO  [run_daily] GIT commit data: END exit_code=0 elapsed=0s
+2026-11-01 11:29:02 INFO  [run_daily] Commit successful: 6c7846a Update Koshvani data
+ 21 files changed, 68 insertions(+), 68 deletions(-)
+
+2026-11-01 11:29:02 INFO  [run_daily] Pushing to GitHub...
+2026-11-01 11:29:03 INFO  [run_daily] GIT push data: START
+fatal: unable to access 'https://github.com/abhi24me/koshvani-dashboard.git/': Failed to connect to github.com:443 after 129456 ms: Could not connect to server
+2026-11-01 14:10:58 INFO  [run_daily] GIT push data: END exit_code=128 elapsed=9716s
+
+2026-11-01 14:10:58 WARN  [run_daily] ERROR: Git push failed.
+2026-11-01 14:10:58 INFO  [run_daily] FINAL STATUS: ERROR (git push failed)
+2026-11-01 14:46:23.387 WARN  [gmail_alert] Email notification failed: could not reach Gmail SMTP (ConnectionAbortedError).
+2026-11-01 14:46:24 INFO  [run_daily] LOG PUBLISH: workflow_exit_code=1 - this log is now being committed and pushed (that outcome is on screen only)
