@@ -283,6 +283,26 @@ chmod-read-only log found modified anyway) and discards the stray edit,
 restoring the log to what was already safely committed, rather than leave it
 jammed forever.
 
+The lock only counts a holder that is genuinely a live `run_daily.sh` (a pid
+alone proves little - Android recycles them, and trusting a recycled one would
+make every later run exit silently as "already running", writing no log at
+all) and never trusts a lock older than 12 hours. A run that yields to a live
+one leaves a one-line trace in `~/.koshvani-dashboard.skips.log`, since by
+design it writes no execution log.
+
+**Staying awake on Termux.** Android freezes the CPU, and the network with it,
+whenever the screen is off and the phone is idle. The run of 31 Oct 2026 shows
+what that does: its log has twenty silent gaps of 10 to 160 minutes inside one
+scrape - a 41-minute job that took 15 hours of real time, with connections
+dropped on every wake-up and even the final `git push` failing after 2 h 42 min.
+`run_daily.sh` therefore takes a wake lock (`termux-wake-lock`, part of stock
+Termux - nothing to install) for exactly as long as it runs and releases it on
+every exit path; where that command does not exist it is skipped. If a run is
+ever frozen anyway, the summary says so (`DEVICE SUSPENDED: ... frozen for about
+Ns`), by comparing the wall clock with the running time. For good measure, set
+Termux to "Unrestricted" in Android's battery settings so it is never killed in
+the background.
+
 A log records, with millisecond timestamps, the level and the worker thread:
 
 - the unique **execution id** (`YYYYMMDD-HHMMSS-xxxxxx`), also written to

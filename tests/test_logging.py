@@ -189,6 +189,32 @@ class TestExecutionLog(LogCase):
         self.assertRegex(self.log, r"ERROR .*Interrupted: simulated")
         self.assertRegex(self.log, r"Execution status: PARTIAL")
 
+    def test_a_device_that_was_frozen_mid_run_is_called_out_in_the_summary(self):
+        """31 Oct 2026: a phone without a wake lock froze for hours inside one run. The
+        monotonic clock does not tick while suspended, the wall clock does - so the gap
+        between the two is the proof, and the summary must say so rather than leave
+        'Wall time: 2447s' to hide a 12-hour run."""
+        ticks = iter([1000.0, 1000.0 + 12 * 3600])         # started, finished: twelve real hours later
+        saved = scrape._wall_clock
+        scrape._wall_clock = lambda: next(ticks)
+        self.addCleanup(setattr, scrape, "_wall_clock", saved)
+        self.run_main()
+        self.assertRegex(self.log, r"WARNING .*DEVICE SUSPENDED: this run took 43200s of real time but only \d+s of running time")
+        self.assertRegex(self.log, r"frozen for about 4[0-9]{4}s")
+        self.assertIn("run_daily.sh holds a wake lock", self.log)
+
+    def test_an_ordinary_run_never_cries_suspend(self):
+        self.run_main()
+        self.assertNotIn("DEVICE SUSPENDED", self.log)
+
+    def test_a_short_pause_below_the_threshold_is_not_reported(self):
+        ticks = iter([5000.0, 5000.0 + 60])                # a minute of slack (clock skew, a slow wake) is not a freeze
+        saved = scrape._wall_clock
+        scrape._wall_clock = lambda: next(ticks)
+        self.addCleanup(setattr, scrape, "_wall_clock", saved)
+        self.run_main()
+        self.assertNotIn("DEVICE SUSPENDED", self.log)
+
 
 class TestHttpLogging(LogCase):
     """The real _fetch / parsing code, against a fake portal."""

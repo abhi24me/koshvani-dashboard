@@ -969,7 +969,18 @@ def _install_signal_handlers():
                 pass
 
 
-def print_summary(counts, fatal_error, overall, execution_id, workers, wall):
+# A run whose real (wall-clock) duration exceeds its running (monotonic) time by more
+# than this was frozen in between: the monotonic clock does not tick while a phone is
+# suspended, the wall clock does. The 31 Oct 2026 run reported 2447 s and had in fact
+# taken over 12 hours - twenty frozen gaps of 10-160 minutes that no log line explained.
+SUSPEND_WARN_SECONDS = 120
+
+
+def _wall_clock():
+    return time.time()
+
+
+def print_summary(counts, fatal_error, overall, execution_id, workers, wall, wall_clock=None):
     say("=" * 50)
     say("KOSHVANI CRAWLER SUMMARY")
     say("=" * 50)
@@ -983,6 +994,10 @@ def print_summary(counts, fatal_error, overall, execution_id, workers, wall):
     say(f"Execution status: {overall}")
     for line in _METRICS.summary_lines(workers, wall):
         say(line)
+    if wall_clock is not None and wall_clock - wall > SUSPEND_WARN_SECONDS:
+        say(f"DEVICE SUSPENDED: this run took {wall_clock:.0f}s of real time but only {wall:.0f}s of running time - "
+            f"the device was frozen for about {wall_clock - wall:.0f}s in between (connections dropped on wake-up are "
+            f"counted above as timeouts / resets). On Termux, run_daily.sh holds a wake lock to prevent this.", logging.WARNING)
     say("=" * 50)
 
 
@@ -996,6 +1011,7 @@ def main(install_signals=True):
     _GATE = StartGate()
     _ctx.tag = ""
     started = time.monotonic()
+    started_wall = _wall_clock()
     if install_signals:
         _install_signal_handlers()
     DATA_DIR.mkdir(parents=True, exist_ok=True)
@@ -1044,7 +1060,8 @@ def main(install_signals=True):
         say(f"Could not finalize crawler_status.json / index.json: {describe_error(exc)}", logging.ERROR)
         return EXIT_INCOMPLETE
 
-    print_summary(crawl.counts(), fatal, crawl.data["overall_status"], execution_id, workers, time.monotonic() - started)
+    print_summary(crawl.counts(), fatal, crawl.data["overall_status"], execution_id, workers, time.monotonic() - started,
+                  wall_clock=_wall_clock() - started_wall)
     return EXIT_OK if crawl.data["overall_status"] in ("SUCCESS", "WARNING") else EXIT_INCOMPLETE
 
 

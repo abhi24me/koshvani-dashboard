@@ -29,6 +29,46 @@ git_step() {
     return $rc
 }
 
+# ---------------------------------------------------------------------------
+# Guarding a run: one at a time, and awake for as long as it takes
+# ---------------------------------------------------------------------------
+
+LOCK_DIR_PATH=""
+WAKE_LOCK_HELD=""
+LOCK_MAX_AGE_MIN=720       # a lock older than this is never trusted, whatever its pid says
+
+# lock_is_live LOCK_DIR: true only if a genuine, recent run_daily.sh still holds it.
+# A pid alone proves very little: Android recycles them, so a lock left behind by a
+# run that was killed can end up pointing at some unrelated live process - and
+# trusting that would make every later run quietly exit as "already running",
+# forever, with no log written at all. So the holder only counts if it is alive,
+# is really a run_daily.sh (where /proc can tell us), and the lock is not ancient.
+lock_is_live() {
+    local lock_dir="$1" pid cmdline
+    pid=$(cat "$lock_dir/pid" 2>/dev/null)
+    if [ -z "$pid" ] || ! kill -0 "$pid" 2>/dev/null; then
+        return 1                                   # nobody is there any more
+    fi
+    if [ -n "$(find "$lock_dir" -maxdepth 0 -mmin +"$LOCK_MAX_AGE_MIN" 2>/dev/null)" ]; then
+        return 1                                   # far too old to be a real run
+    fi
+    if [ -r "/proc/$pid/cmdline" ]; then
+        cmdline=$(tr '\0' ' ' < "/proc/$pid/cmdline" 2>/dev/null)
+        case "$cmdline" in
+            *run_daily.sh*) ;;
+            *) return 1 ;;                         # the pid was recycled by something else
+        esac
+    fi
+    return 0
+}
+
+# cleanup_on_exit: runs however the script ends (a normal exit, an error, SIGTERM).
+cleanup_on_exit() {
+    [ -n "$LOCK_DIR_PATH" ] && rm -rf "$LOCK_DIR_PATH"
+    [ -n "$WAKE_LOCK_HELD" ] && termux-wake-unlock >/dev/null 2>&1
+    return 0
+}
+
 # acquire_lock: refuses to let two run_daily.sh executions touch the same git
 # working tree at once. A double-trigger (a stuck previous run plus a fresh
 # scheduled one, or the scheduler itself firing twice) is exactly how
@@ -38,25 +78,39 @@ git_step() {
 # the crawler never ran again until that file was manually cleared. This lock
 # makes a second overlapping run exit immediately instead of racing the first.
 # A plain `mkdir` (atomic, no extra package - works unchanged on Termux) is the
-# lock; a stale lock from a run that crashed or was killed is detected by
-# checking whether its pid is still alive, and taken over.
+# lock. A skipped run writes no execution log (it must not touch the repository),
+# so it leaves a one-line trace in $HOME instead, where a missing day can be explained.
 acquire_lock() {
     local lock_dir="$HOME/.koshvani-dashboard.lock" holder
     if ! mkdir "$lock_dir" 2>/dev/null; then
         holder=$(cat "$lock_dir/pid" 2>/dev/null)
-        if [ -n "$holder" ] && kill -0 "$holder" 2>/dev/null; then
+        if lock_is_live "$lock_dir"; then
             warn "another run_daily.sh (pid $holder) is already running - exiting without touching the repository"
+            echo "$(date '+%Y-%m-%d %H:%M:%S') skipped: run_daily.sh pid $holder still holds the lock" >> "$HOME/.koshvani-dashboard.skips.log"
             exit 0
         fi
-        warn "a stale lock from pid ${holder:-?} (no longer running) was left behind - taking it over"
+        warn "a stale lock from pid ${holder:-?} (no longer a running run_daily.sh) was left behind - taking it over"
         rm -rf "$lock_dir"
         mkdir "$lock_dir" || { warn "could not create the lock directory - exiting"; exit 1; }
     fi
     echo $$ > "$lock_dir/pid"
-    # $lock_dir is local to this function, so the trap command is expanded NOW,
-    # while it is still in scope, rather than left as a reference that would be
-    # empty by the time EXIT actually fires.
-    trap "rm -rf '$lock_dir'" EXIT
+    LOCK_DIR_PATH="$lock_dir"
+    trap cleanup_on_exit EXIT
+}
+
+# acquire_wake_lock: on Termux, Android freezes the CPU - and the network with it -
+# whenever the screen is off and the phone sits idle. That is what wrecked the run of
+# 31 Oct: its log has twenty silent gaps of 10 to 160 minutes in the middle of one
+# scrape (a 41-minute job that took 15 hours of real time, with connections dropped
+# on every wake-up and even the final `git push` taking 2 h 42 min before failing).
+# `termux-wake-lock` ships with Termux's stock termux-tools - no extra package - and
+# keeps the phone awake for as long as this run lasts; cleanup_on_exit releases it.
+# Anywhere else the command does not exist and this is simply skipped.
+acquire_wake_lock() {
+    if command -v termux-wake-lock >/dev/null 2>&1 && termux-wake-lock >/dev/null 2>&1; then
+        WAKE_LOCK_HELD=1
+        export KOSHVANI_WAKE_LOCK="held (the phone cannot suspend this run)"
+    fi
 }
 
 # ==========================================
@@ -75,6 +129,7 @@ log "========================================"
 log "KOSHVANI JOB STARTED"
 log "execution_id=$KOSHVANI_EXECUTION_ID log=$KOSHVANI_LOG_FILE"
 log "host: $(uname -sr) | $(python --version 2>&1) | $(git --version)"
+log "wake lock: ${KOSHVANI_WAKE_LOCK:-not held (this device can suspend a long run)}"
 log "repo: branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null) HEAD=$(git rev-parse --short HEAD 2>/dev/null) dir=$REPO"
 log "========================================"
 
@@ -356,6 +411,7 @@ publish_log() {
 
 run_outer() {
     acquire_lock
+    acquire_wake_lock
     REPO="$HOME/koshvani-dashboard"
     LOG_DIR="$REPO/logs"
     cd "$REPO" || exit 1

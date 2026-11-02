@@ -120,6 +120,30 @@ class RunDailyCase(unittest.TestCase):
     def newest_local_log(self):
         return (self.repo / "logs" / self.local_logs()[-1]).read_text(encoding="utf-8")
 
+    def start_lock_holder(self, looks_like_run_daily=True, lock_age_hours=0):
+        """Plants a lock held by a genuinely live process. A pid bash's own `kill -0`
+        is sure to recognize is bash's OWN view of it ($$), not Python's subprocess.pid:
+        on Windows those are two different numbering spaces (a native Win32 pid vs. an
+        MSYS one). `looks_like_run_daily` decides whether that process's command line
+        names run_daily.sh (a real earlier run) or not (a recycled pid)."""
+        lock_dir = self.home / ".koshvani-dashboard.lock"
+        lock_dir.mkdir()
+        pid_file = self.home / "holder_pid.txt"
+        command = f"echo $$ > '{pid_file.as_posix()}'; sleep 30; :"     # the trailing ':' stops bash exec-ing 'sleep' in place of itself
+        argv = ["bash", "-c", command] + (["run_daily.sh"] if looks_like_run_daily else [])
+        holder = subprocess.Popen(argv)
+        self.addCleanup(holder.wait)
+        self.addCleanup(holder.kill)
+        for _ in range(50):
+            if pid_file.exists() and pid_file.read_text(encoding="utf-8").strip():
+                break
+            time.sleep(0.1)
+        (lock_dir / "pid").write_text(pid_file.read_text(encoding="utf-8").strip(), encoding="utf-8")
+        if lock_age_hours:
+            old = time.time() - lock_age_hours * 3600
+            os.utime(lock_dir, (old, old))
+        return lock_dir
+
 
 class TestEveryRunPublishesItsLog(RunDailyCase):
     def test_a_complete_run_publishes_data_reports_then_publishes_its_log(self):
@@ -330,27 +354,44 @@ class TestLeftoversAndFailures(RunDailyCase):
         """The root cause of the 16 Oct incident: two run_daily.sh invocations racing
         on the same working tree. The lock must stop a second one cold, before it
         ever touches git, rather than let both run and corrupt the tree between them."""
-        lock_dir = self.home / ".koshvani-dashboard.lock"
-        lock_dir.mkdir()
-        # A pid bash's own `kill -0` is sure to recognize as alive: bash's OWN view of
-        # its pid ($$), not Python's subprocess.pid - on Windows those are two different
-        # numbering spaces (a native Win32 pid vs. an MSYS one), so only the self-reported
-        # value is something another bash process can actually look up.
-        pid_file = self.home / "holder_pid.txt"
-        holder = subprocess.Popen(["bash", "-c", f"echo $$ > '{pid_file.as_posix()}'; sleep 30"])
-        self.addCleanup(holder.wait)
-        self.addCleanup(holder.kill)
-        for _ in range(50):
-            if pid_file.exists():
-                break
-            time.sleep(0.1)
-        (lock_dir / "pid").write_text(pid_file.read_text(encoding="utf-8").strip(), encoding="utf-8")
+        lock_dir = self.start_lock_holder()
         rc = self.run_script("success")
         self.assertEqual(rc, 0, self.output)
         self.assertIn("already running - exiting without touching the repository", self.output)
         self.assertEqual(self.head(), git(self.repo, "rev-parse", "origin/main").stdout.strip(), "nothing was pulled, committed or pushed")
         self.assertEqual(self.alert_calls(), [], "no report was sent - this invocation never ran the workflow at all")
         self.assertTrue(lock_dir.exists(), "the lock belongs to the (still alive) other run; this invocation must not remove it")
+
+    def test_a_skipped_run_leaves_a_trace_since_it_writes_no_log(self):
+        """A run that yields to a live one creates no execution log (it must not touch
+        the repository), so without a trace a missing day cannot be explained."""
+        self.start_lock_holder()
+        self.run_script("success")
+        trace = (self.home / ".koshvani-dashboard.skips.log").read_text(encoding="utf-8")
+        self.assertRegex(trace, r"^\d{4}-\d\d-\d\d \d\d:\d\d:\d\d skipped: run_daily.sh pid \d+ still holds the lock")
+        self.assertFalse((self.repo / "logs").exists() and list((self.repo / "logs").glob("daily-*.log")), "and no log file")
+
+    def test_a_recycled_pid_does_not_block_every_later_run_forever(self):
+        """Android recycles pids: a lock left by a killed run can end up pointing at an
+        unrelated live process. That must not make every later run exit silently as
+        'already running' - only a live process that really IS run_daily.sh counts."""
+        lock_dir = self.start_lock_holder(looks_like_run_daily=False)
+        self.assertEqual(self.run_script("success"), 0, self.output)
+        self.assertIn("stale lock", self.output)
+        self.assertNotIn("already running", self.output)
+        self.assertEqual(len(self.alert_calls()), 1, "the run went ahead normally")
+        self.assertFalse(lock_dir.exists(), "and released its own lock afterwards")
+
+    def test_an_ancient_lock_is_never_trusted_even_if_its_holder_looks_alive(self):
+        self.start_lock_holder(lock_age_hours=13)
+        self.assertEqual(self.run_script("success"), 0, self.output)
+        self.assertIn("stale lock", self.output)
+        self.assertEqual(len(self.alert_calls()), 1)
+
+    def test_a_recent_lock_with_a_live_run_daily_holder_is_respected(self):
+        self.start_lock_holder(lock_age_hours=11)
+        self.run_script("success")
+        self.assertIn("already running", self.output)
 
     def test_a_stale_lock_from_a_dead_process_is_taken_over(self):
         lock_dir = self.home / ".koshvani-dashboard.lock"
@@ -417,6 +458,54 @@ class TestLeftoversAndFailures(RunDailyCase):
         self.assertIn("elsewhere.txt", self.origin_git("ls-tree", "-r", "--name-only", "main").split())
         self.assertEqual(len(self.origin_logs()), 1)
         self.assertEqual(self.origin_git("rev-parse", "main").strip(), self.head())
+
+
+class TestWakeLock(RunDailyCase):
+    """On Termux the phone must not be allowed to suspend mid-run (31 Oct: twenty
+    frozen gaps of 10-160 minutes inside one scrape). termux-wake-lock ships with
+    Termux itself; elsewhere it does not exist and must simply be skipped."""
+
+    def install_fake_termux(self):
+        bindir = self.home / "fakebin"
+        bindir.mkdir()
+        calls = self.home / "wake_calls.txt"
+        for name in ("termux-wake-lock", "termux-wake-unlock"):
+            script = bindir / name
+            script.write_text(f"#!/bin/sh\necho {name} >> '{calls.as_posix()}'\n", encoding="utf-8", newline="\n")
+            os.chmod(script, 0o755)
+        self.extra_path = str(bindir)
+        return calls
+
+    def run_script_with_fake_termux(self, mode):
+        saved = os.environ["PATH"]
+        os.environ["PATH"] = self.extra_path + os.pathsep + saved
+        try:
+            return self.run_script(mode)
+        finally:
+            os.environ["PATH"] = saved
+
+    def test_the_run_holds_a_wake_lock_and_releases_it_afterwards(self):
+        calls = self.install_fake_termux()
+        self.assertEqual(self.run_script_with_fake_termux("success"), 0, self.output)
+        self.assertEqual(calls.read_text(encoding="utf-8").split(), ["termux-wake-lock", "termux-wake-unlock"])
+        self.assertIn("wake lock: held (the phone cannot suspend this run)", self.newest_local_log())
+
+    def test_the_wake_lock_is_released_even_when_the_run_fails(self):
+        calls = self.install_fake_termux()
+        git(self.repo, "remote", "set-url", "origin", (self.home / "does-not-exist.git").as_posix())
+        self.assertEqual(self.run_script_with_fake_termux("success"), 1)
+        self.assertEqual(calls.read_text(encoding="utf-8").split(), ["termux-wake-lock", "termux-wake-unlock"])
+
+    def test_a_second_overlapping_run_never_takes_or_drops_the_wake_lock(self):
+        calls = self.install_fake_termux()
+        self.start_lock_holder()
+        self.assertEqual(self.run_script_with_fake_termux("success"), 0, self.output)
+        self.assertIn("already running", self.output)
+        self.assertFalse(calls.exists(), "yielding to the other run must not touch ITS wake lock")
+
+    def test_without_termux_the_run_simply_goes_ahead(self):
+        self.assertEqual(self.run_script("success"), 0, self.output)
+        self.assertIn("wake lock: not held (this device can suspend a long run)", self.newest_local_log())
 
 
 class TestScriptSource(unittest.TestCase):
