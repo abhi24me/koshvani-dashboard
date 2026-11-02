@@ -337,9 +337,9 @@
       "crawl_status": -1
     }
   ],
-  "generated_at": "2026-11-01T14:29:02+00:00",
-  "execution_id": "20261101-183629-64034a",
-  "overall_status": "WARNING",
+  "generated_at": "2026-11-02T19:17:36+00:00",
+  "execution_id": "20261102-213228-091836",
+  "overall_status": "RUNNING",
   "expected_scheme_count": 24,
   "successful_scheme_count": 0,
   "failed_scheme_count": 24,
