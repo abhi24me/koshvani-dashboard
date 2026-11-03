@@ -1,10 +1,10 @@
 {
-  "execution_id": "20261102-213228-091836",
-  "started_at": "2026-11-02T16:02:33+00:00",
-  "updated_at": "2026-11-02T22:16:21+00:00",
-  "finished_at": "2026-11-02T22:16:21+00:00",
+  "execution_id": "20261103-004811-3a9521",
+  "started_at": "2026-11-02T19:18:14+00:00",
+  "updated_at": "2026-11-02T23:07:58+00:00",
+  "finished_at": "2026-11-02T23:07:58+00:00",
   "overall_status": "WARNING",
-  "fatal_error": "",
+  "fatal_error": "Interrupted: ",
   "schemes": {
     "2401000010500": {
       "status": -1,
@@ -68,62 +68,62 @@
     },
     "2401001090700": {
       "status": -1,
-      "attempts": 9,
+      "attempts": 8,
       "remark": "ReadTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Read timed out. (read timeout=45)"
     },
     "2401001090900": {
       "status": -1,
-      "attempts": 9,
+      "attempts": 7,
       "remark": "ReadTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Read timed out. (read timeout=45)"
     },
     "2401001130104": {
       "status": -1,
-      "attempts": 9,
+      "attempts": 7,
       "remark": "ReadTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Read timed out. (read timeout=45)"
     },
     "2401001140101": {
       "status": -1,
-      "attempts": 9,
+      "attempts": 7,
       "remark": "ReadTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Read timed out. (read timeout=45)"
     },
     "2401001140300": {
       "status": -1,
-      "attempts": 9,
+      "attempts": 6,
       "remark": "ReadTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Read timed out. (read timeout=45)"
     },
     "2401008000203": {
       "status": -1,
-      "attempts": 9,
+      "attempts": 6,
       "remark": "ReadTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Read timed out. (read timeout=45)"
     },
     "2401008000400": {
       "status": -1,
-      "attempts": 9,
+      "attempts": 6,
       "remark": "ReadTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Read timed out. (read timeout=45)"
     },
     "2402001020109": {
       "status": -1,
-      "attempts": 9,
+      "attempts": 6,
       "remark": "ReadTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Read timed out. (read timeout=45)"
     },
     "2402001020111": {
       "status": -1,
-      "attempts": 9,
+      "attempts": 6,
       "remark": "ReadTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Read timed out. (read timeout=45)"
     },
     "4401001030300": {
       "status": -1,
-      "attempts": 9,
+      "attempts": 6,
       "remark": "ReadTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Read timed out. (read timeout=45)"
     },
     "4401001030401": {
       "status": -1,
-      "attempts": 9,
+      "attempts": 6,
       "remark": "ReadTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Read timed out. (read timeout=45)"
     },
     "4401001030403": {
       "status": -1,
-      "attempts": 9,
+      "attempts": 6,
       "remark": "ReadTimeout: HTTPSConnectionPool(host='koshvani.up.nic.in', port=443): Read timed out. (read timeout=45)"
     }
   }
