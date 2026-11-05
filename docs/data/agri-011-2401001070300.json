@@ -5,20 +5,20 @@
   "scheme_code": "2401001070300",
   "district": "G.B.NAGAR",
   "fin_year": "2026-2027",
-  "generated_at": "2026-11-03T12:58:57+00:00",
+  "generated_at": "2026-11-05T12:50:40+00:00",
   "status": "ok",
   "message": null,
-  "prev_month": "September",
-  "current_month": "October",
+  "prev_month": "October",
+  "current_month": "November",
   "column_headers": [
     "Treasury",
     "Standard Object",
     "Plan / Non-Plan",
     "Voted / Charged",
     "Progressive Allotment",
-    "Actual Progressive Expenditure upto month (September)",
-    "Provisional Current Month Expenditure(October)",
-    "Total Expenditure Upto Month (October)",
+    "Actual Progressive Expenditure upto month (October)",
+    "Provisional Current Month Expenditure(November)",
+    "Total Expenditure Upto Month (November)",
     "% A/E"
   ],
   "column_widths": [
@@ -40,10 +40,10 @@
         "N",
         "V",
         "6198540.00",
-        "2905200.00",
+        "3354200.00",
         "0.00",
-        "2905200.00",
-        "46.87"
+        "3354200.00",
+        "54.11"
       ]
     },
     {
@@ -53,10 +53,10 @@
         "N",
         "V",
         "4264080.00",
-        "1759632.00",
+        "2029032.00",
         "0.00",
-        "1759632.00",
-        "41.27"
+        "2029032.00",
+        "47.58"
       ]
     },
     {
@@ -222,10 +222,10 @@
         "N",
         "V",
         "263000.00",
-        "151550.00",
+        "176070.00",
         "0.00",
-        "151550.00",
-        "57.62"
+        "176070.00",
+        "66.95"
       ]
     },
     {
@@ -257,9 +257,9 @@
   ],
   "totals": {
     "progressive_allotment": 10764820.0,
-    "expenditure_upto_prev_month": 4836415.0,
+    "expenditure_upto_prev_month": 5579335.0,
     "current_month_expenditure": 0.0,
-    "total_expenditure_upto_month": 4836415.0,
-    "pct_expenditure_of_allotment": 44.93
+    "total_expenditure_upto_month": 5579335.0,
+    "pct_expenditure_of_allotment": 51.83
   }
 }

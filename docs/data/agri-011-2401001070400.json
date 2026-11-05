@@ -5,20 +5,20 @@
   "scheme_code": "2401001070400",
   "district": "G.B.NAGAR",
   "fin_year": "2026-2027",
-  "generated_at": "2026-11-03T12:58:48+00:00",
+  "generated_at": "2026-11-05T12:50:17+00:00",
   "status": "ok",
   "message": null,
-  "prev_month": "September",
-  "current_month": "October",
+  "prev_month": "October",
+  "current_month": "November",
   "column_headers": [
     "Treasury",
     "Standard Object",
     "Plan / Non-Plan",
     "Voted / Charged",
     "Progressive Allotment",
-    "Actual Progressive Expenditure upto month (September)",
-    "Provisional Current Month Expenditure(October)",
-    "Total Expenditure Upto Month (October)",
+    "Actual Progressive Expenditure upto month (October)",
+    "Provisional Current Month Expenditure(November)",
+    "Total Expenditure Upto Month (November)",
     "% A/E"
   ],
   "column_widths": [
@@ -40,8 +40,8 @@
         "N",
         "V",
         "13000.00",
-        "2377.00",
-        "9208.00",
+        "11585.00",
+        "0.00",
         "11585.00",
         "89.12"
       ]
@@ -53,8 +53,8 @@
         "N",
         "V",
         "9000.00",
-        "6800.00",
-        "2200.00",
+        "9000.00",
+        "0.00",
         "9000.00",
         "100.00"
       ]
@@ -66,8 +66,8 @@
         "N",
         "V",
         "7000.00",
-        "5871.00",
-        "1129.00",
+        "7000.00",
+        "0.00",
         "7000.00",
         "100.00"
       ]
@@ -118,10 +118,10 @@
         "N",
         "V",
         "970000.00",
-        "271074.00",
-        "69507.00",
         "340581.00",
-        "35.11"
+        "56178.00",
+        "396759.00",
+        "40.90"
       ]
     },
     {
@@ -144,8 +144,8 @@
         "N",
         "V",
         "19000.00",
-        "0.00",
         "19000.00",
+        "0.00",
         "19000.00",
         "100.00"
       ]
@@ -166,9 +166,9 @@
   ],
   "totals": {
     "progressive_allotment": 1083000.0,
-    "expenditure_upto_prev_month": 321122.0,
-    "current_month_expenditure": 101044.0,
-    "total_expenditure_upto_month": 422166.0,
-    "pct_expenditure_of_allotment": 38.98
+    "expenditure_upto_prev_month": 422166.0,
+    "current_month_expenditure": 56178.0,
+    "total_expenditure_upto_month": 478344.0,
+    "pct_expenditure_of_allotment": 44.17
   }
 }
