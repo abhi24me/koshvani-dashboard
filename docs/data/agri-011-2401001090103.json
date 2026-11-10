@@ -5,7 +5,7 @@
   "scheme_code": "2401001090103",
   "district": "G.B.NAGAR",
   "fin_year": "2026-2027",
-  "generated_at": "2026-11-09T12:32:53+00:00",
+  "generated_at": "2026-11-10T12:37:05+00:00",
   "status": "ok",
   "message": null,
   "prev_month": "October",
@@ -39,11 +39,11 @@
         "27-सब्सिडी",
         "N",
         "V",
-        "1172286.00",
+        "1501686.00",
         "996757.00",
         "0.00",
         "996757.00",
-        "85.03"
+        "66.38"
       ]
     },
     {
@@ -52,11 +52,11 @@
         "42-अन्य व्यय",
         "N",
         "V",
-        "1030000.00",
+        "1393000.00",
         "1014500.00",
         "0.00",
         "1014500.00",
-        "98.50"
+        "72.83"
       ]
     },
     {
@@ -65,19 +65,19 @@
         "44-प्रशिक्षण हेतु यात्रा एवं अन्य प्रासंगिक व्यय",
         "N",
         "V",
-        "559197.00",
+        "1367197.00",
         "540000.00",
         "0.00",
         "540000.00",
-        "96.57"
+        "39.50"
       ]
     }
   ],
   "totals": {
-    "progressive_allotment": 2761483.0,
+    "progressive_allotment": 4261883.0,
     "expenditure_upto_prev_month": 2551257.0,
     "current_month_expenditure": 0.0,
     "total_expenditure_upto_month": 2551257.0,
-    "pct_expenditure_of_allotment": 92.39
+    "pct_expenditure_of_allotment": 59.86
   }
 }
