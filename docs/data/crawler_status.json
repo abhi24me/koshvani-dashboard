@@ -1,30 +1,30 @@
 {
-  "execution_id": "20261115-193429-1e7f53",
-  "started_at": "2026-11-15T14:04:35+00:00",
-  "updated_at": "2026-11-15T14:07:49+00:00",
-  "finished_at": "2026-11-15T14:07:49+00:00",
+  "execution_id": "20261116-191149-046141",
+  "started_at": "2026-11-16T13:41:56+00:00",
+  "updated_at": "2026-11-16T13:55:13+00:00",
+  "finished_at": "2026-11-16T13:55:13+00:00",
   "overall_status": "SUCCESS",
   "fatal_error": "",
   "schemes": {
     "2401000010500": {
       "status": 1,
-      "attempts": 1,
-      "remark": ""
+      "attempts": 3,
+      "remark": "Recovered on retry"
     },
     "2401001020103": {
       "status": 1,
-      "attempts": 1,
-      "remark": ""
+      "attempts": 3,
+      "remark": "Recovered on retry"
     },
     "2401001020129": {
       "status": 1,
-      "attempts": 1,
-      "remark": ""
+      "attempts": 3,
+      "remark": "Recovered on retry"
     },
     "2401001030300": {
       "status": 1,
-      "attempts": 1,
-      "remark": ""
+      "attempts": 4,
+      "remark": "Recovered in cool-down round 1"
     },
     "2401001030500": {
       "status": 1,
@@ -33,43 +33,43 @@
     },
     "2401001030600": {
       "status": 1,
-      "attempts": 1,
-      "remark": ""
+      "attempts": 4,
+      "remark": "Recovered in cool-down round 1"
     },
     "2401001070300": {
       "status": 1,
-      "attempts": 1,
-      "remark": ""
+      "attempts": 4,
+      "remark": "Recovered in cool-down round 1"
     },
     "2401001070400": {
       "status": 1,
-      "attempts": 1,
-      "remark": ""
+      "attempts": 4,
+      "remark": "Recovered in cool-down round 1"
     },
     "2401001090103": {
       "status": 1,
-      "attempts": 1,
-      "remark": ""
+      "attempts": 4,
+      "remark": "Recovered in cool-down round 1"
     },
     "2401001090104": {
       "status": 1,
-      "attempts": 1,
-      "remark": ""
+      "attempts": 2,
+      "remark": "Recovered on retry"
     },
     "2401001090105": {
       "status": 1,
-      "attempts": 1,
-      "remark": ""
+      "attempts": 2,
+      "remark": "Recovered on retry"
     },
     "2401001090300": {
       "status": 1,
-      "attempts": 1,
-      "remark": ""
+      "attempts": 2,
+      "remark": "Recovered on retry"
     },
     "2401001090700": {
       "status": 1,
-      "attempts": 1,
-      "remark": ""
+      "attempts": 2,
+      "remark": "Recovered on retry"
     },
     "2401001090900": {
       "status": 1,
